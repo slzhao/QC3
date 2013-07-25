@@ -1,0 +1,125 @@
+<!-- report.tmpl -->
+<html>
+<head>
+<title>vcf Report</title>
+<style type="text/css">
+    	.first { background-color: #2894ff; color: #FFFFFF; }
+        .odd  { background-color: #FFFFFF }
+        .even { background-color: #97cbff }
+  pre {
+   	padding: 1em;
+    border: 1px dashed #2f6fab;
+    color: black;
+    background-color: #f9f9f9;
+    line-height: 1.1em;
+    WORD-WRAP: break-word;
+	}
+h2 {
+  color: #800000;
+  padding-bottom: 0;
+  margin-bottom: 0;
+  clear:left;
+  }
+</style>
+
+<style type="text/css">
+    div.summary {
+    width: 18em;
+  }
+   div.summary ul {
+  padding-left:0;
+  list-style-type:none;
+  font-weight:bold;
+  }
+  
+  div.summary ul li img {
+  margin-bottom:-0.5em;
+  margin-top:0.5em;
+  }
+</style>
+
+<style type="text/css">
+  .centeredImage
+    {
+    text-align:center;
+    margin-top:0px;
+    margin-bottom:0px;
+    padding:0px;
+    }
+</style>
+
+</head>
+<body>
+<h1>VCF Report</h1>
+<div><h2 id="M100">Command</h2>
+<p>The report was generated at <TMPL_VAR NAME=CREATTIME>. Here is your command for generating this report, keep it in order to reproduce the result.</p>
+<pre><TMPL_VAR NAME=COMMAND></pre>
+</div>
+<div><h2 id="M200">Statistics</h2>
+<p>Say somthing</p>
+<table align="center" style="border:#2894ff 1px solid;">
+<!-- TMPL_LOOP NAME=MAKETABLE3 --> <CSTM_ROW EVEN=even ODD=odd FIRST=first>
+   </tr>
+<!-- /TMPL_LOOP -->
+</table>
+<p class="centeredImage"><img src="<TMPL_VAR NAME=FIGNUMBER>"></p>
+</div>
+<div><h2 id="M300">Consistence</h2>
+<p>Say somthing</p>
+<table align="center" style="border:#2894ff 1px solid;">
+<!-- TMPL_LOOP NAME=MAKETABLE2 --> <CSTM_ROW EVEN=even ODD=odd FIRST=first>
+   </tr>
+<!-- /TMPL_LOOP -->
+</table>
+<p class="centeredImage"><img src="<TMPL_VAR NAME=FIG>"></p>
+</div>
+<div><h2 id="M350">SNP count</h2>
+<p>Say somthing</p>
+<table align="center" style="border:#2894ff 1px solid;">
+<!-- TMPL_LOOP NAME=MAKETABLE1 --> <CSTM_ROW EVEN=even ODD=odd FIRST=first>
+   </tr>
+<!-- /TMPL_LOOP -->
+</table>
+</div>
+<div><h2 id="M400">Score</h2>
+<p>Say somthing</p>
+<p>POS: Allele position in chromosome</p>
+<p>AB: Allele Balance for hets (ref/(ref+alt))</p>
+<p>AC: Allele count in genotypes, for each ALT allele, in the same order as listed</p>
+<p>AF: Allele Frequency, for each ALT allele, in the same order as listed</p>
+<p>AN: Total number of alleles in called genotypes</p>
+<p>BaseQRankSum: Z-score from Wilcoxon rank sum test of Alt Vs. Ref base qualities</p>
+<p>DP: Filtered Depth</p>
+<p>Dels: Fraction of Reads Containing Spanning Deletions</p>
+<p>FS: Phred-scaled p-value using Fisher's exact test to detect strand bias</p>
+<p>HRun: Largest Contiguous Homopolymer Run of Variant Allele In Either Direction</p>
+<p>HaplotypeScore: Consistency of the site with at most two segregating haplotypes</p>
+<p>MQ: RMS Mapping Quality</p>
+<p>MQ0: Total Mapping Quality Zero Reads</p>
+<p>MQRankSum: Z-score From Wilcoxon rank sum test of Alt vs. Ref read mapping qualities</p>
+<p>QD: Variant Confidence/Quality by Depth</p>
+<p>ReadPosRankSum: Z-score from Wilcoxon rank sum test of Alt vs. Ref read position bias</p>
+<p>SB: Strand Bias</p>
+<TMPL_LOOP NAME=FIGURE1>
+<p class="centeredImage"><img src="<TMPL_VAR NAME=FIGURE2>"></p>
+</TMPL_LOOP>
+</div>
+<div><h2 id="M500">Annovar</h2>
+<p>Say somthing</p>
+
+<table align="center" style="border:#2894ff 1px solid;">
+<tr class="first">
+  <th>File</th>
+  <th>Description</th>
+</tr>
+<!-- TMPL_LOOP NAME=FL1 -->
+   <CSTM_ROW EVEN=even ODD=odd>
+      <td align="center"><a href=<TMPL_VAR NAME=FS2>><TMPL_VAR NAME=FS2_NAME></a></td>
+      <td align="center">Annovar Annotation Result</td>
+   </tr>
+<!-- /TMPL_LOOP -->
+</table>
+</div>
+
+</body>
+</html>

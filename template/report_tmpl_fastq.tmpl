@@ -1,0 +1,84 @@
+<!-- report.tmpl -->
+<html>
+<head>
+<title>fastaq Report</title>
+<style type="text/css">
+    	.first { background-color: #2894ff; color: #FFFFFF; }
+        .odd  { background-color: #FFFFFF }
+        .even { background-color: #97cbff }
+  pre {
+   	padding: 1em;
+    border: 1px dashed #2f6fab;
+    color: black;
+    background-color: #f9f9f9;
+    line-height: 1.1em;
+    WORD-WRAP: break-word;
+	}
+h2 {
+  color: #800000;
+  padding-bottom: 0;
+  margin-bottom: 0;
+  clear:left;
+  }
+</style>
+
+<style type="text/css">
+    div.summary {
+    width: 18em;
+  }
+   div.summary ul {
+  padding-left:0;
+  list-style-type:none;
+  font-weight:bold;
+  }
+  
+  div.summary ul li img {
+  margin-bottom:-0.5em;
+  margin-top:0.5em;
+  }
+</style>
+
+<style type="text/css">
+  .centeredImage
+    {
+    text-align:center;
+    margin-top:0px;
+    margin-bottom:0px;
+    padding:0px;
+    }
+</style>
+
+</head>
+<body>
+<h1>fastq Report</h1>
+
+<div><h2 id="M100">Command</h2>
+<p>The report was generated at <TMPL_VAR NAME=CREATTIME>. Here is your command for generating this report, keep it in order to reproduce the result.</p>
+<pre><TMPL_VAR NAME=COMMAND></pre>
+</div>
+
+<div><h2 id="M200">Base</h2>
+<table align="center" style="border:#2894ff 1px solid;">
+<!-- TMPL_LOOP NAME=MAKETABLE1 --> <CSTM_ROW EVEN=even ODD=odd FIRST=first>
+   </tr>
+<!-- /TMPL_LOOP -->
+</table>
+<p>Per base sequence quality</p>
+<p class="centeredImage"><img src="<TMPL_VAR NAME=FIGUREBASESCORE>"></p>
+<p class="centeredImage"><img src="<TMPL_VAR NAME=FIGUREBASESCOREN>"></p>
+<p class="centeredImage"><img src="<TMPL_VAR NAME=FIGUREBASESCOREYN>"></p>
+<p>Per base sequence content</p>
+<p class="centeredImage"><img src="<TMPL_VAR NAME=FIGUREBASENUC>"></p>
+<p class="centeredImage"><img src="<TMPL_VAR NAME=FIGUREBASENUCN>"></p>
+<p class="centeredImage"><img src="<TMPL_VAR NAME=FIGUREBASENUCYN>"></p>
+</div>
+
+<div><h2 id="M300">Batch effect</h2>
+<p>Batch</p>
+<TMPL_LOOP NAME=FIGURELOOP1>
+<p class="centeredImage"><img src="<TMPL_VAR NAME=FIGUREBATCH>"></p>
+</TMPL_LOOP>
+</div>
+
+</body>
+</html>

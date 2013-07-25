@@ -1,0 +1,94 @@
+<!-- report.tmpl -->
+<html>
+<head>
+<title>bam Report</title>
+<style type="text/css">
+    	.first { background-color: #2894ff; color: #FFFFFF; }
+        .odd  { background-color: #FFFFFF }
+        .even { background-color: #97cbff }
+  pre {
+   	padding: 1em;
+    border: 1px dashed #2f6fab;
+    color: black;
+    background-color: #f9f9f9;
+    line-height: 1.1em;
+    WORD-WRAP: break-word;
+	}
+h2 {
+  color: #800000;
+  padding-bottom: 0;
+  margin-bottom: 0;
+  clear:left;
+  }
+</style>
+
+<style type="text/css">
+    div.summary {
+    width: 18em;
+  }
+   div.summary ul {
+  padding-left:0;
+  list-style-type:none;
+  font-weight:bold;
+  }
+  
+  div.summary ul li img {
+  margin-bottom:-0.5em;
+  margin-top:0.5em;
+  }
+</style>
+
+<style type="text/css">
+  .centeredImage
+    {
+    text-align:center;
+    margin-top:0px;
+    margin-bottom:0px;
+    padding:0px;
+    }
+</style>
+
+</head>
+<body>
+<h1>bam Report</h1>
+
+<div><h2 id="M100">Command</h2>
+<p>The report was generated at <TMPL_VAR NAME=CREATTIME>. Here is your command for generating this report, keep it in order to reproduce the result.</p>
+<pre><TMPL_VAR NAME=COMMAND></pre>
+</div>
+
+<div><h2 id="M150">Results</h2>
+<table align="center" style="border:#2894ff 1px solid;">
+<!-- TMPL_LOOP NAME=MAKETABLE1 --> <CSTM_ROW EVEN=even ODD=odd FIRST=first>
+   </tr>
+<!-- /TMPL_LOOP -->
+</table>
+<p>Coloum names:</p>
+<pre>
+On/Off target: Number of sequences mapped on/off the regions indicated in target region file
+Off-target-intron: Number of sequences mapped off the regions indicated in target region file, and on the intron regions indicated in gtf file
+Off-target-intergenic: Number of sequences mapped off the regions indicated in target region file, and on the intergenic regions indicated in gtf file
+Off-target-mito: Number of sequences mapped off the regions indicated in target region file, and on the mitochondria regions
+MQ: Mapping quality of the sequences
+InsertSize: 
+Depth: The reading depth of sequences
+</pre>
+</div>
+
+<div><h2 id="M200">Distribution</h2>
+<p>Say something</p>
+<TMPL_LOOP NAME=FIGURELOOP1>
+<p class="centeredImage"><img src="<TMPL_VAR NAME=FIGUREDIS>"></p>
+</TMPL_LOOP>
+</div>
+</div>
+
+<div><h2 id="M300">Batch effect</h2>
+<p>Batch</p>
+<TMPL_LOOP NAME=FIGURELOOP2>
+<p class="centeredImage"><img src="<TMPL_VAR NAME=FIGUREBATCH>"></p>
+</TMPL_LOOP>
+</div>
+
+</body>
+</html>
