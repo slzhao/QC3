@@ -57,24 +57,31 @@ h2 {
 <pre><TMPL_VAR NAME=COMMAND></pre>
 </div>
 
-<div><h2 id="M200">Base</h2>
+<div><h2 id="M200">Result Table</h2>
 <table align="center" style="border:#2894ff 1px solid;">
 <!-- TMPL_LOOP NAME=MAKETABLE1 --> <CSTM_ROW EVEN=even ODD=odd FIRST=first>
    </tr>
 <!-- /TMPL_LOOP -->
 </table>
+<p>Column description</p>
+<pre>
+TotalReads: Total reads in fastq file
+Reads(Y) or (N): Y if the read fails filter (read is bad), N otherwise
+BQ: base quality score
+GC: GC content
+</pre>
+</div>
+
+<div><h2 id="M200">Sequence quality and content</h2>
 <p>Per base sequence quality</p>
-<p class="centeredImage"><img src="<TMPL_VAR NAME=FIGUREBASESCORE>"></p>
-<p class="centeredImage"><img src="<TMPL_VAR NAME=FIGUREBASESCOREN>"></p>
+<p class="centeredImage"><img src="<TMPL_VAR NAME=FIGUREBASESCOREYNLEGEND>"></p>
 <p class="centeredImage"><img src="<TMPL_VAR NAME=FIGUREBASESCOREYN>"></p>
 <p>Per base sequence content</p>
-<p class="centeredImage"><img src="<TMPL_VAR NAME=FIGUREBASENUC>"></p>
-<p class="centeredImage"><img src="<TMPL_VAR NAME=FIGUREBASENUCN>"></p>
 <p class="centeredImage"><img src="<TMPL_VAR NAME=FIGUREBASENUCYN>"></p>
 </div>
 
 <div><h2 id="M300">Batch effect</h2>
-<p>Batch</p>
+<p>The results were separated into different groups by their RunNumber, Flowcell and Lane. Then boxplot plots were used to visualize their distribution. Kruskal-Wallis rank sum test and Fligner-Killeen test were performed to see if the distributions and variances in each of the groups are the same</p>
 <TMPL_LOOP NAME=FIGURELOOP1>
 <p class="centeredImage"><img src="<TMPL_VAR NAME=FIGUREBATCH>"></p>
 </TMPL_LOOP>

@@ -269,8 +269,12 @@ sub getbammetric {
 					$offtargetmito++;
 					&storeData( $MQ, $offtargetmitoMQ, $caculateMethod )
 					  if ($MQflag);
-					&storeData( $insert, $offtargetmitoinsert, $caculateMethod )
-					  if ($insertflag);
+#					&storeData( $insert, $offtargetmitoinsert, $caculateMethod )
+#					  if ($insertflag);
+					if ($insertflag) {
+						print "Instert:$insert\n";
+					  	&storeData( $insert, $offtargetmitoinsert, $caculateMethod );
+					}
 				}
 			}
 		}
@@ -575,6 +579,13 @@ sub findMedianMean {
 				}
 			}
 		}
+		print "TotalCount:$totalCount\tArrayLength:$arrayLength\n";
+		my $tempArryLocation=0;
+		foreach my $temp (@{ $_[0] }) {
+			if (defined $temp) {print "$tempArryLocation:$temp\t"}
+			$tempArryLocation++;
+		}
+		print "\n";
 		return('NA1');
 	}
 }

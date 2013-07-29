@@ -84,6 +84,7 @@ if ( $module eq "f" ) {
 #	${$reportHash}{'FIGUREBASENUC'}   = "./fastqfigure/nucPercenty.png";
 #	${$reportHash}{'FIGUREBASESCOREN'} = "./fastqfigure/fastqScoreN.png";
 	${$reportHash}{'FIGUREBASESCOREYN'} = "./fastqfigure/fastqScoreYN.png";
+	${$reportHash}{'FIGUREBASESCOREYNLEGEND'} = "./fastqfigure/fastqScoreYN.png.legend.png";
 #	${$reportHash}{'FIGUREBASENUCN'}   = "./fastqfigure/nucPercentyN.png";
 	${$reportHash}{'FIGUREBASENUCYN'}   = "./fastqfigure/nucPercentyYN.png";
 	${$reportHash}{'FIGURELOOP1'}     = $figureList1;

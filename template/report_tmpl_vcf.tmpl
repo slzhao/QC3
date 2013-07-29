@@ -56,7 +56,6 @@ h2 {
 <pre><TMPL_VAR NAME=COMMAND></pre>
 </div>
 <div><h2 id="M200">Statistics</h2>
-<p>Say somthing</p>
 <table align="center" style="border:#2894ff 1px solid;">
 <!-- TMPL_LOOP NAME=MAKETABLE3 --> <CSTM_ROW EVEN=even ODD=odd FIRST=first>
    </tr>
@@ -64,17 +63,25 @@ h2 {
 </table>
 <p class="centeredImage"><img src="<TMPL_VAR NAME=FIGNUMBER>"></p>
 </div>
-<div><h2 id="M300">Consistence</h2>
-<p>Say somthing</p>
+<div><h2 id="M300">Consistency</h2>
+<p>Result table</p>
 <table align="center" style="border:#2894ff 1px solid;">
 <!-- TMPL_LOOP NAME=MAKETABLE2 --> <CSTM_ROW EVEN=even ODD=odd FIRST=first>
    </tr>
 <!-- /TMPL_LOOP -->
 </table>
+<p>Column description</p>
+<pre>
+CountB: Number of heterozygous SNPs in Sample B (denominator)
+CountA2B: Number of SNPs in sample A that have consistent heterozygous genotype comparing to Sample B (numerator)
+CountA: Number of heterozygous SNPs in Sample A (denominator)
+CountB2A: Number of SNPs in sample B that have consistent heterozygous genotype comparing to Sample A (numerator)
+</pre>
+<p>Result figure</p>
 <p class="centeredImage"><img src="<TMPL_VAR NAME=FIG>"></p>
 </div>
 <div><h2 id="M350">SNP count</h2>
-<p>Say somthing</p>
+<p>SNP counts for each sample in each chromesome</p>
 <table align="center" style="border:#2894ff 1px solid;">
 <!-- TMPL_LOOP NAME=MAKETABLE1 --> <CSTM_ROW EVEN=even ODD=odd FIRST=first>
    </tr>
@@ -82,31 +89,31 @@ h2 {
 </table>
 </div>
 <div><h2 id="M400">Score</h2>
-<p>Say somthing</p>
-<p>POS: Allele position in chromosome</p>
-<p>AB: Allele Balance for hets (ref/(ref+alt))</p>
-<p>AC: Allele count in genotypes, for each ALT allele, in the same order as listed</p>
-<p>AF: Allele Frequency, for each ALT allele, in the same order as listed</p>
-<p>AN: Total number of alleles in called genotypes</p>
-<p>BaseQRankSum: Z-score from Wilcoxon rank sum test of Alt Vs. Ref base qualities</p>
-<p>DP: Filtered Depth</p>
-<p>Dels: Fraction of Reads Containing Spanning Deletions</p>
-<p>FS: Phred-scaled p-value using Fisher's exact test to detect strand bias</p>
-<p>HRun: Largest Contiguous Homopolymer Run of Variant Allele In Either Direction</p>
-<p>HaplotypeScore: Consistency of the site with at most two segregating haplotypes</p>
-<p>MQ: RMS Mapping Quality</p>
-<p>MQ0: Total Mapping Quality Zero Reads</p>
-<p>MQRankSum: Z-score From Wilcoxon rank sum test of Alt vs. Ref read mapping qualities</p>
-<p>QD: Variant Confidence/Quality by Depth</p>
-<p>ReadPosRankSum: Z-score from Wilcoxon rank sum test of Alt vs. Ref read position bias</p>
-<p>SB: Strand Bias</p>
+<p>Description for each figure</p>
+<pre>
+POS: Allele position in chromosome
+AB: Allele Balance for hets (ref/(ref+alt))
+AC: Allele count in genotypes, for each ALT allele, in the same order as listed
+AF: Allele Frequency, for each ALT allele, in the same order as listed
+AN: Total number of alleles in called genotypes
+BaseQRankSum: Z-score from Wilcoxon rank sum test of Alt Vs. Ref base qualities
+DP: Filtered Depth
+Dels: Fraction of Reads Containing Spanning Deletions
+FS: Phred-scaled p-value using Fisher's exact test to detect strand bias
+HRun: Largest Contiguous Homopolymer Run of Variant Allele In Either Direction
+HaplotypeScore: Consistency of the site with at most two segregating haplotypes
+MQ: RMS Mapping Quality
+MQ0: Total Mapping Quality Zero Reads
+MQRankSum: Z-score From Wilcoxon rank sum test of Alt vs. Ref read mapping qualities
+QD: Variant Confidence/Quality by Depth
+ReadPosRankSum: Z-score from Wilcoxon rank sum test of Alt vs. Ref read position bias
+SB: Strand Bias
+</pre>
 <TMPL_LOOP NAME=FIGURE1>
 <p class="centeredImage"><img src="<TMPL_VAR NAME=FIGURE2>"></p>
 </TMPL_LOOP>
 </div>
-<div><h2 id="M500">Annovar</h2>
-<p>Say somthing</p>
-
+<div><h2 id="M500">Annovar annotation</h2>
 <table align="center" style="border:#2894ff 1px solid;">
 <tr class="first">
   <th>File</th>

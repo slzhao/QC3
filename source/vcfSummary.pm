@@ -237,7 +237,7 @@ sub vcfSummary {
 	}
 
 	print RESULT3
-"Sample\tTransitions:Transversions (Based on all SNPs)\t01:11 (Based on all SNPs)\tTransitions:Transversions (After filter)\t01:11 (After filter)\n";
+"Sample\tTransitions:Transversions (Based on all SNPs)\tHeterozygous:Non-reference homozygous (Based on all SNPs)\tTransitions:Transversions (After filter)\tHeterozygous:Non-reference homozygous (After filter)\n";
 	foreach my $sample ( sort keys %Sample2NumberAll ) {
 		my $TTRatioAll =&myDivide($Sample2NumberAll{$sample}{"Transitions"},$Sample2NumberAll{$sample}{"Transversions"});
 		my $TTRatioFilter =&myDivide($Sample2NumberFilter{$sample}{"Transitions"},$Sample2NumberFilter{$sample}{"Transversions"});
@@ -252,7 +252,7 @@ sub vcfSummary {
 	}
 
 	print RESULT4
-"FileTitle\tSampleA\tSampleB\tCountA\tCountA2B\tHeterogeneous Consistency(RatioA2B)\tCountB\tCountB2A\tHeterogeneous Consistency(RatioB2A)\tCountAB\tCountABTotal\tOverall Consistency";
+"FileTitle\tSampleA\tSampleB\tCountA2B\tCountB\tHeterozygous Consistency (CountA2B:CountB)\tCountB2A\tCountA\tHeterozygous Consistency (CountB2A:CountA)\tOverall Consistent SNPs\tOverall Overlapped SNPs\tOverall Consistency";
 	foreach my $change ( sort keys %changes ) {
 		print RESULT4 "\t$change";
 	}
@@ -371,14 +371,6 @@ sub caculate_ratio {
 	my @lines2 = ( split /;|:|,|\//, $sample2 );
 
 	#deepth <10
-#	print "S1:$sample1\tS2:$sample2\n";
-#	if (!defined($lines1[2]) or !defined($lines1[3])  or !defined($lines2[2])  or !defined($lines2[3])) {
-#		print "S1:$sample1\n";
-#		print "S2:$sample2\n";
-#		print 'S2b',"$sample2"."z\n";
-#		if ($sample1 eq './.') {print "YY1\n";} else {print "NN1\n";}
-#		if ($sample2 eq './.') {print "YY2\n";} else {print "NN2\n";}
-#	}
 	if ( ( $lines1[2] + $lines1[3] ) < 10 or ( $lines2[2] + $lines2[3] ) < 10 )
 	{
 		(

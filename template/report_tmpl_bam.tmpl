@@ -57,7 +57,7 @@ h2 {
 <pre><TMPL_VAR NAME=COMMAND></pre>
 </div>
 
-<div><h2 id="M150">Results</h2>
+<div><h2 id="M150">Result Table</h2>
 <table align="center" style="border:#2894ff 1px solid;">
 <!-- TMPL_LOOP NAME=MAKETABLE1 --> <CSTM_ROW EVEN=even ODD=odd FIRST=first>
    </tr>
@@ -76,7 +76,6 @@ Depth: The reading depth of sequences
 </div>
 
 <div><h2 id="M200">Distribution</h2>
-<p>Say something</p>
 <TMPL_LOOP NAME=FIGURELOOP1>
 <p class="centeredImage"><img src="<TMPL_VAR NAME=FIGUREDIS>"></p>
 </TMPL_LOOP>
@@ -84,7 +83,7 @@ Depth: The reading depth of sequences
 </div>
 
 <div><h2 id="M300">Batch effect</h2>
-<p>Batch</p>
+<p>The results were separated into different groups by their RunNumber, Flowcell and Lane. Then boxplot plots were used to visualize their distribution. Kruskal-Wallis rank sum test and Fligner-Killeen test were performed to see if the distributions and variances in each of the groups are the same</p>
 <TMPL_LOOP NAME=FIGURELOOP2>
 <p class="centeredImage"><img src="<TMPL_VAR NAME=FIGUREBATCH>"></p>
 </TMPL_LOOP>

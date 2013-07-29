@@ -2,7 +2,7 @@ Table of Content
 ================
 * [Overview](#Overview)
 * [Change log](#Change)
- * [Release version 1.0](#RV10)
+ * [Release candidate (RC) version 1.0](#RC10)
 * [Prerequisites](#Prerequisites)
  * [Install required perl packages](#irpp)
  * [Install required software](#irs)
@@ -21,14 +21,20 @@ Table of Content
  * [Introduction for vcf QC result](#iqr)
 * [Others](#Others)
 
-
+<a name="Overview"/>
 # Overview #
 Say something
 
+<a name="Change"/>
 # Change log #
-Say something
 
+<a name="RC10">
+## Release candidate (RC) version 1.0 on July 26, 2013
+Release version version 1.0 for test
+
+<a name="Prerequisites"/>
 # Prerequisites #
+<a name="irpp"/>
 ## Install required perl packages ##
 
 There are several other packages needed to be installed on your computer.
@@ -61,6 +67,7 @@ Otherwise, it may look like this
 
 Then you need to install the missing packages from [CPAN](http://www.cpan.org/). 
 
+<a name="irs"/>
 ## Install required software ##
 
 ### R ###
@@ -92,14 +99,19 @@ After you install ANNOVAR and add ANNOVAR bin file to your Path, the software ca
 
 Please note: ANNOVAR and ANNOVAR database are not essential for vcf QC. If not provided or not found, ANNOVAR annotation will not be performed in vcf QC.
 
+<a name="drd"/>
 ## Download required database ##
-These database files were needed in bam QC. At least one of them should be provided in bam QC. They could be downloaded from:
+A gtf and/or a bed file was taken as database files in bam QC, and the position annotation for each sequence was exported from them. At least one of them should be provided in bam QC. The format of these files were: 
 
-Homo\_sapiens.GRCh37.63\_protein\_coding\_chr1-22-X-Y-M.gtf
+	hg19\_protein\_coding.bed
+	Column1	    Column2         Column3
+	Chromosome	StartPosition	EndPosition
 
-hg19\_protein\_coding.bed
+	Homo\_sapiens.GRCh37.63\_protein\_coding\_chr1-22-X-Y-M.gtf
+	Column1   	...	Column3	Column4	        Column5	...
+	Chromosome	...	exon	StartPosition	EndPosition	...
 
-
+<a name="Usage"/>
 # Usage #
 Example code for running QC with given example dataset could be:
 
@@ -112,13 +124,14 @@ Example code for running QC with given example dataset could be:
 
 Here is more details for each module:
 
+<a name="fqc"/>
 ## fastq QC 
 
 	perl main.pl -m f -i inputFileList -o outputDir
 
 	-t [int]        Threads used in analysis. The default value is 4. This parameter only valid for fastq QC. Only one thread would be used in bam and vcf QC.
 
-
+<a name="bqc"/>
 ## bam QC
 
 	perl main.pl -m b -i inputFileList -o outputDir
@@ -127,35 +140,41 @@ Here is more details for each module:
 	-g [database]	A gtf file
 	-d				whether the depth in on-/off-target regions will be calculated, -d = will be calculated
 
+<a name="vqc"/>
 ## vcf QC
 
 	perl main.pl -m v -i inputFile -o outputDir
 
 	-s [int]		Method used in consistence calculation, should be 1 or 2. In method 1, only the two samples will completely same allele will be taken as consist. In method 2, the two samples satisfy the criterion in method 1 or ~~~ will be taken as consist.
 
+<a name="Example"/>
 # Example #
 
 The example files can be downloaded at 121221.
 
 Example code for running QC with given example data set could be:
 
+<a name="fqcE"/>
 ## fastq QC ##
 
 	perl main.pl -m f -i example_fastq_fileList.txt -o example_fastq_result
 
 
-
+<a name="bqcE"/>
 ## bam QC
 
 	perl main.pl -m b -i example_bam_fileList.txt -t /data/cqs/guoy1/reference/annotation/hg19/hg19_protein_coding.bed -g /data/cqs/guoy1/reference/annotation/hg19/Homo_sapiens.GRCh37.63_protein_coding_chr1-22-X-Y-M.gtf -o example_bam_result -d 1
 
+<a name="vqcE"/>
 ## vcf QC
 
 	perl main.pl -m v -i /scratch/cqs/zhaos/QC/test/example/vcf/HNSC_TCGA-CV-7261.vcf.top4000.txt -s 1 -o example_vcf_result
 
+<a name="Results"/>
 # Results #
 The first section in all reports was the date and command for report generation. So that the user can easily reproduce the report.
  
+<a name="ifr"/>
 ## Introduction for fastq QC result ##
 fastq QC report was constituted by two sections. 
 
@@ -163,12 +182,14 @@ The "Base" section indicated the per base sequence quality and per base nucleoti
 
 The "Batch effect" section indicated the statistics of reads, BQ and GC by different runs/machines/Flowcells/Lanes to demonstrate if there were batch effects in all experiments. Boxplot was used to visualize the distributions of statistics in different groups. Kruskal-Wallis rank sum test and Fligner-Killeen test was used to determine the significance of distribution in different groups.
 
+<a name="ibr"/>
 ## Introduction for bam QC result ##
 
 The "Distribution" section visualized the distributions of statistics in all experiments.
 
 The "Batch effect" section indicated the statistics of reads, on-target and off-target by different runs/machines/Flowcells/Lanes to demonstrate if there were batch effects in all experiments. Boxplot was used to visualize the distributions of statistics in different groups. Kruskal-Wallis rank sum test and Fligner-Killeen test was used to determine the significance of distribution in different groups.
 
+<a name="ivr"/>
 ## Introduction for vcf QC result ##
 The "Statistics" section visualized the Transitions:Transversions ratio and 0/1:1/1 ratio in all samples.
 
@@ -177,3 +198,6 @@ The "Consistence" section visualized the consistence in all samples.
 The "Score" section visualized the score before and after filter.
 
 The "Annovar" section listed the annovar annotation result files.
+
+<a name="Others"/>
+# Others #

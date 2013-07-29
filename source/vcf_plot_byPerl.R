@@ -101,17 +101,17 @@ if (file.exists(paste(fileDir,vcfFileName,".Method1.txt",sep=""))) {
 } else if (file.exists(paste(fileDir,vcfFileName,".Method2.txt",sep=""))) {
 	consistenceFile<-paste(fileDir,vcfFileName,".Method2.txt",sep="")
 }
-consistence<-read.delim(consistenceFile,header=T,as.is=T)
+consistence<-read.delim(consistenceFile,header=T,as.is=T,check.names=F)
 png(paste(figureDir,basename(consistenceFile),".png",sep=""),res=res,width=1000,height=1000)
 showConsistence(consistence,cex=cex)
 dev.off()
 
 sampleNumberFile<-paste(fileDir,vcfFileName,".SampleNumber.txt",sep="")
 sampleNumber<-read.delim(sampleNumberFile,header=T,row.names=1,check.names=F)
-png(paste(figureDir,vcfFileName,".sampleNumber.png",sep=""),width=900,height=600,res=res)
-par(mar=c(8,2,1,14), xpd=TRUE)
+png(paste(figureDir,vcfFileName,".sampleNumber.png",sep=""),width=600,height=800,res=res)
+par(mar=c(9,2,5,1), xpd=TRUE)
 matplot(sampleNumber,xaxt="n",las=1,type="l",lwd=2,col=rainbow(ncol(sampleNumber)),lty=1,ylab="",cex.axis=cex)
-legend("right",inset=c(-1,0),legend=colnames(sampleNumber),col=rainbow(ncol(sampleNumber)),lwd=2,bty="n",cex=cex)
+legend("top",inset=c(0,-0.3),legend=colnames(sampleNumber),col=rainbow(ncol(sampleNumber)),lwd=2,bty="n",cex=cex)
 axis(1,at=1:nrow(sampleNumber),labels=row.names(sampleNumber),las=2,cex.axis=cex)
 dev.off()
 

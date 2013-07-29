@@ -23,7 +23,7 @@ sub fasqSummary {
 	my $maxThreads = $config->{'maxThreads'};
 	my $logFile = $config->{'log'};
 	my $usage =
-"Please use the follow command:\n main.pl -m f -i inputFastqList -o outputDir [-p]\nFor more information, plase read the readme file\n";
+"Please use the follow command:\n main.pl -m f -i inputFastqList -o outputDir [-t threads used] [-p]\nFor more information, plase read the readme file\n";
 	die "$!\n$usage"
 	  if ( !defined($filelist) or !-e $filelist or !defined($resultDir) );
 
@@ -98,6 +98,7 @@ sub fasqSummary {
 	close INFORMATION2;
 	close INFORMATION3;
 	close INFORMATION4;
+	#test R, end comment
 
 	#plot by R
 	my $Rsource =
@@ -177,32 +178,15 @@ sub getmetric {
 		}
 		$failed = ( split /:/, $line1 )[7];
 
-#        if($line1=~/@(.*?):(.*?):(.*?):(.*?):(.*?):(.*?):(.*?)\s+(.*?):(.*?):(.*?):(.*?)/){
-#            my($instrument1,$runid,$flowcellid,$lane1,$tilenumber,$x,$y,$pair,$failed,$n,$index)= ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11);
-#            if($first){
-#                $instrument=$instrument1;
-#                $run=$runid;
-#                $flowcell=$flowcellid;
-#                $lane=$lane1;
-#                $first=0;
-#            }
 		$totalreads++;
 
 		$readlen = length($line2) - 1;    #note the "/n" at the end
 
 		$totalnuclear += $readlen;
 
-		#            my $gcnum=0;
-		#            foreach my $s(split //,$line2){
-		#                $gcnum++ if($s=~/c|g/i);
-		#            }
 		my $gcnum = () = $line2 =~ /[GC]/gi;
 		$gc += $gcnum;
 
-		#		my @tmpscores = ();
-		#		foreach my $s ( split //, $line4 ) {
-		#			push @tmpscores, ord($s);
-		#		}
 		my @tmpscores = map( ord, ( split //, $line4 ) );
 
 		my @temp = ( split //, $line2 );
