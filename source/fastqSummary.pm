@@ -32,73 +32,73 @@ sub fasqSummary {
 	}
 	my $outputFile = $resultDir . '/fastqResult/fastqSummary.txt';
 
-	#test R, comment below code
-	$| = 1;
-	open OUT, ">$outputFile" or die $!;
-	print OUT join "\t",
-	  (
-		"#Sample", "Instrument", "RunNumber", "Flowcell",
-		"Lane",    "TotalReads", "Reads(Y)",  "Reads(N)",
-		"BQ",      "BQ(Y)",      "BQ(N)",     "GC",
-		"GC(Y)",   "GC(N)\n"
-	  );
-	open( IN,           $filelist )                or die $!;
-	open( INFORMATION1, ">$outputFile.score.txt" ) or die $!;
-	open( INFORMATION2, ">$outputFile.nuc.txt" )   or die $!;
-	open( INFORMATION3, ">$outputFile.scoreN.txt" ) or die $!;
-	open( INFORMATION4, ">$outputFile.nucN.txt" )   or die $!;
-	print INFORMATION1 "File\n";
-	print INFORMATION2 "File\tA1\tT1\tC1\tG1\n";
-	print INFORMATION3 "File\n";
-	print INFORMATION4 "File\tA1\tT1\tC1\tG1\n";
-
-	while ( my $f = <IN> ) {
-		$f =~ s/\r|\n//g;
-		if ( scalar( threads->list() ) < $maxThreads ) {
-			pInfo("Processing $f ",$logFile);
-			my ($t) = threads->new( \&getmetric, $f );
-		}
-		else {
-			foreach my $thread ( threads->list() ) {
-				my ( $metric, $info1, $info2, $info3, $info4 ) = $thread->join;
-				print OUT join "\t", ( @{$metric} );
-				print OUT "\n";
-				print INFORMATION1 join "\t", ( @{$info1} );
-				print INFORMATION1 "\n";
-				print INFORMATION2 join "\t", ( @{$info2} );
-				print INFORMATION2 "\n";
-				print INFORMATION3 join "\t", ( @{$info3} );
-				print INFORMATION3 "\n";
-				print INFORMATION4 join "\t", ( @{$info4} );
-				print INFORMATION4 "\n";
-				pInfo("Processing $f ",$logFile);
-				my ($t) = threads->new( \&getmetric, $f );
-				last;
-			}
-		}
-	}
-	close IN;
-
-	#join all left threads
-	foreach my $thread ( threads->list() ) {
-		my ( $metric, $info1, $info2, $info3, $info4 ) = $thread->join;
-		print OUT join "\t", ( @{$metric} );
-		print OUT "\n";
-		print INFORMATION1 join "\t", ( @{$info1} );
-		print INFORMATION1 "\n";
-		print INFORMATION2 join "\t", ( @{$info2} );
-		print INFORMATION2 "\n";
-		print INFORMATION3 join "\t", ( @{$info3} );
-		print INFORMATION3 "\n";
-		print INFORMATION4 join "\t", ( @{$info4} );
-		print INFORMATION4 "\n";
-	}
-	close OUT;
-	close INFORMATION1;
-	close INFORMATION2;
-	close INFORMATION3;
-	close INFORMATION4;
-	#test R, end comment
+#	#test R, comment below code
+#	$| = 1;
+#	open OUT, ">$outputFile" or die $!;
+#	print OUT join "\t",
+#	  (
+#		"#Sample", "Instrument", "RunNumber", "Flowcell",
+#		"Lane",    "TotalReads", "Reads(Y)",  "Reads(N)",
+#		"BQ",      "BQ(Y)",      "BQ(N)",     "GC",
+#		"GC(Y)",   "GC(N)\n"
+#	  );
+#	open( IN,           $filelist )                or die $!;
+#	open( INFORMATION1, ">$outputFile.score.txt" ) or die $!;
+#	open( INFORMATION2, ">$outputFile.nuc.txt" )   or die $!;
+#	open( INFORMATION3, ">$outputFile.scoreN.txt" ) or die $!;
+#	open( INFORMATION4, ">$outputFile.nucN.txt" )   or die $!;
+#	print INFORMATION1 "File\n";
+#	print INFORMATION2 "File\tA1\tT1\tC1\tG1\n";
+#	print INFORMATION3 "File\n";
+#	print INFORMATION4 "File\tA1\tT1\tC1\tG1\n";
+#
+#	while ( my $f = <IN> ) {
+#		$f =~ s/\r|\n//g;
+#		if ( scalar( threads->list() ) < $maxThreads ) {
+#			pInfo("Processing $f ",$logFile);
+#			my ($t) = threads->new( \&getmetric, $f );
+#		}
+#		else {
+#			foreach my $thread ( threads->list() ) {
+#				my ( $metric, $info1, $info2, $info3, $info4 ) = $thread->join;
+#				print OUT join "\t", ( @{$metric} );
+#				print OUT "\n";
+#				print INFORMATION1 join "\t", ( @{$info1} );
+#				print INFORMATION1 "\n";
+#				print INFORMATION2 join "\t", ( @{$info2} );
+#				print INFORMATION2 "\n";
+#				print INFORMATION3 join "\t", ( @{$info3} );
+#				print INFORMATION3 "\n";
+#				print INFORMATION4 join "\t", ( @{$info4} );
+#				print INFORMATION4 "\n";
+#				pInfo("Processing $f ",$logFile);
+#				my ($t) = threads->new( \&getmetric, $f );
+#				last;
+#			}
+#		}
+#	}
+#	close IN;
+#
+#	#join all left threads
+#	foreach my $thread ( threads->list() ) {
+#		my ( $metric, $info1, $info2, $info3, $info4 ) = $thread->join;
+#		print OUT join "\t", ( @{$metric} );
+#		print OUT "\n";
+#		print INFORMATION1 join "\t", ( @{$info1} );
+#		print INFORMATION1 "\n";
+#		print INFORMATION2 join "\t", ( @{$info2} );
+#		print INFORMATION2 "\n";
+#		print INFORMATION3 join "\t", ( @{$info3} );
+#		print INFORMATION3 "\n";
+#		print INFORMATION4 join "\t", ( @{$info4} );
+#		print INFORMATION4 "\n";
+#	}
+#	close OUT;
+#	close INFORMATION1;
+#	close INFORMATION2;
+#	close INFORMATION3;
+#	close INFORMATION4;
+#	#test R, end comment
 
 	#plot by R
 	my $Rsource =

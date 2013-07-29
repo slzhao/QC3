@@ -208,7 +208,7 @@ The first section in all reports was the date and command for report generation.
 <a name="ifr"/>
 ## Introduction for fastq QC result ##
 
-This example report could be accessed at [Here]( http://htmlpreview.github.com/?https://github.com/riverlee/MitoSeek/blob/release/brca_tumor/mitoSeek.html)
+This example report could be accessed at [Here](http://htmlpreview.github.io/?https://github.com/slzhao/QC3/blob/master/reportExample/fastq/fastqReport.html)
 
 fastq QC report was constituted by two sections. 
 
