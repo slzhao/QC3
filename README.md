@@ -97,7 +97,7 @@ After you install SAMtools and add SAMtools bin file to your Path, the software 
 
 ### annovar ###
 
-ANNOVAR is an efficient software tool to utilize update-to-date information to functionally annotate genetic variants detected from diverse genomes. We used ANNOVAR for annotation in vcf summary. It could be downloaded from [ANNOVAR website](http://www.openbioinformatics.org/annovar/).
+ANNOVAR is an efficient software tool to utilize update-to-date information to functionally annotate genetic variants detected from diverse genomes. We used ANNOVAR for annotation in vcf QC. It could be downloaded from [ANNOVAR website](http://www.openbioinformatics.org/annovar/).
 
 The ANNOVAR database files were also needed for ANNOVAR annotation. Please refer to the [ANNOVAR document](http://www.openbioinformatics.org/annovar/annovar_db.html) for the  database preparation.
 
@@ -105,7 +105,7 @@ After you install ANNOVAR and add ANNOVAR bin file to your Path, the software ca
 
 	$config{'annovarBin'}  = "annotate_variation.pl";		#where the ANNOVAR bin file is
 
-**Please note: ANNOVAR and ANNOVAR database are not essential for vcf QC. If not provided or not found, ANNOVAR annotation will not be performed in vcf QC**.
+**Please note: ANNOVAR and ANNOVAR database are not essential for vcf QC. If not provided or not found, ANNOVAR annotation will not be performed but other functions in vcf QC work well**.
 
 <a name="drd"/>
 ## Download required database ##
@@ -163,11 +163,12 @@ Here is more details for each module:
 
 The example files can be downloaded at [sourceforge](http://sourceforge.net/projects/qc3/files/).
 
-You need to download and extract it to a directory, such as exampleDir. Then the example code for running QC with given example data set could be:
+You need to download and extract it to a directory. Then the example code for running QC with given example data set could be:
 
 <a name="ded"/>
 ## download example data ##
-	#download and extract example data
+	#download and extract example data into exampleDir
+	mkdir exampleDir	
 	cd exampleDir
 	wget http://sourceforge.net/projects/qc3/files/example.tar.gz/download
 	tar zxvf example.tar.gz
@@ -206,6 +207,9 @@ The first section in all reports was the date and command for report generation.
  
 <a name="ifr"/>
 ## Introduction for fastq QC result ##
+
+This example report could be accessed at [Here]( http://htmlpreview.github.com/?https://github.com/riverlee/MitoSeek/blob/release/brca_tumor/mitoSeek.html)
+
 fastq QC report was constituted by two sections. 
 
 The "Base" section indicated the per base sequence quality and per base nucleotide content for each fastq files (For pair end results the two files indicating one sample were plotted in the same figure).

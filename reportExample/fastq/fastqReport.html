@@ -1,0 +1,1391 @@
+<!-- report.tmpl -->
+<html>
+<head>
+<title>fastaq Report</title>
+<style type="text/css">
+    	.first { background-color: #2894ff; color: #FFFFFF; }
+        .odd  { background-color: #FFFFFF }
+        .even { background-color: #97cbff }
+  pre {
+   	padding: 1em;
+    border: 1px dashed #2f6fab;
+    color: black;
+    background-color: #f9f9f9;
+    line-height: 1.1em;
+    WORD-WRAP: break-word;
+	}
+h2 {
+  color: #800000;
+  padding-bottom: 0;
+  margin-bottom: 0;
+  clear:left;
+  }
+</style>
+
+<style type="text/css">
+    div.summary {
+    width: 18em;
+  }
+   div.summary ul {
+  padding-left:0;
+  list-style-type:none;
+  font-weight:bold;
+  }
+  
+  div.summary ul li img {
+  margin-bottom:-0.5em;
+  margin-top:0.5em;
+  }
+</style>
+
+<style type="text/css">
+  .centeredImage
+    {
+    text-align:center;
+    margin-top:0px;
+    margin-bottom:0px;
+    padding:0px;
+    }
+</style>
+
+</head>
+<body>
+<h1>fastq Report</h1><div class="summary">
+    <h2>Table of Contents</h2>
+        <ul>
+<li><a href=#M100>Command</a></li>
+<li><a href=#M200>Result Table</a></li>
+<li><a href=#M200>Sequence quality and content</a></li>
+<li><a href=#M300>Batch effect</a></li>        </ul>
+</div>
+
+<div><h2 id="M100">Command</h2>
+<p>The report was generated at Thu Jul 25 18:12:49 2013. Here is your command for generating this report, keep it in order to reproduce the result.</p>
+<pre>perl /home/zhaos/source/perl_cqs/software_QC/RC1/main.pl -m f -t 12 -p -i 2110_fastq_fileList.txt -o ./2110_report/2110_fastq_result</pre>
+</div>
+
+<div><h2 id="M200">Result Table</h2>
+<table align="center" style="border:#2894ff 1px solid;">
+ 
+                 <tr class="first">
+                  
+                 
+      <td align="center">#Sample</td>
+      <td align="center">Instrument</td>
+      <td align="center">RunNumber</td>
+      <td align="center">Flowcell</td>
+      <td align="center">Lane</td>
+      <td align="center">TotalReads</td>
+      <td align="center">Reads(Y)</td>
+      <td align="center">Reads(N)</td>
+      <td align="center">BQ</td>
+      <td align="center">BQ(Y)</td>
+      <td align="center">BQ(N)</td>
+      <td align="center">GC</td>
+      <td align="center">GC(Y)</td>
+      <td align="center">GC(N)</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-10_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">3</td>
+      <td align="center">36738652</td>
+      <td align="center">3949435</td>
+      <td align="center">32789217</td>
+      <td align="center">32.31</td>
+      <td align="center">12.81</td>
+      <td align="center">34.66</td>
+      <td align="center">0.52</td>
+      <td align="center">0.53</td>
+      <td align="center">0.52</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-10_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">3</td>
+      <td align="center">36738652</td>
+      <td align="center">3949435</td>
+      <td align="center">32789217</td>
+      <td align="center">32.77</td>
+      <td align="center">18.98</td>
+      <td align="center">34.43</td>
+      <td align="center">0.52</td>
+      <td align="center">0.53</td>
+      <td align="center">0.52</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-11_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">3</td>
+      <td align="center">93702907</td>
+      <td align="center">11125894</td>
+      <td align="center">82577013</td>
+      <td align="center">31.97</td>
+      <td align="center">12.11</td>
+      <td align="center">34.65</td>
+      <td align="center">0.51</td>
+      <td align="center">0.52</td>
+      <td align="center">0.51</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-11_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">3</td>
+      <td align="center">93702907</td>
+      <td align="center">11125894</td>
+      <td align="center">82577013</td>
+      <td align="center">32.77</td>
+      <td align="center">18.84</td>
+      <td align="center">34.65</td>
+      <td align="center">0.51</td>
+      <td align="center">0.53</td>
+      <td align="center">0.51</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-12_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">3</td>
+      <td align="center">75808729</td>
+      <td align="center">8968765</td>
+      <td align="center">66839964</td>
+      <td align="center">31.97</td>
+      <td align="center">12.09</td>
+      <td align="center">34.64</td>
+      <td align="center">0.51</td>
+      <td align="center">0.52</td>
+      <td align="center">0.51</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-12_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">3</td>
+      <td align="center">75808729</td>
+      <td align="center">8968765</td>
+      <td align="center">66839964</td>
+      <td align="center">32.75</td>
+      <td align="center">18.84</td>
+      <td align="center">34.62</td>
+      <td align="center">0.51</td>
+      <td align="center">0.53</td>
+      <td align="center">0.51</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-1_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">1</td>
+      <td align="center">49866747</td>
+      <td align="center">3939659</td>
+      <td align="center">45927088</td>
+      <td align="center">34.00</td>
+      <td align="center">12.35</td>
+      <td align="center">35.86</td>
+      <td align="center">0.52</td>
+      <td align="center">0.54</td>
+      <td align="center">0.52</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-1_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">1</td>
+      <td align="center">49866747</td>
+      <td align="center">3939659</td>
+      <td align="center">45927088</td>
+      <td align="center">33.90</td>
+      <td align="center">19.67</td>
+      <td align="center">35.12</td>
+      <td align="center">0.52</td>
+      <td align="center">0.54</td>
+      <td align="center">0.52</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-13_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">5</td>
+      <td align="center">62513940</td>
+      <td align="center">18037269</td>
+      <td align="center">44476671</td>
+      <td align="center">29.52</td>
+      <td align="center">17.15</td>
+      <td align="center">34.54</td>
+      <td align="center">0.50</td>
+      <td align="center">0.51</td>
+      <td align="center">0.50</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-13_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">5</td>
+      <td align="center">62513940</td>
+      <td align="center">18037269</td>
+      <td align="center">44476671</td>
+      <td align="center">31.23</td>
+      <td align="center">24.58</td>
+      <td align="center">33.93</td>
+      <td align="center">0.51</td>
+      <td align="center">0.51</td>
+      <td align="center">0.50</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-14_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">5</td>
+      <td align="center">71682553</td>
+      <td align="center">20750547</td>
+      <td align="center">50932006</td>
+      <td align="center">29.55</td>
+      <td align="center">17.19</td>
+      <td align="center">34.58</td>
+      <td align="center">0.51</td>
+      <td align="center">0.51</td>
+      <td align="center">0.51</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-14_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">5</td>
+      <td align="center">71682553</td>
+      <td align="center">20750547</td>
+      <td align="center">50932006</td>
+      <td align="center">31.37</td>
+      <td align="center">24.73</td>
+      <td align="center">34.08</td>
+      <td align="center">0.51</td>
+      <td align="center">0.52</td>
+      <td align="center">0.51</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-15_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">5</td>
+      <td align="center">60845870</td>
+      <td align="center">17818648</td>
+      <td align="center">43027222</td>
+      <td align="center">29.32</td>
+      <td align="center">16.87</td>
+      <td align="center">34.48</td>
+      <td align="center">0.51</td>
+      <td align="center">0.52</td>
+      <td align="center">0.51</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-15_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">5</td>
+      <td align="center">60845870</td>
+      <td align="center">17818648</td>
+      <td align="center">43027222</td>
+      <td align="center">31.03</td>
+      <td align="center">24.25</td>
+      <td align="center">33.84</td>
+      <td align="center">0.52</td>
+      <td align="center">0.52</td>
+      <td align="center">0.52</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-16_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">5</td>
+      <td align="center">63167884</td>
+      <td align="center">18555890</td>
+      <td align="center">44611994</td>
+      <td align="center">29.32</td>
+      <td align="center">16.84</td>
+      <td align="center">34.51</td>
+      <td align="center">0.51</td>
+      <td align="center">0.52</td>
+      <td align="center">0.51</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-16_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">5</td>
+      <td align="center">63167884</td>
+      <td align="center">18555890</td>
+      <td align="center">44611994</td>
+      <td align="center">31.12</td>
+      <td align="center">24.33</td>
+      <td align="center">33.95</td>
+      <td align="center">0.52</td>
+      <td align="center">0.52</td>
+      <td align="center">0.52</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-19_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">6</td>
+      <td align="center">46473108</td>
+      <td align="center">4545127</td>
+      <td align="center">41927981</td>
+      <td align="center">33.07</td>
+      <td align="center">13.55</td>
+      <td align="center">35.18</td>
+      <td align="center">0.51</td>
+      <td align="center">0.53</td>
+      <td align="center">0.51</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-19_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">6</td>
+      <td align="center">46473108</td>
+      <td align="center">4545127</td>
+      <td align="center">41927981</td>
+      <td align="center">33.23</td>
+      <td align="center">19.18</td>
+      <td align="center">34.75</td>
+      <td align="center">0.51</td>
+      <td align="center">0.52</td>
+      <td align="center">0.51</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-20_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">6</td>
+      <td align="center">63147826</td>
+      <td align="center">6187152</td>
+      <td align="center">56960674</td>
+      <td align="center">33.06</td>
+      <td align="center">13.48</td>
+      <td align="center">35.19</td>
+      <td align="center">0.51</td>
+      <td align="center">0.52</td>
+      <td align="center">0.51</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-20_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">6</td>
+      <td align="center">63147826</td>
+      <td align="center">6187152</td>
+      <td align="center">56960674</td>
+      <td align="center">33.08</td>
+      <td align="center">18.75</td>
+      <td align="center">34.64</td>
+      <td align="center">0.51</td>
+      <td align="center">0.52</td>
+      <td align="center">0.51</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-21_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">6</td>
+      <td align="center">74637341</td>
+      <td align="center">7674749</td>
+      <td align="center">66962592</td>
+      <td align="center">32.89</td>
+      <td align="center">13.06</td>
+      <td align="center">35.16</td>
+      <td align="center">0.51</td>
+      <td align="center">0.53</td>
+      <td align="center">0.51</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-21_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">6</td>
+      <td align="center">74637341</td>
+      <td align="center">7674749</td>
+      <td align="center">66962592</td>
+      <td align="center">33.01</td>
+      <td align="center">18.44</td>
+      <td align="center">34.68</td>
+      <td align="center">0.51</td>
+      <td align="center">0.52</td>
+      <td align="center">0.51</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-22_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">6</td>
+      <td align="center">59153155</td>
+      <td align="center">5986030</td>
+      <td align="center">53167125</td>
+      <td align="center">32.97</td>
+      <td align="center">13.18</td>
+      <td align="center">35.20</td>
+      <td align="center">0.51</td>
+      <td align="center">0.53</td>
+      <td align="center">0.51</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-22_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">6</td>
+      <td align="center">59153155</td>
+      <td align="center">5986030</td>
+      <td align="center">53167125</td>
+      <td align="center">33.13</td>
+      <td align="center">18.66</td>
+      <td align="center">34.76</td>
+      <td align="center">0.51</td>
+      <td align="center">0.52</td>
+      <td align="center">0.51</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-2_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">1</td>
+      <td align="center">61213706</td>
+      <td align="center">4825731</td>
+      <td align="center">56387975</td>
+      <td align="center">34.01</td>
+      <td align="center">12.36</td>
+      <td align="center">35.86</td>
+      <td align="center">0.52</td>
+      <td align="center">0.54</td>
+      <td align="center">0.52</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-2_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">1</td>
+      <td align="center">61213706</td>
+      <td align="center">4825731</td>
+      <td align="center">56387975</td>
+      <td align="center">33.88</td>
+      <td align="center">19.53</td>
+      <td align="center">35.10</td>
+      <td align="center">0.52</td>
+      <td align="center">0.53</td>
+      <td align="center">0.52</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-3_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">1</td>
+      <td align="center">55365552</td>
+      <td align="center">4489049</td>
+      <td align="center">50876503</td>
+      <td align="center">33.94</td>
+      <td align="center">12.16</td>
+      <td align="center">35.86</td>
+      <td align="center">0.52</td>
+      <td align="center">0.54</td>
+      <td align="center">0.52</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-3_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">1</td>
+      <td align="center">55365552</td>
+      <td align="center">4489049</td>
+      <td align="center">50876503</td>
+      <td align="center">33.96</td>
+      <td align="center">19.72</td>
+      <td align="center">35.22</td>
+      <td align="center">0.52</td>
+      <td align="center">0.53</td>
+      <td align="center">0.52</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-37_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">7</td>
+      <td align="center">14353</td>
+      <td align="center">456</td>
+      <td align="center">13897</td>
+      <td align="center">35.95</td>
+      <td align="center">15.09</td>
+      <td align="center">36.64</td>
+      <td align="center">0.48</td>
+      <td align="center">0.51</td>
+      <td align="center">0.48</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-37_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">7</td>
+      <td align="center">14353</td>
+      <td align="center">456</td>
+      <td align="center">13897</td>
+      <td align="center">32.82</td>
+      <td align="center">17.83</td>
+      <td align="center">33.32</td>
+      <td align="center">0.49</td>
+      <td align="center">0.50</td>
+      <td align="center">0.49</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-38_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">7</td>
+      <td align="center">64476170</td>
+      <td align="center">6916704</td>
+      <td align="center">57559466</td>
+      <td align="center">32.97</td>
+      <td align="center">12.77</td>
+      <td align="center">35.39</td>
+      <td align="center">0.48</td>
+      <td align="center">0.49</td>
+      <td align="center">0.48</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-38_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">7</td>
+      <td align="center">64476170</td>
+      <td align="center">6916704</td>
+      <td align="center">57559466</td>
+      <td align="center">32.28</td>
+      <td align="center">16.56</td>
+      <td align="center">34.17</td>
+      <td align="center">0.48</td>
+      <td align="center">0.49</td>
+      <td align="center">0.48</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-39_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">7</td>
+      <td align="center">54179186</td>
+      <td align="center">5927817</td>
+      <td align="center">48251369</td>
+      <td align="center">32.84</td>
+      <td align="center">12.52</td>
+      <td align="center">35.33</td>
+      <td align="center">0.49</td>
+      <td align="center">0.51</td>
+      <td align="center">0.49</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-39_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">7</td>
+      <td align="center">54179186</td>
+      <td align="center">5927817</td>
+      <td align="center">48251369</td>
+      <td align="center">32.40</td>
+      <td align="center">16.80</td>
+      <td align="center">34.32</td>
+      <td align="center">0.50</td>
+      <td align="center">0.51</td>
+      <td align="center">0.50</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-40_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">7</td>
+      <td align="center">67430214</td>
+      <td align="center">7407806</td>
+      <td align="center">60022408</td>
+      <td align="center">32.86</td>
+      <td align="center">12.38</td>
+      <td align="center">35.39</td>
+      <td align="center">0.48</td>
+      <td align="center">0.49</td>
+      <td align="center">0.48</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-40_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">7</td>
+      <td align="center">67430214</td>
+      <td align="center">7407806</td>
+      <td align="center">60022408</td>
+      <td align="center">32.23</td>
+      <td align="center">16.30</td>
+      <td align="center">34.20</td>
+      <td align="center">0.49</td>
+      <td align="center">0.50</td>
+      <td align="center">0.48</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-41_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">8</td>
+      <td align="center">67647777</td>
+      <td align="center">13399519</td>
+      <td align="center">54248258</td>
+      <td align="center">29.82</td>
+      <td align="center">11.59</td>
+      <td align="center">34.32</td>
+      <td align="center">0.48</td>
+      <td align="center">0.49</td>
+      <td align="center">0.47</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-41_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">8</td>
+      <td align="center">67647777</td>
+      <td align="center">13399519</td>
+      <td align="center">54248258</td>
+      <td align="center">27.36</td>
+      <td align="center">12.38</td>
+      <td align="center">31.06</td>
+      <td align="center">0.46</td>
+      <td align="center">0.43</td>
+      <td align="center">0.46</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-42_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">8</td>
+      <td align="center">54316496</td>
+      <td align="center">10517721</td>
+      <td align="center">43798775</td>
+      <td align="center">29.99</td>
+      <td align="center">11.73</td>
+      <td align="center">34.37</td>
+      <td align="center">0.48</td>
+      <td align="center">0.49</td>
+      <td align="center">0.48</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-42_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">8</td>
+      <td align="center">54316496</td>
+      <td align="center">10517721</td>
+      <td align="center">43798775</td>
+      <td align="center">27.43</td>
+      <td align="center">12.11</td>
+      <td align="center">31.11</td>
+      <td align="center">0.47</td>
+      <td align="center">0.43</td>
+      <td align="center">0.47</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-4_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">1</td>
+      <td align="center">48237104</td>
+      <td align="center">3859527</td>
+      <td align="center">44377577</td>
+      <td align="center">33.97</td>
+      <td align="center">12.21</td>
+      <td align="center">35.86</td>
+      <td align="center">0.52</td>
+      <td align="center">0.54</td>
+      <td align="center">0.52</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-4_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">1</td>
+      <td align="center">48237104</td>
+      <td align="center">3859527</td>
+      <td align="center">44377577</td>
+      <td align="center">34.09</td>
+      <td align="center">20.28</td>
+      <td align="center">35.29</td>
+      <td align="center">0.52</td>
+      <td align="center">0.54</td>
+      <td align="center">0.52</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-43_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">8</td>
+      <td align="center">90793580</td>
+      <td align="center">18493197</td>
+      <td align="center">72300383</td>
+      <td align="center">29.64</td>
+      <td align="center">11.22</td>
+      <td align="center">34.35</td>
+      <td align="center">0.48</td>
+      <td align="center">0.49</td>
+      <td align="center">0.47</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-43_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">8</td>
+      <td align="center">90793580</td>
+      <td align="center">18493197</td>
+      <td align="center">72300383</td>
+      <td align="center">26.95</td>
+      <td align="center">11.58</td>
+      <td align="center">30.88</td>
+      <td align="center">0.46</td>
+      <td align="center">0.43</td>
+      <td align="center">0.46</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-44_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">8</td>
+      <td align="center">64725601</td>
+      <td align="center">13299535</td>
+      <td align="center">51426066</td>
+      <td align="center">29.46</td>
+      <td align="center">11.08</td>
+      <td align="center">34.21</td>
+      <td align="center">0.50</td>
+      <td align="center">0.51</td>
+      <td align="center">0.50</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-44_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">8</td>
+      <td align="center">64725601</td>
+      <td align="center">13299535</td>
+      <td align="center">51426066</td>
+      <td align="center">26.97</td>
+      <td align="center">11.68</td>
+      <td align="center">30.92</td>
+      <td align="center">0.48</td>
+      <td align="center">0.44</td>
+      <td align="center">0.49</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-45_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">157</td>
+      <td align="center">C0UMFACXX</td>
+      <td align="center">1</td>
+      <td align="center">69607353</td>
+      <td align="center">5562502</td>
+      <td align="center">64044851</td>
+      <td align="center">34.18</td>
+      <td align="center">12.48</td>
+      <td align="center">36.07</td>
+      <td align="center">0.48</td>
+      <td align="center">0.50</td>
+      <td align="center">0.48</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-45_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">157</td>
+      <td align="center">C0UMFACXX</td>
+      <td align="center">1</td>
+      <td align="center">69607353</td>
+      <td align="center">5562502</td>
+      <td align="center">64044851</td>
+      <td align="center">33.46</td>
+      <td align="center">17.23</td>
+      <td align="center">34.87</td>
+      <td align="center">0.48</td>
+      <td align="center">0.49</td>
+      <td align="center">0.48</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-46_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">157</td>
+      <td align="center">C0UMFACXX</td>
+      <td align="center">1</td>
+      <td align="center">62447560</td>
+      <td align="center">5233773</td>
+      <td align="center">57213787</td>
+      <td align="center">33.93</td>
+      <td align="center">12.39</td>
+      <td align="center">35.90</td>
+      <td align="center">0.49</td>
+      <td align="center">0.50</td>
+      <td align="center">0.49</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-46_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">157</td>
+      <td align="center">C0UMFACXX</td>
+      <td align="center">1</td>
+      <td align="center">62447560</td>
+      <td align="center">5233773</td>
+      <td align="center">57213787</td>
+      <td align="center">33.24</td>
+      <td align="center">18.33</td>
+      <td align="center">34.61</td>
+      <td align="center">0.49</td>
+      <td align="center">0.50</td>
+      <td align="center">0.49</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-5_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">2</td>
+      <td align="center">61797464</td>
+      <td align="center">4721877</td>
+      <td align="center">57075587</td>
+      <td align="center">33.89</td>
+      <td align="center">12.14</td>
+      <td align="center">35.69</td>
+      <td align="center">0.52</td>
+      <td align="center">0.53</td>
+      <td align="center">0.51</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-5_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">2</td>
+      <td align="center">61797464</td>
+      <td align="center">4721877</td>
+      <td align="center">57075587</td>
+      <td align="center">34.02</td>
+      <td align="center">19.66</td>
+      <td align="center">35.21</td>
+      <td align="center">0.52</td>
+      <td align="center">0.53</td>
+      <td align="center">0.51</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-6_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">2</td>
+      <td align="center">35016656</td>
+      <td align="center">2521247</td>
+      <td align="center">32495409</td>
+      <td align="center">34.05</td>
+      <td align="center">12.54</td>
+      <td align="center">35.72</td>
+      <td align="center">0.52</td>
+      <td align="center">0.53</td>
+      <td align="center">0.52</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-6_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">2</td>
+      <td align="center">35016656</td>
+      <td align="center">2521247</td>
+      <td align="center">32495409</td>
+      <td align="center">34.23</td>
+      <td align="center">20.58</td>
+      <td align="center">35.29</td>
+      <td align="center">0.52</td>
+      <td align="center">0.53</td>
+      <td align="center">0.52</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-7_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">2</td>
+      <td align="center">83722064</td>
+      <td align="center">6632266</td>
+      <td align="center">77089798</td>
+      <td align="center">33.82</td>
+      <td align="center">11.91</td>
+      <td align="center">35.71</td>
+      <td align="center">0.52</td>
+      <td align="center">0.53</td>
+      <td align="center">0.51</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-7_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">2</td>
+      <td align="center">83722064</td>
+      <td align="center">6632266</td>
+      <td align="center">77089798</td>
+      <td align="center">34.05</td>
+      <td align="center">19.55</td>
+      <td align="center">35.30</td>
+      <td align="center">0.52</td>
+      <td align="center">0.53</td>
+      <td align="center">0.51</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-8_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">2</td>
+      <td align="center">39824496</td>
+      <td align="center">3083773</td>
+      <td align="center">36740723</td>
+      <td align="center">33.78</td>
+      <td align="center">11.93</td>
+      <td align="center">35.62</td>
+      <td align="center">0.52</td>
+      <td align="center">0.54</td>
+      <td align="center">0.52</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-8_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">2</td>
+      <td align="center">39824496</td>
+      <td align="center">3083773</td>
+      <td align="center">36740723</td>
+      <td align="center">33.87</td>
+      <td align="center">19.33</td>
+      <td align="center">35.10</td>
+      <td align="center">0.52</td>
+      <td align="center">0.54</td>
+      <td align="center">0.52</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-9_1_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">3</td>
+      <td align="center">41111584</td>
+      <td align="center">4507069</td>
+      <td align="center">36604515</td>
+      <td align="center">32.27</td>
+      <td align="center">12.65</td>
+      <td align="center">34.68</td>
+      <td align="center">0.52</td>
+      <td align="center">0.53</td>
+      <td align="center">0.52</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">/scratch/cqs/guoy1/2110/rawdata/2110-JP-9_2_sequence.txt</td>
+      <td align="center">HWI-ST829</td>
+      <td align="center">156</td>
+      <td align="center">D12DCACXX</td>
+      <td align="center">3</td>
+      <td align="center">41111584</td>
+      <td align="center">4507069</td>
+      <td align="center">36604515</td>
+      <td align="center">32.67</td>
+      <td align="center">18.53</td>
+      <td align="center">34.41</td>
+      <td align="center">0.52</td>
+      <td align="center">0.53</td>
+      <td align="center">0.52</td>
+   </tr>
+
+</table>
+<p>Column description</p>
+<pre>
+TotalReads: Total reads in fastq file
+Reads(Y) or (N): Y if the read fails filter (read is bad), N otherwise
+BQ: base quality score
+GC: GC content
+</pre>
+</div>
+
+<div><h2 id="M200">Sequence quality and content</h2>
+<p>Per base sequence quality</p>
+<p class="centeredImage"><img src="./fastqfigure/fastqScoreYN.png.legend.png"></p>
+<p class="centeredImage"><img src="./fastqfigure/fastqScoreYN.png"></p>
+<p>Per base sequence content</p>
+<p class="centeredImage"><img src="./fastqfigure/nucPercentyYN.png"></p>
+</div>
+
+<div><h2 id="M300">Batch effect</h2>
+<p>The results were separated into different groups by their RunNumber, Flowcell and Lane. Then boxplot plots were used to visualize their distribution. Kruskal-Wallis rank sum test and Fligner-Killeen test were performed to see if the distributions and variances in each of the groups are the same</p>
+
+<p class="centeredImage"><img src="./fastqFigure//batch_TotalReads.png"></p>
+
+<p class="centeredImage"><img src="./fastqFigure//batch_Reads(Y).png"></p>
+
+<p class="centeredImage"><img src="./fastqFigure//batch_Reads(N).png"></p>
+
+<p class="centeredImage"><img src="./fastqFigure//batch_BQ.png"></p>
+
+<p class="centeredImage"><img src="./fastqFigure//batch_BQ(Y).png"></p>
+
+<p class="centeredImage"><img src="./fastqFigure//batch_BQ(N).png"></p>
+
+<p class="centeredImage"><img src="./fastqFigure//batch_GC.png"></p>
+
+<p class="centeredImage"><img src="./fastqFigure//batch_GC(Y).png"></p>
+
+<p class="centeredImage"><img src="./fastqFigure//batch_GC(N).png"></p>
+
+</div>
+
+</body>
+</html>
