@@ -19,8 +19,8 @@ Table of Content
 * [Results](#Results)
  * [Introduction for fastq QC result](#ifr)
  * [Introduction for bam QC result](#ibr)
- * [Introduction for vcf QC result](#iqr)
-* [Others](#Others)
+ * [Introduction for vcf QC result](#ivr)
+* [Contacts](#Contacts)
 
 <a name="Overview"/>
 # Overview #
@@ -109,7 +109,7 @@ After you install ANNOVAR and add ANNOVAR bin file to your Path, the software ca
 
 <a name="drd"/>
 ## Download required database ##
-A gtf and/or a bed file was taken as database files in bam QC, and the position annotation for each sequence was exported from them. At least one of them should be provided in bam QC. The format of these files were: 
+A gtf and/or a bed file was taken as database files in bam QC, and the position annotation for each sequence was exported from them. At least one of them should be provided in bam QC. These files could be downloaded at [UCSC table browser](http://genome.ucsc.edu/cgi-bin/hgTables?command=start). The format of these files were: 
 
 	hg19_protein_coding.bed
 	Column1	    Column2         Column3
@@ -155,8 +155,8 @@ Here is more details for each module:
 
 	perl qc3.pl -m v -i inputFile -o outputDir
 
-	-s [int]		    Method used in consistence calculation, should be 1 or 2. In method 1, only the two samples will completely same allele will be taken as consist. In method 2, the two samples satisfy the criterion in method 1 or ~~~ will be taken as consist.
-	-a  [database]	Directory of annovar database.
+	-s [int]		    Method used in consistence calculation, should be 1 or 2. In method 1, only the two samples will completely same allele will be taken as consist. In method 2, the two samples satisfy the criterion in method 1, or if the two samples were 0/0 vs 0/1 but 0/0 sample has some read counts in alternative allele, they will be taken as consistent.
+	-a [database]	Directory of annovar database.
 
 <a name="Example"/>
 # Example #
@@ -248,5 +248,8 @@ The "Score" section visualized the position and score of SNPs before and after f
 
 The "Annovar annotation" section listed the annovar annotation result files.
 
-<a name="Others"/>
-# Others #
+<a name="Contacts"/>
+# Contacts #
+Shilin Zhao:	shilin.zhao@vanderbilt.edu
+
+Yan Guo:	    yan.guo@vanderbilt.edu
