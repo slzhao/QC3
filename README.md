@@ -208,16 +208,24 @@ The first section in all reports was the date and command for report generation.
 <a name="ifr"/>
 ## Introduction for fastq QC result ##
 
-This example report could be accessed at [Here](http://htmlpreview.github.io/?https://github.com/slzhao/QC3/blob/master/reportExample/fastq/fastqReport.html)
+An example report could be accessed at [Here](http://htmlpreview.github.io/?https://github.com/slzhao/QC3/blob/master/reportExample/fastq/fastqReport.html)
 
-fastq QC report was constituted by two sections. 
+fastq QC report was constituted by three sections. 
 
-The "Base" section indicated the per base sequence quality and per base nucleotide content for each fastq files (For pair end results the two files indicating one sample were plotted in the same figure).
+The "Result Table" section displayed the instrument, run number, flowcell, lane, total reads, base quality score and GC content for each fastq file. 
+
+The "Sequence quality and content" section indicated the per base sequence quality and per base nucleotide content for each fastq file (For pair end results the two files indicating one sample were plotted in the same figure).
 
 The "Batch effect" section indicated the statistics of reads, BQ and GC by different runs/machines/Flowcells/Lanes to demonstrate if there were batch effects in all experiments. Boxplot was used to visualize the distributions of statistics in different groups. Kruskal-Wallis rank sum test and Fligner-Killeen test was used to determine the significance of distribution in different groups.
 
 <a name="ibr"/>
 ## Introduction for bam QC result ##
+
+An example report could be accessed at [Here](http://htmlpreview.github.io/?https://github.com/slzhao/QC3/blob/master/reportExample/bam/bamReport.html)
+
+bam QC report was constituted by three sections. 
+
+The "Result Table" section displayed the instrument, run number, flowcell, lane, total reads, on/off target reads, intron/intergenic/mito reads,  for each bam file. 
 
 The "Distribution" section visualized the distributions of statistics in all experiments.
 
@@ -225,13 +233,20 @@ The "Batch effect" section indicated the statistics of reads, on-target and off-
 
 <a name="ivr"/>
 ## Introduction for vcf QC result ##
-The "Statistics" section visualized the Transitions:Transversions ratio and 0/1:1/1 ratio in all samples.
 
-The "Consistence" section visualized the consistence in all samples.
+An example report could be accessed at [Here](http://htmlpreview.github.io/?https://github.com/slzhao/QC3/blob/master/reportExample/vcf/vcfReport.html)
 
-The "Score" section visualized the score before and after filter.
+vcf QC report was constituted by five sections. 
 
-The "Annovar" section listed the annovar annotation result files.
+The "Statistics" section displayed the Transitions:Transversions ratio and Heterozygous:Non-reference homozygous ratio in all samples.
+
+The "Consistency" section visualized the consistency in all sample to sample pairs.
+
+The "SNP count" section displayed the SNP count of each sample in different chromesomes.
+
+The "Score" section visualized the position and score of SNPs before and after filter.
+
+The "Annovar annotation" section listed the annovar annotation result files.
 
 <a name="Others"/>
 # Others #

@@ -73,10 +73,10 @@ GC: GC content
 </div>
 
 <div><h2 id="M200">Sequence quality and content</h2>
-<p>Per base sequence quality</p>
+<p>Per base sequence quality. N means only keep the reads that didn't fail filter. If the data was pair-end, pearson correlation coefficient and euclidean distance between data from two ends will be calculated and displayed.</p>
 <p class="centeredImage"><img src="<TMPL_VAR NAME=FIGUREBASESCOREYNLEGEND>"></p>
 <p class="centeredImage"><img src="<TMPL_VAR NAME=FIGUREBASESCOREYN>"></p>
-<p>Per base sequence content</p>
+<p>Per base sequence content. N means only keep the reads that didn't fail filter. The standard deviation of per base sequence content (except the top 10 bases) for A, T, C, G will be calculated respectively and the median standard deviation will be displayed.</p>
 <p class="centeredImage"><img src="<TMPL_VAR NAME=FIGUREBASENUCYN>"></p>
 </div>
 

@@ -60,7 +60,7 @@ h2 {
 </div>
 
 <div><h2 id="M100">Command</h2>
-<p>The report was generated at Mon Jul 29 15:09:39 2013. Here is your command for generating this report, keep it in order to reproduce the result.</p>
+<p>The report was generated at Mon Jul 29 17:14:16 2013. Here is your command for generating this report, keep it in order to reproduce the result.</p>
 <pre>perl /home/zhaos/source/perl_cqs/software_QC/RC1/qc3.pl -m f -t 12 -p -i 2110_fastq_fileList.txt -o ./2110_report/2110_fastq_result</pre>
 </div>
 
@@ -1357,10 +1357,10 @@ GC: GC content
 </div>
 
 <div><h2 id="M200">Sequence quality and content</h2>
-<p>Per base sequence quality</p>
+<p>Per base sequence quality. N means only keep the reads that didn't fail filter. If the data was pair-end, pearson correlation coefficient and euclidean distance between data from two ends will be calculated and displayed.</p>
 <p class="centeredImage"><img src="./fastqFigure/fastqScoreYN.png.legend.png"></p>
 <p class="centeredImage"><img src="./fastqFigure/fastqScoreYN.png"></p>
-<p>Per base sequence content</p>
+<p>Per base sequence content. N means only keep the reads that didn't fail filter. The standard deviation of per base sequence content (except the top 10 bases) for A, T, C, G will be calculated respectively and the median standard deviation will be displayed.</p>
 <p class="centeredImage"><img src="./fastqFigure/nucPercentyYN.png"></p>
 </div>
 
