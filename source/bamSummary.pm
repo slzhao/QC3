@@ -31,7 +31,10 @@ sub bamSummary {
 	my $logFile        = $config->{'log'};
 	my $caculateMethod = $config->{'caculateMethod'};  #1 as mean 2 as median
 	
-	die $!
+		my $usage =
+"Please use the follow command:\n perl qc3.pl -m b -i inputBamList -o outputDir [-r targetregion file] [-g gtf file] [-cm data summary method] [-d depth caculation]\nFor more information, plase read the readme file\n";
+	
+	die "$!\n$usage"
 	  if ( !defined($filelist)
 		or !-e $filelist
 		or !defined($resultDir)

@@ -23,7 +23,7 @@ sub fasqSummary {
 	my $maxThreads = $config->{'maxThreads'};
 	my $logFile = $config->{'log'};
 	my $usage =
-"Please use the follow command:\n main.pl -m f -i inputFastqList -o outputDir [-t threads used] [-p]\nFor more information, plase read the readme file\n";
+"Please use the follow command:\n perl qc3.pl -m f -i inputFastqList -o outputDir [-t threads used] [-p pair-end]\nFor more information, plase read the readme file\n";
 	die "$!\n$usage"
 	  if ( !defined($filelist) or !-e $filelist or !defined($resultDir) );
 

@@ -27,6 +27,14 @@ sub vcfSummary {
 	my $annovarBin = $config->{'annovarBin'};
 	my $annovarDb  = $config->{'annovarDb'};
 	
+	my $usage =
+"Please use the follow command:\n perl qc3.pl -m v -i inputVcfFile -o outputDir [-s Method in consistence calculation] [-a annovar database]\nFor more information, plase read the readme file\n";
+	
+	if ( !( defined $cfgFile ) or $cfgFile eq '' ) {
+		$cfgFile = dirname($0) . '/GATK.cfg';
+	}
+	die "$!\n$usage" if ( !defined($VCF) or !( -e $VCF ) or !( -e $cfgFile ) );
+	
 	my $doAnnovar=1;
 	if ((grep -x "$_/$annovarBin", @PATH)) {
 	} elsif (-e $annovarBin) {
@@ -40,11 +48,6 @@ sub vcfSummary {
 		pInfo("Can't find annovar database. Will not perform annovar annotation",$logFile);
 	}
 	
-	if ( !( defined $cfgFile ) or $cfgFile eq '' ) {
-		$cfgFile = dirname($0) . '/GATK.cfg';
-	}
-	die $! if ( !defined($VCF) or !( -e $VCF ) or !( -e $cfgFile ) );
-
 	my %IDList;
 	my $done_filter;
 	my @titles;
