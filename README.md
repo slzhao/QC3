@@ -32,9 +32,9 @@ Say something
 <a name="RC11">
 ## Release candidate (RC) version 1.1 on July 29, 2013
 Release version 1.1 for test
-Documents were improved;
-Some bugs were fixed;
-Example files were provided;
+ * Documents were improved;
+ * Some bugs were fixed;
+ * Example files were provided;
 
 <a name="RC10">
 ## Release candidate (RC) version 1.0 on July 26, 2013
