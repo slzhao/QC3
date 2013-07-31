@@ -39,7 +39,7 @@ plot_dataFrame<-function(rawData,colBox=5:ncol(rawData),colList=NA,cex=1,dolog=F
 		rawData<-as.matrix(rawData)
 		png(paste("summary_lines",".png",sep=""),width=800,height=winNrow*400,res=res)
 		par(mfrow=c(winNrow,2))
-		par(mar=c(5, 4, 2, 1), xpd=TRUE)
+		par(mar=c(7, 4, 2, 1), xpd=TRUE)
 		legendText<-colnames(rawData)[colList[[1]]]
 		for (x in 1:length(colList)) {
 			colLine<-colList[[x]]
@@ -49,7 +49,7 @@ plot_dataFrame<-function(rawData,colBox=5:ncol(rawData),colList=NA,cex=1,dolog=F
 			mainText<-gsub("\\(|\\)","",mainText)
 			if (mainText=="") {mainText="Read Counts"}
 			matplot(temp,lty=1,col=rainbow(length(colLine)),type="l",las=1,xlab="",ylab="",lwd=2,cex.axis=cex-0.1,xaxt="n",main=mainText,cex.main=cex)
-			axis(1,las=2,cex.axis=cex-0.1,at=1:nrow(temp),labels=row.names(temp))
+			axis(1,las=2,cex.axis=cex-0.2,at=1:nrow(temp),labels=row.names(temp))
 		}
 		plot(1:10,type="n",xaxt="n",yaxt="n",bty="n",xlab="",ylab="")
 		legend("center",legend=legendText,col=rainbow(length(colLine)),lwd=2,bty="n",cex=cex)

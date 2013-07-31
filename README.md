@@ -2,6 +2,8 @@ Table of Content
 ================
 * [Overview](#Overview)
 * [Change log](#Change)
+ * [Release candidate (RC) version 1.2](#RC12)
+ * [Release candidate (RC) version 1.1](#RC11)
  * [Release candidate (RC) version 1.0](#RC10)
 * [Prerequisites](#Prerequisites)
  * [Install required perl packages](#irpp)
@@ -28,6 +30,11 @@ Say something
 
 <a name="Change"/>
 # Change log #
+
+<a name="RC12">
+## Release candidate (RC) version 1.2 on July 31, 2013
+Release version 1.2 for test
+ * The algorithm in bam QC was improved and the memory usage was highly decreased;
 
 <a name="RC11">
 ## Release candidate (RC) version 1.1 on July 29, 2013
@@ -128,22 +135,21 @@ Example code for running QC with given example dataset could be:
 	-m [module]         QC module used. It should be f (fastq QC), b (bam QC), or v (vcf QC).
 	-i [inputFile]      Input file. It should be a file list including all analyzed files in fastq QC and bam QC. In vcf QC, it should be the vcf file.
 	-o [outputDir]      Output directory for QC result. If the directory doesn't exist, it would be created. If the directory already existed, the files in it would be deleted.
-	
+	-t [int]            Threads used in analysis. The default value is 4. This parameter only valid for fastq and bam QC. Only one thread would be used in vcf QC.
 
 Here is more details for each module:
 
 <a name="fqc"/>
 ## fastq QC 
 
-	perl qc3.pl -m f -i inputFileList -o outputDir
+	perl qc3.pl -m f -i inputFileList -o outputDir -t threads
 
-	-t [int]        Threads used in analysis. The default value is 4. This parameter only valid for fastq QC. Only one thread would be used in bam and vcf QC.
 	-p				whether the fastq files were pair-end data. -p = pair-end.
 
 <a name="bqc"/>
 ## bam QC
 
-	perl qc3.pl -m b -i inputFileList -o outputDir
+	perl qc3.pl -m b -i inputFileList -o outputDir -t threads
 
 	-r  [database]	A targetregion file.
 	-g  [database]	A gtf file.
