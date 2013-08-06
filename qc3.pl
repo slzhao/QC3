@@ -1,8 +1,7 @@
+#!/usr/bin/perl
 use strict;
 use warnings;
-#use forks;
 use threads;
-#use threads::shared;
 use File::Basename;
 use HTML::Template;
 use Getopt::Long;
@@ -14,11 +13,14 @@ use source::fastqSummary;
 use source::bamSummary;
 use source::vcfSummary;
 
+my $version="RC 1.3";
 my %config;
 $config{'RBin'}        = "R";       #where the R bin file is
-$config{'annovarBin'}  = "annotate_variation.pl";		#where the ANNOVAR bin file is
+$config{'annovarBin'}  = "table_annovar.pl";		#where the ANNOVAR bin file is
+$config{'annovarConvert'}  = "convert2annovar.pl";		#where the ANNOVAR convert bin file is
+$config{'annovarOption'}  = "-buildver hg19 -protocol refGene,snp137 -operation g,f --remove --otherinfo "; #other options for ANNOVAR
 $config{'samtoolsBin'} = "samtools";	#where the SAMtools bin file is
-$config{'logFileName'} = "qcLog.txt";	#name of the log file
+$config{'logFileName'} = "qc3Log.txt";	#name of the log file
 
 my $commandline = "perl $0 "
   . join( " ", @ARGV )
@@ -44,18 +46,30 @@ GetOptions(
 	"s=i" => \$method,
 	"a=s" => \$annovarDb,
 );
+if ( !defined $module) {die ("Module (-m) must be specified\n");}
+if ( !defined $filelist or !defined $resultDir) {die ("Input file (-i) and Output directory (-o) must be provided\n");}
+
 if ( !defined $pairend )    { $pairend              = 0; }
 if ( !defined $isdepth )    { $isdepth              = 0; }
+if ( !defined $method ) { $method = 1; }
+if ( !( defined $cfgFile ) or $cfgFile eq '' ) {
+		$cfgFile = dirname($0) . '/GATK.cfg';
+}
 if ( !defined $maxThreads ) { $config{'maxThreads'} = 4; }
 else {
 	$config{'maxThreads'} = $maxThreads;
 }
-if ( !defined $caculateMethod ) { $config{'caculateMethod'} = 1; }
+if ( !defined $caculateMethod ) { $config{'caculateMethod'} = 1; } #1 as mean 2 as median
 else {
 	$config{'caculateMethod'} = $caculateMethod;
 }
 $config{'resultDir'} = $resultDir;
-if ( !( -e $resultDir ) ) { mkdir $resultDir; }
+if (!( -e $resultDir ) ) { 
+	if (mkdir $resultDir) {
+	} else {	
+		die "can't make result dir. $!\n";
+	}
+}
 
 my $reportHash;
 ${$reportHash}{'COMMAND'}   = $commandline;
@@ -63,7 +77,9 @@ ${$reportHash}{'CREATTIME'} = localtime;
 my $template;
 my $reportFileName;
 
-open $config{'log'}, ">$resultDir/".$config{'logFileName'} or die "can't open log file. $!\n";
+if (defined $resultDir) {
+	open $config{'log'}, ">$resultDir/".$config{'logFileName'} or die "can't open log file. $!\n";
+}
 
 if ( $module eq "f" ) {
 	pInfo("Start fastq summary for $filelist",$config{'log'});
@@ -80,13 +96,9 @@ if ( $module eq "f" ) {
 	  &dir2list( $resultDir, "/fastqFigure/", "^batch_", "FIGUREBATCH" );
 	my $table1 =
 	  &file2table("$resultDir/fastqResult/fastqSummary.txt",'',1);
-#	${$reportHash}{'FIGUREBASESCORE'} = "./fastqfigure/fastqScore.png";
-#	${$reportHash}{'FIGUREBASENUC'}   = "./fastqfigure/nucPercenty.png";
-#	${$reportHash}{'FIGUREBASESCOREN'} = "./fastqfigure/fastqScoreN.png";
-	${$reportHash}{'FIGUREBASESCOREYN'} = "./fastqfigure/fastqScoreYN.png";
-	${$reportHash}{'FIGUREBASESCOREYNLEGEND'} = "./fastqfigure/fastqScoreYN.png.legend.png";
-#	${$reportHash}{'FIGUREBASENUCN'}   = "./fastqfigure/nucPercentyN.png";
-	${$reportHash}{'FIGUREBASENUCYN'}   = "./fastqfigure/nucPercentyYN.png";
+	${$reportHash}{'FIGUREBASESCOREYN'} = "./fastqFigure/fastqScoreYN.png";
+	${$reportHash}{'FIGUREBASESCOREYNLEGEND'} = "./fastqFigure/fastqScoreYN.png.legend.png";
+	${$reportHash}{'FIGUREBASENUCYN'}   = "./fastqFigure/nucPercentyYN.png";
 	${$reportHash}{'FIGURELOOP1'}     = $figureList1;
 	${$reportHash}{'MAKETABLE1'} = $table1;
 	$template =
@@ -126,7 +138,7 @@ elsif ( $module eq "v" ) {
 	pInfo("Start vcf summary for $filelist",$config{'log'});
 	$config{'cfgFile'} = $cfgFile;
 	$config{'method'}  = $method;
-	$config{'annovarDb'}   = $annovarDb; #"/scratch/cqs/shengq1/references/annovar/humandb/"
+	$config{'annovarDb'}   = $annovarDb;
 	my $rResult = &vcfSummary( $filelist, \%config );
 	if ( $rResult != 0 ) {
 		print(
@@ -136,6 +148,7 @@ elsif ( $module eq "v" ) {
 
 	#report
 	my $vcfFileName = basename($filelist);
+	my $cfgFileContent=&file2text($cfgFile);
 	my $table1 =
 	  &file2table("$resultDir/vcfResult/$vcfFileName.SampleNumber.txt",'',1);
 	my $table2 =
@@ -143,16 +156,23 @@ elsif ( $module eq "v" ) {
 		[ 1, 2, 3,4,5,6,7, 8,9,10, 11 ],1 );
 	my $table3 =
 	  &file2table("$resultDir/vcfResult/$vcfFileName.snpCount.txt",'',1);
+	my $table4;
+	 if (-e "$resultDir/vcfAnnovarResult/$vcfFileName.pass.avinput.annovar.countTable.txt") {
+	 		$table4 =
+	  &file2table("$resultDir/vcfAnnovarResult/$vcfFileName.pass.avinput.annovar.countTable.txt",'',1);
+	 }
 	my $figureList1 =
 	  &dir2list( $resultDir, "/vcfFigure/", "scoreCompare", "FIGURE2" );
 	my $figureList2 =
 	  &dir2list( $resultDir, "/vcfAnnovarResult/", ".variant_function", "FS2",
 		1 );
-	${$reportHash}{'TABLE1'} = $table1;
-#	${$reportHash}{'TABLE2'} = $table2;
-	${$reportHash}{'MAKETABLE1'} = $table3;
+#	${$reportHash}{'TABLE1'} = $table1;
+	${$reportHash}{'MAKETABLE1'} = $table1;
 	${$reportHash}{'MAKETABLE2'} = $table2;
-	${$reportHash}{'MAKETABLE3'} = $table1;
+	${$reportHash}{'MAKETABLE3'} = $table3;
+	${$reportHash}{'MAKETABLE4'} = $table4;
+	${$reportHash}{'FILTERFILE'}   = $cfgFile;
+	${$reportHash}{'FILTERFILECONTENT'}   = $cfgFileContent;
 	${$reportHash}{'FIG'}    = "./vcfFigure/$vcfFileName.Method$method.txt.png";
 	${$reportHash}{'FIGNUMBER'} = "./vcfFigure/$vcfFileName.sampleNumber.png";
 	${$reportHash}{'FIGURE1'}   = $figureList1;

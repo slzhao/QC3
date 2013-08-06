@@ -2,6 +2,7 @@ Table of Content
 ================
 * [Overview](#Overview)
 * [Change log](#Change)
+ * [Release candidate (RC) version 1.3](#RC13)
  * [Release candidate (RC) version 1.2](#RC12)
  * [Release candidate (RC) version 1.1](#RC11)
  * [Release candidate (RC) version 1.0](#RC10)
@@ -31,21 +32,27 @@ Say something
 <a name="Change"/>
 # Change log #
 
+<a name="RC13">
+## Release candidate (RC) version 1.3 on August 06, 2013
+Release candidate version 1.3 for test
+ * The ANNOVAR annotation function in vcf QC was changed;
+ * The codes in bam QC and fastq QC were improved;
+
 <a name="RC12">
 ## Release candidate (RC) version 1.2 on July 31, 2013
-Release version 1.2 for test
+Release candidate version 1.2 for test
  * The algorithm in bam QC was improved and the memory usage was highly decreased;
 
 <a name="RC11">
 ## Release candidate (RC) version 1.1 on July 29, 2013
-Release version 1.1 for test
+Release candidate version 1.1 for test
  * Documents were improved;
  * Some bugs were fixed;
  * Example files were provided;
 
 <a name="RC10">
 ## Release candidate (RC) version 1.0 on July 26, 2013
-Release version 1.0 for test
+Release candidate version 1.0 for test
 
 <a name="Prerequisites"/>
 # Prerequisites #
@@ -80,7 +87,10 @@ Otherwise, it may look like this
 	ok   source::makeReport
 	ok   source::vcfSummary
 
-Then you need to install the missing packages from [CPAN](http://www.cpan.org/). 
+Then you need to install the missing packages from [CPAN](http://www.cpan.org/). A program was also provided to make the package installation more convenient.
+	
+	#if HTML::Template was missing
+	./install.modules HTML::Template
 
 <a name="irs"/>
 ## Install required software ##
@@ -104,15 +114,22 @@ After you install SAMtools and add SAMtools bin file to your Path, the software 
 
 ### annovar ###
 
-ANNOVAR is an efficient software tool to utilize update-to-date information to functionally annotate genetic variants detected from diverse genomes. We used ANNOVAR for annotation in vcf QC. It could be downloaded from [ANNOVAR website](http://www.openbioinformatics.org/annovar/).
+**Please note: ANNOVAR and ANNOVAR database are not essential for vcf QC. If not provided or not found, ANNOVAR annotation will not be performed but other functions in vcf QC work well**.
 
-The ANNOVAR database files were also needed for ANNOVAR annotation. Please refer to the [ANNOVAR document](http://www.openbioinformatics.org/annovar/annovar_db.html) for the  database preparation.
+ANNOVAR is an efficient software tool to utilize update-to-date information to functionally annotate genetic variants detected from diverse genomes. We used ANNOVAR for annotation in vcf QC. It could be downloaded from [ANNOVAR website](http://www.openbioinformatics.org/annovar/).
 
 After you install ANNOVAR and add ANNOVAR bin file to your Path, the software can find and use ANNOVAR automatically. Or you can change the qc3.pl script and tell the program where the ANNOVAR is on your computer. Here is the line you need to modify.
 
 	$config{'annovarBin'}  = "annotate_variation.pl";		#where the ANNOVAR bin file is
+	$config{'annovarConvert'}  = "convert2annovar.pl";		#where the ANNOVAR convert bin file is
+	$config{'annovarOption'}  = "-buildver hg19 -protocol refGene,snp137 -operation g,f --remove --otherinfo "; #other options for ANNOVAR
 
-**Please note: ANNOVAR and ANNOVAR database are not essential for vcf QC. If not provided or not found, ANNOVAR annotation will not be performed but other functions in vcf QC work well**.
+The ANNOVAR database files were also needed for ANNOVAR annotation. Please refer to the [ANNOVAR document](http://www.openbioinformatics.org/annovar/annovar_db.html) for the  database preparation. Or you can simply use the following codes to prepare ANNOVAR database files.
+
+	#assume ANNOVAR was installed and added to Path. Then you want to download ANNOVAR database in annovarDatabase directory.
+	cd annovarDatabase
+	annotate_variation.pl -downdb -buildver hg19 -webfrom annovar snp137 humandb/
+	annotate_variation.pl -downdb -buildver hg19 -webfrom annovar refGene humandb/
 
 <a name="drd"/>
 ## Download required database ##
@@ -153,7 +170,7 @@ Here is more details for each module:
 
 	-r  [database]	A targetregion file.
 	-g  [database]	A gtf file.
-	-cm [int]	    Calculation method for data summary, should be 1 or 2. Method 1 means mean and method 2 means median.
+	-cm [int]	    Calculation method for data summary, should be 1 or 2. Method 1 means mean and method 2 means median. The default value is 1.
 	-d				whether the depth in on-/off-target regions will be calculated, -d = will be calculated.
 
 <a name="vqc"/>
@@ -161,7 +178,8 @@ Here is more details for each module:
 
 	perl qc3.pl -m v -i inputFile -o outputDir
 
-	-s [int]		    Method used in consistence calculation, should be 1 or 2. In method 1, only the two samples will completely same allele will be taken as consist. In method 2, the two samples satisfy the criterion in method 1, or if the two samples were 0/0 vs 0/1 but 0/0 sample has some read counts in alternative allele, they will be taken as consistent.
+	-s [int]		    Method used in consistence calculation, should be 1 or 2. In method 1, only the two samples will completely same allele will be taken as consist. In method 2, the two samples satisfy the criterion in method 1, or if the two samples were 0/0 vs 0/1 but 0/0 sample has some read counts in alternative allele, they will be taken as consistent. The default value is 1.
+	-c [database]	A file indicating the filter arguments for vcf files. If not specified, the default file 'GATK.cfg' in qc3 directory with GATK best practices recommended arguments will be used.
 	-a [database]	Directory of annovar database.
 
 <a name="Example"/>
@@ -179,33 +197,36 @@ You need to download and extract it to a directory. Then the example code for ru
 	wget http://sourceforge.net/projects/qc3/files/example.tar.gz/download
 	tar zxvf example.tar.gz
 	ls
-	
-	#make file list file for fastq and bam QC
-	bash makeFileList.sh
-	head example_bam_fileList.txt
-	head example_fastq_fileList.txt
-	#example_bam_fileList.txt and example_fastq_fileList.txt would be generated in exampleDir
 
 <a name="fqcE"/>
 ## fastq QC ##
 
 	#assume qc3.pl in qc3Dir, examples in exampleDir
-	cd qc3Dir
-	perl qc3.pl -m f -t 8 -i exampleDir/example_fastq_fileList.txt -o exampleDir/example_fastq_result -p
+	cd exampleDir
+	cd fastq
+	perl qc3Dir/qc3.pl -m f -i example_fastq_fileList.txt -o example_fastq_result -p
 
 
 <a name="bqcE"/>
 ## bam QC
 
 	#assume qc3.pl in qc3Dir, examples in exampleDir
-	cd qc3Dir
-	perl qc3.pl -m b -i exampleDir/example_bam_fileList.txt -r exampleDir/bamQcDatabase/hg19_protein_coding.bed.Part -g exampleDir/bamQcDatabase/Homo_sapiens.GRCh37.63_protein_coding_chr1-22-X-Y-M.gtf.Part -o exampleDir/example_bam_result -d
+	cd exampleDir
+	cd bam
+
+	#a simple example, with only bed file
+	perl qc3Dir/qc3.pl -m b -i example_bam_fileList.txt -r ../bamQcDatabase/hg19_protein_coding.bed.Part -o example_bam_result1
+	
+	#a example with both bed and gtf file, and will calculate the depth
+	perl qc3Dir/qc3.pl -m b -i example_bam_fileList.txt -r ../bamQcDatabase/hg19_protein_coding.bed.Part -g ../bamQcDatabase/Homo_sapiens.GRCh37.63_protein_coding_chr1-22-X-Y-M.gtf.Part -o example_bam_result2
 
 <a name="vqcE"/>
 ## vcf QC
 	
 	#assume qc3.pl in qc3Dir, examples in exampleDir
-	perl qc3.pl -m v -i exampleDir/vcf/CV-7261.vcf.top40000.txt -s 1 -o exampleDir/example_vcf_result
+	cd exampleDir
+	cd vcf
+	perl qc3Dir/qc3.pl -m v -i CV-7261.vcf.top40000.txt -s 1 -o example_vcf_result
 
 <a name="Results"/>
 # Results #
@@ -242,7 +263,9 @@ The "Batch effect" section indicated the statistics of reads, on-target and off-
 
 An example report could be accessed at [Here](http://htmlpreview.github.io/?https://github.com/slzhao/QC3/blob/master/reportExample/vcf/vcfReport.html)
 
-vcf QC report was constituted by five sections. 
+vcf QC report was constituted by six sections. 
+
+The "Filter" section displayed the arguments for the filter of vcf files.
 
 The "Statistics" section displayed the Transitions:Transversions ratio and Heterozygous:Non-reference homozygous ratio in all samples.
 
@@ -252,7 +275,7 @@ The "SNP count" section displayed the SNP count of each sample in different chro
 
 The "Score" section visualized the position and score of SNPs before and after filter.
 
-The "Annovar annotation" section listed the annovar annotation result files.
+The "Annovar annotation" section displayed the counts of SNPs with different functions, such as synonymous/nonsynonymous SNV, and whether they were in snp137 database.
 
 <a name="Contacts"/>
 # Contacts #

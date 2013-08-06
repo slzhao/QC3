@@ -8,13 +8,17 @@ plot_dataFrame<-function(rawData,colBox=5:ncol(rawData),colList=NA,cex=1,dolog=F
 	row.names(rawData)<-gsub(".bam","",row.names(rawData))
 	temp<-strsplit(row.names(rawData),"/")
 	row.names(rawData)<-sapply(temp,function(x) x[length(x)])
-	cex.axis<-c(cex,cex-0.2,cex)
+#	cex.axis<-c(cex,cex-0.3,cex)
+	cex.axis<-c(cex,cex,cex-0.3,cex)
 	for (x in colBox) {
 		if (length(na.omit(as.numeric(rawData[,x])))<=1) {next;}
-		png(paste("batch_",colnames(rawData)[x],".png",sep=""),width=1000,height=300,res=res)
-		par(mfrow=c(1,3))
+#		png(paste("batch_",colnames(rawData)[x],".png",sep=""),width=1000,height=300,res=res)
+		png(paste("batch_",colnames(rawData)[x],".png",sep=""),width=1300,height=300,res=res)
+#		par(mfrow=c(1,3))
+		par(mfrow=c(1,4))
+#		par(mar=c(3,6,2,1))
 		par(mar=c(3,5,2,1))
-		for (y in 2:4) {
+		for (y in 1:4) {
 			col<-rainbow(length(table(rawData[,y])))
 			if (length(col)==1) {
 				pvalue1<-NA
@@ -24,8 +28,10 @@ plot_dataFrame<-function(rawData,colBox=5:ncol(rawData),colList=NA,cex=1,dolog=F
 				pvalue2<-fligner.test(rawData[,x],rawData[,y])$p.value
 			}
 			ylim<-c(min(rawData[,x],na.rm=T)-(max(rawData[,x],na.rm=T)-min(rawData[,x],na.rm=T))*0.27,max(rawData[,x],na.rm=T))
-			boxplot(rawData[,x]~rawData[,y],las=1,main=paste(colnames(rawData)[x],colnames(rawData)[y],sep=" by "),border=col,cex.axis=cex.axis[y-1],cex.main=cex-0.2,yaxt="n",ylim=ylim)
+#			boxplot(rawData[,x]~rawData[,y],las=1,main=paste(colnames(rawData)[x],colnames(rawData)[y],sep=" by "),border=col,cex.axis=cex.axis[y-1],cex.main=cex-0.3,yaxt="n",ylim=ylim)
+			boxplot(rawData[,x]~rawData[,y],las=1,main=paste(colnames(rawData)[x],colnames(rawData)[y],sep=" by "),border=col,cex.axis=cex.axis[y],cex.main=cex-0.3,yaxt="n",ylim=ylim)
 			axis(2,cex.axis=cex,las=1)
+			if (length(unique(rawData[,y]))==1) {axis(1,at=1,labels=rawData[1,y],cex.axis=cex.axis[y])}
 			legend("bottomright",legend=c(showP(pvalue1,title="Kruskal ",cutoff=0.001),showP(pvalue2,title="Fligner ",cutoff=0.001)),bty="n",cex=cex-0.1)
 		}
 		dev.off()

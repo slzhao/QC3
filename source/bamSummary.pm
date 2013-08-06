@@ -33,7 +33,6 @@ sub bamSummary {
 	my $caculateMethod = $config->{'caculateMethod'};    #1 as mean 2 as median
 	
 	my $maxThreads       = $config->{'maxThreads'};
-#	my $maxThreads=4;
 
 	my $usage =
 "Please use the follow command:\n perl qc3.pl -m b -i inputBamList -o outputDir [-r targetregion file] [-g gtf file] [-cm data summary method] [-d depth caculation]\nFor more information, plase read the readme file\n";
@@ -54,129 +53,130 @@ sub bamSummary {
 	else {
 		$methodText = "Median";
 	}
-#
-#	#test R, comment below codes
-#	if ( $isdepth == 1 ) {
-#		pInfo(
-#"Will calculate the depth in on-/off-target regions. It will take a long time. You can turn it off without -d in your command line",
-#			$logFile
-#		);
-#	}
-#	else {
-#		$isdepth = 0;
-#	}
-#
-#	my %regionDatabase;
-#	open( BAMFILE1,  $filelist )      or die $!;
-#	my $bamFile1 = <BAMFILE1>;
-#	&initializeDatabase($bamFile1,\%regionDatabase,$samtoolsBin);
-#	close (BAMFILE1);
-#	my $inBedSign = 1;    #1=10 in bed; 2=01 in exon; 3=11 in intron
-#
-#	# 1) Load targetregionfile
-#	if ( defined($targetregionfile) ) {
-#		pInfo( "Load target region file '$targetregionfile'", $logFile );
-#		loadbed( $targetregionfile, \%regionDatabase );
-#	}
-#	else {
-#		$inBedSign = 2;
-#		pInfo(
-#			"No targetregion file, will use exon regions in gtf file instead",
-#			$logFile );
-#	}
-#
-#	# 2) Load gtf file
-#	if ( defined($gtffile) ) {
-#		pInfo( "Load gtf file '$gtffile'", $logFile );
-#		loadgtf( $gtffile, \%regionDatabase );
-#	}
-#	else {
-#		pInfo( "No gtf file", $logFile );
-#	}
-#
-#	# 3) read bam file
-#	pInfo( "Read bam file and write out", $logFile );
-#	open( IN,  $filelist )      or die $!;
-#	open( OUT, ">$outputFile" ) or die $!;
-#
-#	print OUT join "\t",
-#	  (
-#		"Sample",
-#		"Instrument",
-#		"Run",
-#		"Flowcell",
-#		"Lane",
-#		"Total Reads",
-#		"On-target",
-#		"Off-target",
-#		"Unmapped",
-#		"Off-target-intron",
-#		"Off-target-intergenic",
-#		"Off-target-mito",
-#		"Total Reads($methodText MQ)",
-#		"On-target($methodText MQ)",
-#		"Off-target($methodText MQ)",
-#		"Off-target-intron($methodText MQ)",
-#		"Off-target-intergenic($methodText MQ)",
-#		"Off-target-mito($methodText MQ)",
-#		"Total Reads($methodText InsertSize)",
-#		"On-target($methodText InsertSize)",
-#		"Off-target($methodText InsertSize)",
-#		"Off-target-intron($methodText InsertSize)",
-#		"Off-target-intergenic($methodText InsertSize)",
-#		"Off-target-mito($methodText InsertSize)"
-#	  );
-#	if ($isdepth) {
-#		print OUT "\t";
-#		print OUT join "\t",
-#		  (
-#			"Total Reads($methodText Depth)",           "On-target($methodText Depth)",
-#			"Off-target($methodText Depth)",            "Off-target-intron($methodText Depth)",
-#			"Off-target-intergenic($methodText Depth)", "Off-target-mito($methodText Depth)\n"
-#		  );
-#	}
-#	else {
+
+	#test R, comment below codes
+	$| = 1;
+	if ( $isdepth == 1 ) {
+		pInfo(
+"Will calculate the depth in on-/off-target regions. It will take a long time. You can turn it off without -d in your command line",
+			$logFile
+		);
+	}
+	else {
+		$isdepth = 0;
+	}
+
+	my %regionDatabase;
+	open( BAMFILE1,  $filelist )      or die $!;
+	my $bamFile1 = <BAMFILE1>;
+	&initializeDatabase($bamFile1,\%regionDatabase,$samtoolsBin);
+	close (BAMFILE1);
+	my $inBedSign = 1;    #1=10 in bed; 2=01 in exon; 3=11 in intron
+
+	# 1) Load targetregionfile
+	if ( defined($targetregionfile) ) {
+		pInfo( "Load target region file '$targetregionfile'", $logFile );
+		loadbed( $targetregionfile, \%regionDatabase );
+	}
+	else {
+		$inBedSign = 2;
+		pInfo(
+			"No targetregion file, will use exon regions in gtf file instead",
+			$logFile );
+	}
+
+	# 2) Load gtf file
+	if ( defined($gtffile) ) {
+		pInfo( "Load gtf file '$gtffile'", $logFile );
+		loadgtf( $gtffile, \%regionDatabase );
+	}
+	else {
+		pInfo( "No gtf file", $logFile );
+	}
+
+	# 3) read bam file
+	pInfo( "Read bam file and write out", $logFile );
+	open( IN,  $filelist )      or die $!;
+	open( OUT, ">$outputFile" ) or die $!;
+
+	print OUT join "\t",
+	  (
+		"Sample",
+		"Instrument",
+		"Run",
+		"Flowcell",
+		"Lane",
+		"Total Reads",
+		"On-target",
+		"Off-target",
+		"Unmapped",
+		"Off-target-intron",
+		"Off-target-intergenic",
+		"Off-target-mito",
+		"Total Reads($methodText MQ)",
+		"On-target($methodText MQ)",
+		"Off-target($methodText MQ)",
+		"Off-target-intron($methodText MQ)",
+		"Off-target-intergenic($methodText MQ)",
+		"Off-target-mito($methodText MQ)",
+		"Total Reads($methodText InsertSize)",
+		"On-target($methodText InsertSize)",
+		"Off-target($methodText InsertSize)",
+		"Off-target-intron($methodText InsertSize)",
+		"Off-target-intergenic($methodText InsertSize)",
+		"Off-target-mito($methodText InsertSize)"
+	  );
+	if ($isdepth) {
+		print OUT "\t";
+		print OUT join "\t",
+		  (
+			"Total Reads($methodText Depth)",           "On-target($methodText Depth)",
+			"Off-target($methodText Depth)",            "Off-target-intron($methodText Depth)",
+			"Off-target-intergenic($methodText Depth)", "Off-target-mito($methodText Depth)\n"
+		  );
+	}
+	else {
+		print OUT "\n";
+	}
+	while ( my $f = <IN> ) {
+		$f =~ s/\r|\n//g;
+		
+#		#single threads
+#		pInfo( "Processing $f ", $logFile );
+#		my @metric =
+#		  &getbammetric( $f, \%regionDatabase, $inBedSign, $isdepth,
+#			$samtoolsBin, $caculateMethod );
+#		print OUT join "\t", (@metric);
 #		print OUT "\n";
-#	}
-#	while ( my $f = <IN> ) {
-#		$f =~ s/\r|\n//g;
-#		
-##		#single threads
-##		pInfo( "Processing $f ", $logFile );
-##		my @metric =
-##		  &getbammetric( $f, \%regionDatabase, $inBedSign, $isdepth,
-##			$samtoolsBin, $caculateMethod );
-##		print OUT join "\t", (@metric);
-##		print OUT "\n";
-#				
-#				#multi threads
-#				if ( scalar( threads->list() ) < $maxThreads ) {
-#					pInfo("Processing $f ",$logFile);
-#					my ($t) =  threads->new( \&getbammetric, $f, \%regionDatabase, $inBedSign, $isdepth,
-#						$samtoolsBin , $caculateMethod);
-#				}
-#				else {
-#					foreach my $thread ( threads->list() ) {
-#						my @metric = $thread->join;
-#						print OUT join "\t", (@metric);
-#						print OUT "\n";
-#						pInfo("Processing $f ",$logFile);
-#						my ($t) =  threads->new( \&getbammetric, $f, \%regionDatabase, $inBedSign, $isdepth,
-#						$samtoolsBin , $caculateMethod);
-#						last;
-#					}
-#				}
-#	}
-#
-#		#join all left threads
-#		foreach my $thread ( threads->list() ) {
-#			my @metric = $thread->join;
-#			print OUT join "\t", (@metric);
-#			print OUT "\n";
-#		}
-#	close OUT;
-#
-#	#end comment by test R
+				
+				#multi threads
+				if ( scalar( threads->list() ) < $maxThreads ) {
+					pInfo("Processing $f ",$logFile);
+					my ($t) =  threads->new( \&getbammetric, $f, \%regionDatabase, $inBedSign, $isdepth,
+						$samtoolsBin , $caculateMethod);
+				}
+				else {
+					foreach my $thread ( threads->list() ) {
+						my @metric = $thread->join;
+						print OUT join "\t", (@metric);
+						print OUT "\n";
+						pInfo("Processing $f ",$logFile);
+						my ($t) =  threads->new( \&getbammetric, $f, \%regionDatabase, $inBedSign, $isdepth,
+						$samtoolsBin , $caculateMethod);
+						last;
+					}
+				}
+	}
+
+		#join all left threads
+		foreach my $thread ( threads->list() ) {
+			my @metric = $thread->join;
+			print OUT join "\t", (@metric);
+			print OUT "\n";
+		}
+	close OUT;
+
+	#end comment by test R
 
 	#plot by R
 	my $Rsource =
@@ -214,6 +214,7 @@ sub getbammetric {
 	close(BAMLINE1);
 	open( BAM, "$samtoolsBin view $in|" ) or die $!;
 	my $flag_read_unmapped = 0x0004;
+	my $flag_read_mapped_proper_pair = 0x0002;
 
 	while (<BAM>) {
 		my @line   = split "\t", $_;
@@ -222,10 +223,10 @@ sub getbammetric {
 		my $MQflag = 0;
 		if ( $MQ =~ /^\d+$/ ) {
 			$MQflag = 1;
-		}
+		} else {print "$_\n";}
 		my $insert     = $line[8];
 		my $insertflag = 0;
-		if ( $insert =~ /^\d+$/ ) {
+		if ( $insert =~ /^\d+$/ and ($flag & $flag_read_mapped_proper_pair)) {
 			$insertflag = 1;
 		}
 		my $chr = $line[2];

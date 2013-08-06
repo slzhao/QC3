@@ -6,7 +6,7 @@ use Exporter;
 use Scalar::Util qw(looks_like_number);
 
 our @ISA    = qw(Exporter);
-our @EXPORT = qw(build_template file2table dir2list cstmrow_filter);
+our @EXPORT = qw(build_template file2table file2text dir2list cstmrow_filter);
 
 1;
 
@@ -71,6 +71,17 @@ sub build_template {
 	}
 #	unlink "$templateName.temp";
 	return ($template);
+}
+
+sub file2text {
+	my $file        = $_[0];
+	my $result="";
+	open READ, "<$file" or die "can't find $file\n";
+	while (<READ>) {
+		chomp;
+		$result="$result$_\n";
+	}
+	return($result);
 }
 
 sub file2table {

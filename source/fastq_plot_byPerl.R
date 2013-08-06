@@ -4,78 +4,6 @@
 ###############################################################################
 
 #functions used
-#plot_fastqScore<-function(rawData,pairEnd=1,cex=1,res=150,ylim=range(rawData,na.rm=T),doSubgroup=T,doLegend=T,filename="fastqScore.png",lwd=1.5) {
-#	if (doSubgroup==T) {
-#		subgroup<-c(101:109,rep(1:((ncol(rawData)-9)%/%5),each=5),rep(99,((ncol(rawData)-9)%%5)))
-#		subgroup<-factor(subgroup,levels=unique(subgroup))
-#		rawData<-t(apply(rawData,1,function(x) tapply(x,subgroup,mean)))
-#	}
-#	if (pairEnd==1) {
-#		if (doLegend==T) {
-#			png(paste(filename,".legend.png",sep=""),width=500,height=500,res=res)
-#			plot(1:10,type="n",xaxt="n",yaxt="n",bty="n")
-#			legend("topleft",legend=c("Pair 1","Pair 2"),col=2:3,lwd=3,bty="n",cex=cex)
-#			dev.off()
-#		}
-#		fileHeight<-(as.integer(nrow(rawData)/2/4)+1)*250
-#		png(filename,width=1000,height=fileHeight,res=res)
-#		par(mfrow=c((as.integer(nrow(rawData)/2/4)+1),4))
-#		par(mar=c(2,2,2,1))
-#		for (x in 1:(nrow(rawData)/2)) {
-#			matplot(t(rawData[(2*x-1):(2*x),]),lty=1,col=2:3,type="l",las=1,xlab="Base",ylab="Average Quality Score",lwd=lwd,cex.axis=cex,cex.main=cex-0.1,main=basename(row.names(rawData)[(2*x-1):(2*x)]),ylim=ylim)
-##		pvalue<-cor.test(as.numeric(rawData[(2*x-1),]),as.numeric(rawData[(2*x),]))$p.value
-#			rvalue<-sprintf("%.2f", cor(as.numeric(rawData[(2*x-1),]),as.numeric(rawData[(2*x),])))		
-#			disvalue<-sprintf("%.2f", dist(rbind(as.numeric(rawData[(2*x-1),]),as.numeric(rawData[(2*x),])))[1])
-#			legend("bottomright",legend=c(paste("Correlation R=",rvalue,sep=""),paste("Euclidean distance=",disvalue,sep="")),bty="n",cex=cex-0.1)
-#		}
-##		plot(1:10,type="n",xaxt="n",yaxt="n",bty="n")
-##		legend("topleft",legend=c("Pair 1","Pair 2"),col=2:3,lwd=3,bty="n",cex=cex)
-#		dev.off()
-#	} else {
-#		fileHeight<-(as.integer(nrow(rawData)/4))*250
-#		png(filename,width=1000,height=fileHeight,res=res)
-#		par(mfrow=c((as.integer(nrow(rawData)/4)),4))
-#		par(mar=c(2,2,2,1))
-#		for (x in 1:(nrow(rawData))) {
-#			matplot(t(rawData[x,]),lty=1,col=2:3,type="l",las=1,xlab="Base",ylab="Average Quality Score",lwd=lwd,cex.axis=cex,cex.main=cex-0.1,main=basename(row.names(rawData)[x]),ylim=ylim)
-#		}
-#		dev.off()
-#	}
-#}
-#plot_fastqNuc<-function(rawData,cex=1,res=150,ylim=range(rawData,na.rm=T),doSubgroup=T,filename="nucPercenty.png",lwd=1.5) {
-##	library(RColorBrewer)
-##	palette(brewer.pal(12,"Paired"))
-#	palette(c("#A6CEE3","#1F78B4","#B2DF8A","#33A02C","#FB9A99","#E31A1C","#FDBF6F","#FF7F00","#CAB2D6","#6A3D9A","#FFFF99","#B15928"))
-#	fileHeight<-(as.integer(nrow(rawData)/2/4)+1)*250
-#	png(filename,width=1000,height=fileHeight,res=res)
-#	par(mfrow=c((as.integer(nrow(rawData)/2/4)+1),4))
-#	par(mar=c(2,3,2,1))
-#	for (x in 1:(nrow(rawData)/2)) {
-#		temp1<-as.matrix(rawData[(2*x-1):(2*x),])	
-#		temp<-rbind(temp1[,(1:(ncol(temp1)/4))*4-3],temp1[,(1:(ncol(temp1)/4))*4-2],temp1[,(1:(ncol(temp1)/4))*4-1],temp1[,(1:(ncol(temp1)/4))*4])
-#		row.names(temp)<-c("A_1","A_2","T_1","T_2","C_1","C_2","G_1","G_2")		
-#		if (doSubgroup==T) {
-#			subgroup<-c(101:109,rep(1:((ncol(temp)-9)%/%5),each=5),rep(99,((ncol(temp)-9)%%5)))
-#			subgroup<-factor(subgroup,levels=unique(subgroup))
-#			temp<-t(apply(temp,1,function(x) tapply(x,subgroup,mean,na.rm=T)))
-#		}
-#		matplot(t(temp),lty=1,col=1:8,type="l",las=1,xlab="Base",ylab="Percenty",lwd=lwd,cex.axis=cex,cex.main=cex-0.1,main=basename(row.names(rawData)[(2*x-1):(2*x)]),ylim=ylim)
-#		sigDiffNuc<-median(apply(temp[,-(1:10)],1,function(x) var(x)),na.rm=T)
-#		legend("bottomright",legend=sigDiffNuc,bty="n",cex=cex)
-#	}
-#	plot(1:10,type="n",xaxt="n",yaxt="n",bty="n")
-#	legend("topleft",legend=row.names(temp),col=1:8,lwd=3,bty="n",cex=cex)
-#	dev.off()
-#}
-#sigDiff<-function(x,cutoff=0.005) {
-#	for (i in (length(x)-1):1) {
-#		if (abs(x[i]-mean(x[(i-1):(length(x))]))>=cutoff) {
-#			return(i)
-#		}
-#	}
-#	return(NA)
-#}
-
 plot_fastqScoreN<-function(rawData,rawDataN,pairEnd=1,doLegend=T,cex=1,res=150,ylim=range(cbind(rawData,rawDataN),na.rm=T),doSubgroup=T,filename="fastqScore.png",col=c(2,4,6,8)) {
 	palette(c("#A6CEE3","#1F78B4","#B2DF8A","#33A02C","#FB9A99","#E31A1C","#FDBF6F","#FF7F00","#CAB2D6","#6A3D9A","#FFFF99","#B15928"))
 	if (doSubgroup==T) {
@@ -148,10 +76,12 @@ plot_fastqNucN<-function(rawData,rawDataN,cex=1,pairEnd=1,res=150,ylim=range(raw
 			selected<-(2*x-1):(2*x)
 			temp1<-as.matrix(rawData[(2*x-1):(2*x),])
 			temp2<-as.matrix(rawDataN[(2*x-1):(2*x),])
+			col<-1:8
 		} else {
 			selected<-x
 			temp1<-as.matrix(rawData[x,,drop=F])
 			temp2<-as.matrix(rawDataN[x,,drop=F])
+			col<-c(2,4,6,8)
 		}
 		temp<-rbind(temp1[,(1:(ncol(temp1)/4))*4-3],temp1[,(1:(ncol(temp1)/4))*4-2],temp1[,(1:(ncol(temp1)/4))*4-1],temp1[,(1:(ncol(temp1)/4))*4])
 #		row.names(temp)<-c("A_1","A_2","T_1","T_2","C_1","C_2","G_1","G_2")		
@@ -160,7 +90,7 @@ plot_fastqNucN<-function(rawData,rawDataN,cex=1,pairEnd=1,res=150,ylim=range(raw
 			subgroup<-factor(subgroup,levels=unique(subgroup))
 			temp<-t(apply(temp,1,function(x) tapply(x,subgroup,mean,na.rm=T)))
 		}
-		matplot(t(temp),lty=1,col=1:8,type="l",las=1,xlab="Base",ylab="Percenty",lwd=2,cex.axis=cex,cex.main=cex-0.1,main=basename(row.names(rawData)[selected]),ylim=ylim)
+		matplot(t(temp),lty=1,col=col,type="l",las=1,xlab="Base",ylab="Percenty",lwd=2,cex.axis=cex,cex.main=cex-0.1,main=basename(row.names(rawData)[selected]),ylim=ylim)
 		sigDiffNuc<-round(median(apply(temp[,-(1:10)],1,function(x) sd(x)),na.rm=T),3)
 		legend("bottomright",legend=paste("SD=",sigDiffNuc,sep=""),bty="n",cex=cex)
 		
@@ -170,15 +100,15 @@ plot_fastqNucN<-function(rawData,rawDataN,cex=1,pairEnd=1,res=150,ylim=range(raw
 			subgroup<-factor(subgroup,levels=unique(subgroup))
 			temp<-t(apply(temp,1,function(x) tapply(x,subgroup,mean,na.rm=T)))
 		}
-		matplot(t(temp),lty=1,col=1:8,type="l",las=1,xlab="Base",ylab="Percenty",lwd=lwd,cex.axis=cex,cex.main=cex-0.1,main=paste(basename(row.names(rawData)[selected])," (N)",sep=""),ylim=ylim)
+		matplot(t(temp),lty=1,col=col,type="l",las=1,xlab="Base",ylab="Percenty",lwd=lwd,cex.axis=cex,cex.main=cex-0.1,main=paste(basename(row.names(rawData)[selected])," (N)",sep=""),ylim=ylim)
 		sigDiffNuc<-round(median(apply(temp[,-(1:10)],1,function(x) sd(x)),na.rm=T),3)
 		legend("bottomright",legend=paste("SD=",sigDiffNuc,sep=""),bty="n",cex=cex)
 	}
 	plot(1:10,type="n",xaxt="n",yaxt="n",bty="n")
 	if (pairEnd==1) {
-		legend("topleft",legend=c("A_1","A_2","T_1","T_2","C_1","C_2","G_1","G_2"),col=1:8,lwd=3,bty="n",cex=cex)
+		legend("topleft",legend=c("A_1","A_2","T_1","T_2","C_1","C_2","G_1","G_2"),col=col,lwd=3,bty="n",cex=cex)
 	} else {
-		legend("topleft",legend=c("A","T","C","G"),col=c(2,4,6,8),lwd=3,bty="n",cex=cex)
+		legend("topleft",legend=c("A","T","C","G"),col=col,lwd=3,bty="n",cex=cex)
 	}
 	dev.off()
 }

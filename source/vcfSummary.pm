@@ -25,27 +25,27 @@ sub vcfSummary {
 
 	my $RBin       = $config->{'RBin'};
 	my $annovarBin = $config->{'annovarBin'};
+	my $annovarConvert = $config->{'annovarConvert'};
+	my $annovarOption = $config->{'annovarOption'};
 	my $annovarDb  = $config->{'annovarDb'};
 	
 	my $usage =
-"Please use the follow command:\n perl qc3.pl -m v -i inputVcfFile -o outputDir [-s Method in consistence calculation] [-a annovar database]\nFor more information, plase read the readme file\n";
+"Please use the follow command:\n perl qc3.pl -m v -i inputVcfFile -o outputDir [-s Method in consistence calculation] [-c filter config file] [-a annovar database]\nFor more information, plase read the readme file\n";
 	
-	if ( !( defined $cfgFile ) or $cfgFile eq '' ) {
-		$cfgFile = dirname($0) . '/GATK.cfg';
-	}
 	die "$!\n$usage" if ( !defined($VCF) or !( -e $VCF ) or !( -e $cfgFile ) );
 	
+	$| = 1;
 	my $doAnnovar=1;
 	if ((grep -x "$_/$annovarBin", @PATH)) {
 	} elsif (-e $annovarBin) {
 		$annovarBin="perl $annovarBin";
 	} else {
 		$doAnnovar=0;
-		pInfo("Can't find annovar bin. Will not perform annovar annotation",$logFile);
+		pInfo("Can't find annovar bin. Will not perform annovar annotation. You can read readme file to find how to download it",$logFile);
 	}
 	if (!(defined $annovarDb) or !(-e $annovarDb)) {
 		$doAnnovar=0;
-		pInfo("Can't find annovar database. Will not perform annovar annotation",$logFile);
+		pInfo("Can't find annovar database. Will not perform annovar annotation. You can read readme file to find how to download it",$logFile);
 	}
 	
 	my %IDList;
@@ -62,8 +62,8 @@ sub vcfSummary {
 	my %changNumber;
 	my %changes;
 	my %cfgFilter;
-	my @filesAnnovar;
-	my %fileHandlesAnn;
+#	my @filesAnnovar;
+#	my %fileHandlesAnn;
 	my %snpCount;
 	
 	open CFG, "<$cfgFile" or die $!;
@@ -93,6 +93,7 @@ sub vcfSummary {
 	my $resultFile = "$resultDir/vcfResult/$filename.Method$method.txt";
 	open RESULT4, ">$resultFile" or die "can't write $resultFile\n";
 	open RESULT5, ">$resultDir/vcfResult/$filename.snpCount.txt" or die $!;
+	open RESULT6, ">$annovarResultDir$filename.pass" or die $!; #new vcf for annovar
 
 	while (<READ>) {    #read title and ID list
 		chomp;
@@ -107,16 +108,6 @@ sub vcfSummary {
 			@titles = ( split /\t/, $_ );
 			$sampleSize = scalar(@titles) - 9;
 			pInfo("The VCF file has $sampleSize samples",$logFile);
-			for ( my $x = 9 ; $x < ( 9 + $sampleSize - 1 ) ; $x++ ) {
-				for ( my $y = ( $x + 1 ) ; $y < ( 9 + $sampleSize ) ; $y++ ) {
-					my $out = $titles[$x] . "to" . $titles[$y];
-					open $fileHandlesAnn{$out},
-					  ">$annovarResultDir" . '/' . "$out.annovar.txt"
-					  or die $!;
-					push @filesAnnovar,
-					  "$annovarResultDir" . '/' . "$out.annovar.txt";
-				}
-			}
 			last;
 		}
 	}
@@ -136,6 +127,7 @@ sub vcfSummary {
 		chomp;
 		s/\r//g;
 		if (/^#/ or $_ eq "") {
+			print RESULT6 "$_\n";
 			next;
 		}
 		my @lines = ( split /\t/, $_ );
@@ -146,6 +138,7 @@ sub vcfSummary {
 		else {
 			$done_filter = 0;
 			print RESULT2 "$lines[0]\t$lines[1]\t$lines[3]\t$lines[4]";
+			print RESULT6 "$_\n";
 		}
 		print RESULT1 "$lines[0]\t$lines[1]\t$lines[3]\t$lines[4]";
 
@@ -225,14 +218,6 @@ sub vcfSummary {
 						$total{ $titles[$y] }{ $titles[$x] }     += $result[3];
 						$selected2{ $titles[$x] }{ $titles[$y] } += $result[4];
 						$total2{ $titles[$x] }{ $titles[$y] }    += $result[5];
-						if ( $result[4] == 0 and $result[5] == 1 ) {
-							my $out = $titles[$x] . "to" . $titles[$y];
-							print { $fileHandlesAnn{$out} }
-"$lines[0]\t$lines[1]\t$lines[1]\t$lines[3]\t$lines[4]\t$lines[$x]\t$lines[$y]\n";
-							$changNumber{ $titles[$x] }{ $titles[$y] }
-							  { $lines[3] . $lines[4] }++;
-							$changes{ $lines[3] . $lines[4] }='';
-						}
 					}
 				}
 			}
@@ -255,7 +240,7 @@ sub vcfSummary {
 	}
 
 	print RESULT4
-"FileTitle\tSampleA\tSampleB\tCountA2B\tCountB\tHeterozygous Consistency (CountA2B:CountB)\tCountB2A\tCountA\tHeterozygous Consistency (CountB2A:CountA)\tOverall Consistent SNPs\tOverall Overlapped SNPs\tOverall Consistency";
+"FileTitle\tSampleA\tSampleB\tCountB2A\tCountA\tHeterozygous Consistency (CountB2A:CountA)\tCountA2B\tCountB\tHeterozygous Consistency (CountA2B:CountB)\tOverall Consistent Genotypes\tOverall Overlapped Genotypes\tOverall Consistency";
 	foreach my $change ( sort keys %changes ) {
 		print RESULT4 "\t$change";
 	}
@@ -314,13 +299,16 @@ sub vcfSummary {
 	}
 	
 	#do annovar
+	my $annovarBuildver="";
 	if ($doAnnovar) {
-			pInfo("do ANNOVAR annotation",$logFile);
-	foreach my $annovaFile (@filesAnnovar) {
-		system(
-"$annovarBin -geneanno $annovaFile -buildver hg19 $annovarDb 1>>$resultDir/vcfAnnovarResult/vcfAnnovarSummary.log 2>>$resultDir/vcfAnnovarResult/vcfAnnovarSummary.log"
-		);
-	}
+		if ($annovarOption=~/-buildver (\S+) /) {
+			$annovarBuildver=$1;
+		}
+		pInfo("do ANNOVAR annotation",$logFile);
+		system("$annovarConvert -format vcf4 $annovarResultDir$filename.pass -includeinfo > $annovarResultDir$filename.pass.avinput");
+		system("$annovarBin $annovarResultDir$filename.pass.avinput $annovarDb $annovarOption --outfile $annovarResultDir$filename.pass.avinput.annovar");
+#		system("$annovarConvert -format vcf4 $annovarResultDir$filename.pass -includeinfo > $annovarResultDir$filename.pass.avinput 1>$annovarResultDir/vcfAnnovarSummary.log 2>$annovarResultDir/vcfAnnovarSummary.log");
+#		system("$annovarBin $annovarResultDir$filename.pass.avinput $annovarDb $annovarOption --outfile $annovarResultDir$filename.pass.avinput.annovar 1>>$annovarResultDir/vcfAnnovarSummary.log 2>>$annovarResultDir/vcfAnnovarSummary.log");
 	}
 
 	#end comment
@@ -328,7 +316,7 @@ sub vcfSummary {
 	#plot by R
 	my $Rsource = dirname($0) . $rSourceLocation;
 	my $rResult = system(
-"cat $Rsource | $RBin --vanilla --slave --args $resultDir/$filename > $resultDir/vcfResult/vcfSummary.rLog"
+"cat $Rsource | $RBin --vanilla --slave --args $resultDir/$filename $annovarBuildver > $resultDir/vcfResult/vcfSummary.rLog"
 	);
 	pInfo("Finish vcf summary!",$logFile);
 	return ($rResult);

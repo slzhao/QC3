@@ -112,12 +112,6 @@ sub fasqSummary {
 
 sub getmetric {
 	my ($in) = @_;
-	if ( $in =~ /\.gz$/ ) {
-		open( IIN, "zcat $in|" ) or die $!;
-	}
-	else {
-		open( IIN, $in ) or die $!;
-	}
 	my @r1         = ($in);    #return values
 	my @r2         = ($in);    #return values
 	my @r3         = ($in);    #return values
@@ -150,21 +144,29 @@ sub getmetric {
 	my $offset = 33;    #default;
 
 	#will use the top 40 reads to guess the offset
-	my $guessoffset = 0;
+#	my $guessoffset = 0;
 	my @scores;
 
 	#store some information needed
 	my $readlen;
-	my %scoreSumBase = ();
-	my %nucSumBase   = ();
-	my %scoreSumBaseN = ();
-	my %nucSumBaseN   = ();
-
-	while ( my $line1 = <IIN> ) {
-		my $line2 = <IIN>;
-		my $line3 = <IIN>;
-		my $line4 = <IIN>;
-		if ( $first == 1 ) {
+	my @scoreSumBase = ();
+	my @nucSumBase   = ();
+	my @scoreSumBaseN = ();
+	my @nucSumBaseN   = ();
+	
+	#find information in title, such as machine, lane. Guess offset with top 40 sequences
+	my $countTemp=0;
+	if ( $in =~ /\.gz$/ ) {
+		open( TITLE, "zcat $in|" ) or die $!;
+	}
+	else {
+		open( TITLE, $in ) or die $!;
+	}
+	while (my $line1=<TITLE>) {
+		<TITLE>;
+		<TITLE>;
+		my $line4 = <TITLE>;
+				if ( $first ) {
 			if ( $line1 =~
 /@(.*?):(.*?):(.*?):(.*?):(.*?):(.*?):(.*?)\s+(.*?):(.*?):(.*?):(.*?)/
 			  )
@@ -176,6 +178,26 @@ sub getmetric {
 				print STDERR "Not in casava 1.8 format\n";
 			}
 		}
+		my @tmpscores = map( ord, ( split //, $line4 ) );
+		push @scores, @tmpscores;
+
+		$countTemp++;
+		if ($countTemp>=40) {last;}
+	}
+	close(TITLE);
+	if ($countTemp<40) {print STDERR "Please note $in has less than 40 reads";}
+	$offset = guessoffset(@scores); 
+	
+	if ( $in =~ /\.gz$/ ) {
+		open( IIN, "zcat $in|" ) or die $!;
+	}
+	else {
+		open( IIN, $in ) or die $!;
+	}
+	while ( my $line1 = <IIN> ) {
+		my $line2 = <IIN>;
+		<IIN>;
+		my $line4 = <IIN>;
 		$failed = ( split /:/, $line1 )[7];
 
 		$totalreads++;
@@ -183,34 +205,23 @@ sub getmetric {
 		$readlen = length($line2) - 1;    #note the "/n" at the end
 
 		$totalnuclear += $readlen;
-
-		my $gcnum = () = $line2 =~ /[GC]/gi;
+		
+		my $gcnum = $line2 =~ tr/[GCgc]//;
 		$gc += $gcnum;
 
-		my @tmpscores = map( ord, ( split //, $line4 ) );
-
-		my @temp = ( split //, $line2 );
+		my @tmpscores;
 		foreach my $key ( 0 .. ( $readlen - 1 ) ) {
 
 			#score for each base
-			$scoreSumBase{$key} += $tmpscores[$key];
+			push @tmpscores,ord(substr $line4, $key, 1);
+			$scoreSumBase[$key] += $tmpscores[$key];
 
 			#nuc for each base
-			$nucSumBase{$key}{ $temp[$key] }++;
+			$nucSumBase[$key]{substr $line2, $key, 1}++;
 		}
 
 		my $tmpbq = mymean(@tmpscores);
 		$bq += $tmpbq;
-
-		if ( $totalreads < 10 ) {
-			push @scores, @tmpscores;
-		}
-		elsif ( !$guessoffset ) {
-
-			# guess the offset
-			$offset      = guessoffset(@scores);
-			$guessoffset = 1;
-		}
 
 		if ( $failed eq "Y" ) {
 			$bqy += $tmpbq;
@@ -227,9 +238,9 @@ sub getmetric {
 			#no Y scores and nuc
 			foreach my $key ( 0 .. ( $readlen - 1 ) ) {
 				#score for each base
-				$scoreSumBaseN{$key} += $tmpscores[$key];
+				$scoreSumBaseN[$key] += $tmpscores[$key];
 				#nuc for each base
-				$nucSumBaseN{$key}{ $temp[$key] }++;
+				$nucSumBaseN[$key]{substr $line2, $key, 1}++;
 			}
 		}
 
@@ -239,29 +250,25 @@ sub getmetric {
 	}
 	close IIN;
 
-	if ( !$guessoffset ) {
-		$offset = guessoffset(@scores);
-	}
-
 	#print to information file
 	foreach my $key ( 0 .. ( $readlen - 1 ) ) {
-		push @r2, $scoreSumBase{$key} / $totalreads - $offset;
-		push @r4, $scoreSumBaseN{$key} / $totalreadsn - $offset;
+		push @r2, $scoreSumBase[$key] / $totalreads - $offset;
+		push @r4, $scoreSumBaseN[$key] / $totalreadsn - $offset;
 		my $totalNuc =
-		  $nucSumBase{$key}{"A"} +
-		  $nucSumBase{$key}{"T"} +
-		  $nucSumBase{$key}{"C"} +
-		  $nucSumBase{$key}{"G"};    #percenty for each nuc, what about U?
+		  $nucSumBase[$key]{"A"} +
+		  $nucSumBase[$key]{"T"} +
+		  $nucSumBase[$key]{"C"} +
+		  $nucSumBase[$key]{"G"};    #percenty for each nuc, what about U?
 		foreach my $nuc ( "A", "T", "C", "G" ) {
-			push @r3, $nucSumBase{$key}{$nuc} / $totalNuc;
+			push @r3, $nucSumBase[$key]{$nuc} / $totalNuc;
 		}
 		$totalNuc =
-		  $nucSumBaseN{$key}{"A"} +
-		  $nucSumBaseN{$key}{"T"} +
-		  $nucSumBaseN{$key}{"C"} +
-		  $nucSumBaseN{$key}{"G"};    #percenty for each nuc, what about U?
+		  $nucSumBaseN[$key]{"A"} +
+		  $nucSumBaseN[$key]{"T"} +
+		  $nucSumBaseN[$key]{"C"} +
+		  $nucSumBaseN[$key]{"G"};    #percenty for each nuc, what about U?
 		foreach my $nuc ( "A", "T", "C", "G" ) {
-			push @r5, $nucSumBaseN{$key}{$nuc} / $totalNuc;
+			push @r5, $nucSumBaseN[$key]{$nuc} / $totalNuc;
 		}
 	}
 

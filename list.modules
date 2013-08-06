@@ -4,4 +4,4 @@
 # Code comes from circos plot group
 # Contributed by Charles Howes
 # http://groups.google.com/group/circos-data-visualization/browse_thread/thread/96e74d863a53e405?hl=en_US
-awk '!/^[\t ]*use /{next};$2~/^(lib|base|strict|vars|warnings);?/{next};{sub(";","",$2);print $2}' ../*.pl | sort -u 
+awk '!/^[\t ]*use /{next};$2~/^(lib|base|strict|vars|warnings);?/{next};{sub(";","",$2);print $2}' ./*.pl | sort -u 

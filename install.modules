@@ -1,0 +1,2 @@
+#!/bin/bash
+curl -L http://cpanmin.us | perl - $1

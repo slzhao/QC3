@@ -55,9 +55,13 @@ h2 {
 <p>The report was generated at <TMPL_VAR NAME=CREATTIME>. Here is your command for generating this report, keep it in order to reproduce the result.</p>
 <pre><TMPL_VAR NAME=COMMAND></pre>
 </div>
+<div><h2 id="M150">Filter</h2>
+<p>The arguments in <TMPL_VAR NAME=FILTERFILE> were used for the filter of vcf files. The file content was listed below:
+<pre><TMPL_VAR NAME=FILTERFILECONTENT></pre>
+</div>
 <div><h2 id="M200">Statistics</h2>
 <table align="center" style="border:#2894ff 1px solid;">
-<!-- TMPL_LOOP NAME=MAKETABLE3 --> <CSTM_ROW EVEN=even ODD=odd FIRST=first>
+<!-- TMPL_LOOP NAME=MAKETABLE1 --> <CSTM_ROW EVEN=even ODD=odd FIRST=first>
    </tr>
 <!-- /TMPL_LOOP -->
 </table>
@@ -65,25 +69,25 @@ h2 {
 </div>
 <div><h2 id="M300">Consistency</h2>
 <p>Result table</p>
+<p>Column description</p>
+<pre>
+CountB: Number of heterozygous genotypes in Sample B (denominator)
+CountA2B: Number of genotypes in sample A that have consistent heterozygous genotype comparing to Sample B (numerator)
+CountA: Number of heterozygous genotypes in Sample A (denominator)
+CountB2A: Number of genotypes in sample B that have consistent heterozygous genotype comparing to Sample A (numerator)
+</pre>
 <table align="center" style="border:#2894ff 1px solid;">
 <!-- TMPL_LOOP NAME=MAKETABLE2 --> <CSTM_ROW EVEN=even ODD=odd FIRST=first>
    </tr>
 <!-- /TMPL_LOOP -->
 </table>
-<p>Column description</p>
-<pre>
-CountB: Number of heterozygous SNPs in Sample B (denominator)
-CountA2B: Number of SNPs in sample A that have consistent heterozygous genotype comparing to Sample B (numerator)
-CountA: Number of heterozygous SNPs in Sample A (denominator)
-CountB2A: Number of SNPs in sample B that have consistent heterozygous genotype comparing to Sample A (numerator)
-</pre>
 <p>Result figure</p>
 <p class="centeredImage"><img src="<TMPL_VAR NAME=FIG>"></p>
 </div>
 <div><h2 id="M350">SNP count</h2>
 <p>SNP counts for each sample in each chromesome</p>
 <table align="center" style="border:#2894ff 1px solid;">
-<!-- TMPL_LOOP NAME=MAKETABLE1 --> <CSTM_ROW EVEN=even ODD=odd FIRST=first>
+<!-- TMPL_LOOP NAME=MAKETABLE3 --> <CSTM_ROW EVEN=even ODD=odd FIRST=first>
    </tr>
 <!-- /TMPL_LOOP -->
 </table>
@@ -115,18 +119,10 @@ SB: Strand Bias
 </div>
 <div><h2 id="M500">Annovar annotation</h2>
 <table align="center" style="border:#2894ff 1px solid;">
-<tr class="first">
-  <th>File</th>
-  <th>Description</th>
-</tr>
-<!-- TMPL_LOOP NAME=FL1 -->
-   <CSTM_ROW EVEN=even ODD=odd>
-      <td align="center"><a href=<TMPL_VAR NAME=FS2>><TMPL_VAR NAME=FS2_NAME></a></td>
-      <td align="center">Annovar Annotation Result</td>
+<!-- TMPL_LOOP NAME=MAKETABLE4 --> <CSTM_ROW EVEN=even ODD=odd FIRST=first>
    </tr>
 <!-- /TMPL_LOOP -->
 </table>
 </div>
-
 </body>
 </html>

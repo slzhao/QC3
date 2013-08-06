@@ -67,7 +67,9 @@ read.bigFile<-function(myfile,header = TRUE,type="txt",skip=0,preRow=20,knownCol
 		if (header ==T) {
 			temp<-readLines(myfile,n=1)
 			temp<-strsplit(temp,"\t")[[1]]
-			if (length(temp)==(ncol(tabAll)+1)) {temp<-temp[-1]} else if (length(temp)!=ncol(tabAll)) {print("Not same col")}
+			if (length(temp)==(ncol(tabAll)+1)) {temp<-temp[-1]} else if (length(temp)!=ncol(tabAll)) {
+#				print("Not same col")
+			}
 			colnames(tabAll)<-temp
 		}
 	} else if (type=="csv") {
@@ -79,15 +81,24 @@ read.bigFile<-function(myfile,header = TRUE,type="txt",skip=0,preRow=20,knownCol
 		if (header ==T) {
 			temp<-readLines(myfile,n=1)
 			temp<-strsplit(temp,",")[[1]]
-			if (length(temp)==(ncol(tabAll)+1)) {temp<-temp[-1]} else if (length(temp)!=ncol(tabAll)) {print("Not same col")}
+			if (length(temp)==(ncol(tabAll)+1)) {temp<-temp[-1]} else if (length(temp)!=ncol(tabAll)) {
+#				print("Not same col")
+			}
 			temp<-gsub("\"","",temp)
 			colnames(tabAll)<-temp
 		}
 	}
 	return(tabAll)
 }
+align<-function(data1,data2,by=0,suffixes=c(deparse(substitute(data1)),deparse(substitute(data2))),sort=T) {
+	data<-merge(data1,data2,by=by,all=T,suffixes=suffixes,sort=sort)
+	row.names(data)<-data[,1]
+	data<-data[,-1]
+	return (data)
+}
 
 combinedArg<-commandArgs()[5]
+annovarBuildver<-commandArgs()[6]
 resultDir<-dirname(combinedArg)
 vcfFileName<-basename(combinedArg)
 figureDir<-paste(resultDir,"/vcfFigure/",sep="")
@@ -130,6 +141,19 @@ for (x in temp) {
 	dev.off()
 }
 
-
+annovarFile<-paste(resultDir,"/vcfAnnovarResult/",vcfFileName,".pass.avinput.annovar.",annovarBuildver,"_multianno.txt",sep="")
+if (file.exists(annovarFile)) {
+	annovarResult<-read.bigFile(annovarFile,header=T,knownColC=1)
+	temp1<-table(annovarResult[which(annovarResult[,"snp137"]!=""),"Func.refGene"])
+	temp2<-table(annovarResult[which(annovarResult[,"snp137"]!=""),"ExonicFunc.refGene"])
+	temp3<-table(annovarResult[which(annovarResult[,"snp137"]==""),"Func.refGene"])
+	temp4<-table(annovarResult[which(annovarResult[,"snp137"]==""),"ExonicFunc.refGene"])
+	result<-rbind(align(c(temp1),c(temp3),sort=F),align(c(temp2),c(temp4),sort=F))
+	result[is.na(result)]<-0
+	result[which(row.names(result)==""),]<-""
+	colnames(result)<-c("In snp 137","Not in snp137")
+	result<-cbind(Function=row.names(result),result)
+	write.table(result,paste(resultDir,"/vcfAnnovarResult/",vcfFileName,".pass.avinput.annovar.countTable.txt",sep=""),sep="\t",quote=F,row.names = F)
+}
 
 
