@@ -63,7 +63,7 @@ There are several other packages needed to be installed on your computer.
 
 	#go the the folder where your software is.
 	#And test whether all the required modules have been installed.
-	./test.modules
+	bash test.modules
 
 The successful output would look like this
 
@@ -90,7 +90,7 @@ Otherwise, it may look like this
 Then you need to install the missing packages from [CPAN](http://www.cpan.org/). A program was also provided to make the package installation more convenient.
 	
 	#if HTML::Template was missing
-	./install.modules HTML::Template
+	bash install.modules HTML::Template
 
 <a name="irs"/>
 ## Install required software ##
@@ -127,6 +127,7 @@ After you install ANNOVAR and add ANNOVAR bin file to your Path, the software ca
 The ANNOVAR database files were also needed for ANNOVAR annotation. Please refer to the [ANNOVAR document](http://www.openbioinformatics.org/annovar/annovar_db.html) for the  database preparation. Or you can simply use the following codes to prepare ANNOVAR database files.
 
 	#assume ANNOVAR was installed and added to Path. Then you want to download ANNOVAR database in annovarDatabase directory.
+	mkdir annovarDatabase
 	cd annovarDatabase
 	annotate_variation.pl -downdb -buildver hg19 -webfrom annovar snp137 humandb/
 	annotate_variation.pl -downdb -buildver hg19 -webfrom annovar refGene humandb/
@@ -204,7 +205,7 @@ You need to download and extract it to a directory. Then the example code for ru
 	#assume qc3.pl in qc3Dir, examples in exampleDir
 	cd exampleDir
 	cd fastq
-	perl qc3Dir/qc3.pl -m f -i example_fastq_fileList.txt -o example_fastq_result -p
+	perl qc3Dir/qc3.pl -m f -i example_fastq_list.txt -o example_fastq_result -p
 
 
 <a name="bqcE"/>
@@ -215,10 +216,10 @@ You need to download and extract it to a directory. Then the example code for ru
 	cd bam
 
 	#a simple example, with only bed file
-	perl qc3Dir/qc3.pl -m b -i example_bam_fileList.txt -r ../bamQcDatabase/hg19_protein_coding.bed.Part -o example_bam_result1
+	perl qc3Dir/qc3.pl -m b -i example_bam_list.txt -r ../bamQcDatabase/hg19_protein_coding.bed.Part -o example_bam_result1
 	
 	#a example with both bed and gtf file, and will calculate the depth
-	perl qc3Dir/qc3.pl -m b -i example_bam_fileList.txt -r ../bamQcDatabase/hg19_protein_coding.bed.Part -g ../bamQcDatabase/Homo_sapiens.GRCh37.63_protein_coding_chr1-22-X-Y-M.gtf.Part -o example_bam_result2
+	perl qc3Dir/qc3.pl -m b -i example_bam_list.txt -r ../bamQcDatabase/hg19_protein_coding.bed.Part -g ../bamQcDatabase/Homo_sapiens.GRCh37.63_protein_coding_chr1-22-X-Y-M.gtf.Part -o example_bam_result2
 
 <a name="vqcE"/>
 ## vcf QC
@@ -226,7 +227,12 @@ You need to download and extract it to a directory. Then the example code for ru
 	#assume qc3.pl in qc3Dir, examples in exampleDir
 	cd exampleDir
 	cd vcf
-	perl qc3Dir/qc3.pl -m v -i CV-7261.vcf.top40000.txt -s 1 -o example_vcf_result
+
+	#a simple example, will not perform ANNOVAR annotation
+	perl qc3Dir/qc3.pl -m v -i CV-7261.vcf.top40000.txt -o example_vcf_result1
+	
+	#assume ANNOVAR database in annovarDatabase, will perform ANNOVAR annotation
+	perl qc3Dir/qc3.pl -m v -i CV-7261.vcf.top40000.txt -s 2 -a annovarDatabase -o example_vcf_result2
 
 <a name="Results"/>
 # Results #

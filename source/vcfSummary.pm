@@ -299,21 +299,20 @@ sub vcfSummary {
 	}
 	
 	#do annovar
-	my $annovarBuildver="";
+	
 	if ($doAnnovar) {
-		if ($annovarOption=~/-buildver (\S+) /) {
-			$annovarBuildver=$1;
-		}
 		pInfo("do ANNOVAR annotation",$logFile);
 		system("$annovarConvert -format vcf4 $annovarResultDir$filename.pass -includeinfo > $annovarResultDir$filename.pass.avinput");
-		system("$annovarBin $annovarResultDir$filename.pass.avinput $annovarDb $annovarOption --outfile $annovarResultDir$filename.pass.avinput.annovar");
-#		system("$annovarConvert -format vcf4 $annovarResultDir$filename.pass -includeinfo > $annovarResultDir$filename.pass.avinput 1>$annovarResultDir/vcfAnnovarSummary.log 2>$annovarResultDir/vcfAnnovarSummary.log");
-#		system("$annovarBin $annovarResultDir$filename.pass.avinput $annovarDb $annovarOption --outfile $annovarResultDir$filename.pass.avinput.annovar 1>>$annovarResultDir/vcfAnnovarSummary.log 2>>$annovarResultDir/vcfAnnovarSummary.log");
+		system("$annovarBin $annovarResultDir$filename.pass.avinput $annovarDb $annovarOption  --outfile $annovarResultDir$filename.pass.avinput.annovar");
 	}
 
 	#end comment
 
 	#plot by R
+	my $annovarBuildver="";
+	if ($annovarOption=~/-buildver (\S+) /) {
+		$annovarBuildver=$1;
+	}
 	my $Rsource = dirname($0) . $rSourceLocation;
 	my $rResult = system(
 "cat $Rsource | $RBin --vanilla --slave --args $resultDir/$filename $annovarBuildver > $resultDir/vcfResult/vcfSummary.rLog"

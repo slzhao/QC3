@@ -151,7 +151,7 @@ if (file.exists(annovarFile)) {
 	result<-rbind(align(c(temp1),c(temp3),sort=F),align(c(temp2),c(temp4),sort=F))
 	result[is.na(result)]<-0
 	result[which(row.names(result)==""),]<-""
-	colnames(result)<-c("In snp 137","Not in snp137")
+	colnames(result)<-c("In snp137","Not in snp137")
 	result<-cbind(Function=row.names(result),result)
 	write.table(result,paste(resultDir,"/vcfAnnovarResult/",vcfFileName,".pass.avinput.annovar.countTable.txt",sep=""),sep="\t",quote=F,row.names = F)
 }

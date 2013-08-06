@@ -18,7 +18,7 @@ my %config;
 $config{'RBin'}        = "R";       #where the R bin file is
 $config{'annovarBin'}  = "table_annovar.pl";		#where the ANNOVAR bin file is
 $config{'annovarConvert'}  = "convert2annovar.pl";		#where the ANNOVAR convert bin file is
-$config{'annovarOption'}  = "-buildver hg19 -protocol refGene,snp137 -operation g,f --remove --otherinfo "; #other options for ANNOVAR
+$config{'annovarOption'}  = "-buildver hg19 -protocol refGene,snp137 -operation g,f --remove"; #other options for ANNOVAR
 $config{'samtoolsBin'} = "samtools";	#where the SAMtools bin file is
 $config{'logFileName'} = "qc3Log.txt";	#name of the log file
 
