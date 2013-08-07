@@ -28,7 +28,7 @@ my $commandline = "perl $0 "
 my (
 	$module,           $filelist, $resultDir, $pairend,
 	$targetregionfile, $gtffile,  $isdepth,   $caculateMethod,$cfgFile,
-	$method,           $maxThreads,$annovarDb
+	$method,           $maxThreads,$annovarDb,$rePlot
 ) = ();
 GetOptions(
 	"t=i" => \$maxThreads,
@@ -45,6 +45,8 @@ GetOptions(
 	"c:s" => \$cfgFile,
 	"s=i" => \$method,
 	"a=s" => \$annovarDb,
+	
+	"rp"   => \$rePlot,
 );
 if ( !defined $module) {die ("Module (-m) must be specified\n");}
 if ( !defined $filelist or !defined $resultDir) {die ("Input file (-i) and Output directory (-o) must be provided\n");}
@@ -64,6 +66,10 @@ else {
 	$config{'caculateMethod'} = $caculateMethod;
 }
 $config{'resultDir'} = $resultDir;
+if ( !defined $rePlot )    { 
+	$config{'rePlot'}          = 0; } else {
+	$config{'rePlot'}          = $rePlot;
+}
 if (!( -e $resultDir ) ) { 
 	if (mkdir $resultDir) {
 	} else {	

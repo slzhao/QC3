@@ -5,6 +5,7 @@ use warnings;
 
 #use forks;
 use threads;
+
 #use threads::shared;
 use Exporter;
 use File::Basename;
@@ -31,8 +32,9 @@ sub bamSummary {
 
 	my $logFile        = $config->{'log'};
 	my $caculateMethod = $config->{'caculateMethod'};    #1 as mean 2 as median
-	
-	my $maxThreads       = $config->{'maxThreads'};
+
+	my $maxThreads = $config->{'maxThreads'};
+	my $rePlot     = $config->{'rePlot'};
 
 	my $usage =
 "Please use the follow command:\n perl qc3.pl -m b -i inputBamList -o outputDir [-r targetregion file] [-g gtf file] [-cm data summary method] [-d depth caculation]\nFor more information, plase read the readme file\n";
@@ -54,119 +56,131 @@ sub bamSummary {
 		$methodText = "Median";
 	}
 
-	#test R, comment below codes
 	$| = 1;
-	if ( $isdepth == 1 ) {
-		pInfo(
+	if ($rePlot) {    #re plot by R only, comment below codes
+
+	}
+	else {
+		if ( $isdepth == 1 ) {
+			pInfo(
 "Will calculate the depth in on-/off-target regions. It will take a long time. You can turn it off without -d in your command line",
-			$logFile
-		);
-	}
-	else {
-		$isdepth = 0;
-	}
+				$logFile
+			);
+		}
+		else {
+			$isdepth = 0;
+		}
 
-	my %regionDatabase;
-	open( BAMFILE1,  $filelist )      or die $!;
-	my $bamFile1 = <BAMFILE1>;
-	&initializeDatabase($bamFile1,\%regionDatabase,$samtoolsBin);
-	close (BAMFILE1);
-	my $inBedSign = 1;    #1=10 in bed; 2=01 in exon; 3=11 in intron
+		my %regionDatabase;
+		open( BAMFILE1, $filelist ) or die $!;
+		my $bamFile1 = <BAMFILE1>;
+		&initializeDatabase( $bamFile1, \%regionDatabase, $samtoolsBin );
+		close(BAMFILE1);
+		my $inBedSign = 1;    #1=10 in bed; 2=01 in exon; 3=11 in intron
 
-	# 1) Load targetregionfile
-	if ( defined($targetregionfile) ) {
-		pInfo( "Load target region file '$targetregionfile'", $logFile );
-		loadbed( $targetregionfile, \%regionDatabase );
-	}
-	else {
-		$inBedSign = 2;
-		pInfo(
-			"No targetregion file, will use exon regions in gtf file instead",
-			$logFile );
-	}
+		# 1) Load targetregionfile
+		if ( defined($targetregionfile) ) {
+			pInfo( "Load target region file '$targetregionfile'", $logFile );
+			loadbed( $targetregionfile, \%regionDatabase );
+		}
+		else {
+			$inBedSign = 2;
+			pInfo(
+"No targetregion file, will use exon regions in gtf file instead",
+				$logFile
+			);
+		}
 
-	# 2) Load gtf file
-	if ( defined($gtffile) ) {
-		pInfo( "Load gtf file '$gtffile'", $logFile );
-		loadgtf( $gtffile, \%regionDatabase );
-	}
-	else {
-		pInfo( "No gtf file", $logFile );
-	}
+		# 2) Load gtf file
+		if ( defined($gtffile) ) {
+			pInfo( "Load gtf file '$gtffile'", $logFile );
+			loadgtf( $gtffile, \%regionDatabase );
+		}
+		else {
+			pInfo( "No gtf file", $logFile );
+		}
 
-	# 3) read bam file
-	pInfo( "Read bam file and write out", $logFile );
-	open( IN,  $filelist )      or die $!;
-	open( OUT, ">$outputFile" ) or die $!;
+		# 3) read bam file
+		pInfo( "Read bam file and write out", $logFile );
+		open( IN,  $filelist )      or die $!;
+		open( OUT, ">$outputFile" ) or die $!;
 
-	print OUT join "\t",
-	  (
-		"Sample",
-		"Instrument",
-		"Run",
-		"Flowcell",
-		"Lane",
-		"Total Reads",
-		"On-target",
-		"Off-target",
-		"Unmapped",
-		"Off-target-intron",
-		"Off-target-intergenic",
-		"Off-target-mito",
-		"Total Reads($methodText MQ)",
-		"On-target($methodText MQ)",
-		"Off-target($methodText MQ)",
-		"Off-target-intron($methodText MQ)",
-		"Off-target-intergenic($methodText MQ)",
-		"Off-target-mito($methodText MQ)",
-		"Total Reads($methodText InsertSize)",
-		"On-target($methodText InsertSize)",
-		"Off-target($methodText InsertSize)",
-		"Off-target-intron($methodText InsertSize)",
-		"Off-target-intergenic($methodText InsertSize)",
-		"Off-target-mito($methodText InsertSize)"
-	  );
-	if ($isdepth) {
-		print OUT "\t";
 		print OUT join "\t",
 		  (
-			"Total Reads($methodText Depth)",           "On-target($methodText Depth)",
-			"Off-target($methodText Depth)",            "Off-target-intron($methodText Depth)",
-			"Off-target-intergenic($methodText Depth)", "Off-target-mito($methodText Depth)\n"
+			"Sample",
+			"Instrument",
+			"Run",
+			"Flowcell",
+			"Lane",
+			"Total Reads",
+			"On-target",
+			"Off-target",
+			"Unmapped",
+			"Off-target-intron",
+			"Off-target-intergenic",
+			"Off-target-mito",
+			"Total Reads($methodText MQ)",
+			"On-target($methodText MQ)",
+			"Off-target($methodText MQ)",
+			"Off-target-intron($methodText MQ)",
+			"Off-target-intergenic($methodText MQ)",
+			"Off-target-mito($methodText MQ)",
+			"Total Reads($methodText InsertSize)",
+			"On-target($methodText InsertSize)",
+			"Off-target($methodText InsertSize)",
+			"Off-target-intron($methodText InsertSize)",
+			"Off-target-intergenic($methodText InsertSize)",
+			"Off-target-mito($methodText InsertSize)"
 		  );
-	}
-	else {
-		print OUT "\n";
-	}
-	while ( my $f = <IN> ) {
-		$f =~ s/\r|\n//g;
-		
-#		#single threads
-#		pInfo( "Processing $f ", $logFile );
-#		my @metric =
-#		  &getbammetric( $f, \%regionDatabase, $inBedSign, $isdepth,
-#			$samtoolsBin, $caculateMethod );
-#		print OUT join "\t", (@metric);
-#		print OUT "\n";
-				
-				#multi threads
-				if ( scalar( threads->list() ) < $maxThreads ) {
-					pInfo("Processing $f ",$logFile);
-					my ($t) =  threads->new( \&getbammetric, $f, \%regionDatabase, $inBedSign, $isdepth,
-						$samtoolsBin , $caculateMethod);
+		if ($isdepth) {
+			print OUT "\t";
+			print OUT join "\t",
+			  (
+				"Total Reads($methodText Depth)",
+				"On-target($methodText Depth)",
+				"Off-target($methodText Depth)",
+				"Off-target-intron($methodText Depth)",
+				"Off-target-intergenic($methodText Depth)",
+				"Off-target-mito($methodText Depth)\n"
+			  );
+		}
+		else {
+			print OUT "\n";
+		}
+		while ( my $f = <IN> ) {
+			$f =~ s/\r|\n//g;
+			if ( !-e $f ) {
+				pInfo( "$f doesn't exist", $logFile );
+				next;
+			}
+
+			#		#single threads
+			#		pInfo( "Processing $f ", $logFile );
+			#		my @metric =
+			#		  &getbammetric( $f, \%regionDatabase, $inBedSign, $isdepth,
+			#			$samtoolsBin, $caculateMethod );
+			#		print OUT join "\t", (@metric);
+			#		print OUT "\n";
+
+			#multi threads
+			if ( scalar( threads->list() ) < $maxThreads ) {
+				pInfo( "Processing $f ", $logFile );
+				my ($t) = threads->new( \&getbammetric, $f, \%regionDatabase,
+					$inBedSign, $isdepth, $samtoolsBin, $caculateMethod );
+			}
+			else {
+				foreach my $thread ( threads->list() ) {
+					my @metric = $thread->join;
+					print OUT join "\t", (@metric);
+					print OUT "\n";
+					pInfo( "Processing $f ", $logFile );
+					my ($t) =
+					  threads->new( \&getbammetric, $f, \%regionDatabase,
+						$inBedSign, $isdepth, $samtoolsBin, $caculateMethod );
+					last;
 				}
-				else {
-					foreach my $thread ( threads->list() ) {
-						my @metric = $thread->join;
-						print OUT join "\t", (@metric);
-						print OUT "\n";
-						pInfo("Processing $f ",$logFile);
-						my ($t) =  threads->new( \&getbammetric, $f, \%regionDatabase, $inBedSign, $isdepth,
-						$samtoolsBin , $caculateMethod);
-						last;
-					}
-				}
-	}
+			}
+		}
 
 		#join all left threads
 		foreach my $thread ( threads->list() ) {
@@ -174,10 +188,10 @@ sub bamSummary {
 			print OUT join "\t", (@metric);
 			print OUT "\n";
 		}
-	close OUT;
-
-	#end comment by test R
-
+		close OUT;
+		#end comment by test R
+	}
+	
 	#plot by R
 	my $Rsource =
 	  dirname($0) . "/source/rFunctions.R " . dirname($0) . $rSourceLocation;
@@ -195,9 +209,14 @@ sub getbammetric {
 	my ( $total, $ontarget, $offtarget, $ummapped, $offtargetintron,
 		$offtargetintergenic, $offtargetmito )
 	  = ( 0, 0, 0, 0, 0, 0, 0 );
-	my ( $totalMQflag, $totalInsertflag,$ontargetMQflag, $ontargetInsertflag,$offtargetMQflag, $offtargetInsertflag,$offtargetintronMQflag,$offtargetintronInsertflag,
-		$offtargetintergenicMQflag,$offtargetintergenicInsertflag, $offtargetmitoMQflag, $offtargetmitoInsertflag )
-	  = ( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
+	my (
+		$totalMQflag,               $totalInsertflag,
+		$ontargetMQflag,            $ontargetInsertflag,
+		$offtargetMQflag,           $offtargetInsertflag,
+		$offtargetintronMQflag,     $offtargetintronInsertflag,
+		$offtargetintergenicMQflag, $offtargetintergenicInsertflag,
+		$offtargetmitoMQflag,       $offtargetmitoInsertflag
+	) = ( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 	my (
 		$totalMQ,                   $ontargetMQ,
 		$offtargetMQ,               $offtargetintronMQ,
@@ -213,7 +232,7 @@ sub getbammetric {
 	  ( $headers[0], $headers[1], $headers[2], $headers[3] );
 	close(BAMLINE1);
 	open( BAM, "$samtoolsBin view $in|" ) or die $!;
-	my $flag_read_unmapped = 0x0004;
+	my $flag_read_unmapped           = 0x0004;
 	my $flag_read_mapped_proper_pair = 0x0002;
 
 	while (<BAM>) {
@@ -223,10 +242,12 @@ sub getbammetric {
 		my $MQflag = 0;
 		if ( $MQ =~ /^\d+$/ ) {
 			$MQflag = 1;
-		} else {print "$_\n";}
+		}
+		else { print "$_\n"; }
 		my $insert     = $line[8];
 		my $insertflag = 0;
-		if ( $insert =~ /^\d+$/ and ($flag & $flag_read_mapped_proper_pair)) {
+		if ( $insert =~ /^\d+$/ and ( $flag & $flag_read_mapped_proper_pair ) )
+		{
 			$insertflag = 1;
 		}
 		my $chr = $line[2];
@@ -239,30 +260,65 @@ sub getbammetric {
 		}
 		else {
 			$total++;
-			if ($MQflag) {&storeData( $MQ, $totalMQ, $caculateMethod );$totalMQflag++;}
-			if ($insertflag) {&storeData( $insert, $totalinsert, $caculateMethod );$totalInsertflag++;}
+			if ($MQflag) {
+				&storeData( $MQ, $totalMQ, $caculateMethod );
+				$totalMQflag++;
+			}
+			if ($insertflag) {
+				&storeData( $insert, $totalinsert, $caculateMethod );
+				$totalInsertflag++;
+			}
 
 			if ( vec( $regionDatabaseRef->{$chr}, $pos, 2 ) == $inBedSign )
 			{    #in bed file
 				$ontarget++;
-				if ($MQflag) {&storeData( $MQ, $ontargetMQ, $caculateMethod );$ontargetMQflag++;}
-				if ($insertflag) {&storeData( $insert, $ontargetinsert, $caculateMethod );$ontargetInsertflag++;}
-				
+				if ($MQflag) {
+					&storeData( $MQ, $ontargetMQ, $caculateMethod );
+					$ontargetMQflag++;
+				}
+				if ($insertflag) {
+					&storeData( $insert, $ontargetinsert, $caculateMethod );
+					$ontargetInsertflag++;
+				}
+
 			}
 			else {
 				$offtarget++;
-				if ($MQflag) {&storeData( $MQ, $offtargetMQ, $caculateMethod );$offtargetMQflag++;}
-				if ($insertflag) {&storeData( $insert, $offtargetinsert, $caculateMethod );$offtargetInsertflag++;}
-				
-				if ( vec($regionDatabaseRef->{$chr},$pos,2)==3) { #in intron
-					$offtargetintron++;
-					if ($MQflag) {&storeData( $MQ, $offtargetintronMQ, $caculateMethod );$offtargetintronMQflag++;}
-					if ($insertflag) {&storeData( $insert, $offtargetintroninsert, $caculateMethod );$offtargetintronInsertflag++;}
+				if ($MQflag) {
+					&storeData( $MQ, $offtargetMQ, $caculateMethod );
+					$offtargetMQflag++;
 				}
-				elsif (! vec($regionDatabaseRef->{$chr},$pos,2)) { #==0, then not in exon and intron, must be intergenic
+				if ($insertflag) {
+					&storeData( $insert, $offtargetinsert, $caculateMethod );
+					$offtargetInsertflag++;
+				}
+
+				if ( vec( $regionDatabaseRef->{$chr}, $pos, 2 ) == 3 )
+				{    #in intron
+					$offtargetintron++;
+					if ($MQflag) {
+						&storeData( $MQ, $offtargetintronMQ, $caculateMethod );
+						$offtargetintronMQflag++;
+					}
+					if ($insertflag) {
+						&storeData( $insert, $offtargetintroninsert,
+							$caculateMethod );
+						$offtargetintronInsertflag++;
+					}
+				}
+				elsif ( !vec( $regionDatabaseRef->{$chr}, $pos, 2 ) )
+				{    #==0, then not in exon and intron, must be intergenic
 					$offtargetintergenic++;
-					if ($MQflag) {&storeData( $MQ, $offtargetintergenicMQ, $caculateMethod );$offtargetintergenicMQflag++;}
-					if ($insertflag) {&storeData( $insert, $offtargetintergenicinsert, $caculateMethod );$offtargetintergenicInsertflag++;}
+					if ($MQflag) {
+						&storeData( $MQ, $offtargetintergenicMQ,
+							$caculateMethod );
+						$offtargetintergenicMQflag++;
+					}
+					if ($insertflag) {
+						&storeData( $insert, $offtargetintergenicinsert,
+							$caculateMethod );
+						$offtargetintergenicInsertflag++;
+					}
 				}
 				if ( $chr =~ /M/i ) {
 					$offtargetmito++;
@@ -271,7 +327,8 @@ sub getbammetric {
 						$offtargetmitoMQflag++;
 					}
 					if ($insertflag) {
-						&storeData( $insert, $offtargetmitoinsert,$caculateMethod );
+						&storeData( $insert, $offtargetmitoinsert,
+							$caculateMethod );
 						$offtargetmitoInsertflag++;
 					}
 				}
@@ -280,19 +337,23 @@ sub getbammetric {
 	}
 	close BAM;
 
-	$totalMQ     = findMedianMean( $totalMQ,     $totalMQflag, $caculateMethod );
-	$totalinsert = findMedianMean( $totalinsert, $totalInsertflag, $caculateMethod );
+	$totalMQ = findMedianMean( $totalMQ, $totalMQflag, $caculateMethod );
+	$totalinsert =
+	  findMedianMean( $totalinsert, $totalInsertflag, $caculateMethod );
 
-	$ontargetMQ = findMedianMean( $ontargetMQ, $ontargetMQflag, $caculateMethod );
+	$ontargetMQ =
+	  findMedianMean( $ontargetMQ, $ontargetMQflag, $caculateMethod );
 	$ontargetinsert =
 	  findMedianMean( $ontargetinsert, $ontargetInsertflag, $caculateMethod );
 
-	$offtargetMQ = findMedianMean( $offtargetMQ, $offtargetMQflag, $caculateMethod );
+	$offtargetMQ =
+	  findMedianMean( $offtargetMQ, $offtargetMQflag, $caculateMethod );
 	$offtargetinsert =
 	  findMedianMean( $offtargetinsert, $offtargetInsertflag, $caculateMethod );
 
 	$offtargetintronMQ =
-	  findMedianMean( $offtargetintronMQ, $offtargetintronMQflag, $caculateMethod );
+	  findMedianMean( $offtargetintronMQ, $offtargetintronMQflag,
+		$caculateMethod );
 	$offtargetintroninsert =
 	  findMedianMean( $offtargetintroninsert, $offtargetintronInsertflag,
 		$caculateMethod );
@@ -301,13 +362,15 @@ sub getbammetric {
 	  findMedianMean( $offtargetintergenicMQ, $offtargetintergenicMQflag,
 		$caculateMethod );
 	$offtargetintergenicinsert =
-	  findMedianMean( $offtargetintergenicinsert, $offtargetintergenicInsertflag,
+	  findMedianMean( $offtargetintergenicinsert,
+		$offtargetintergenicInsertflag,
 		$caculateMethod );
 
 	$offtargetmitoMQ =
 	  findMedianMean( $offtargetmitoMQ, $offtargetmitoMQflag, $caculateMethod );
 	$offtargetmitoinsert =
-	  findMedianMean( $offtargetmitoinsert, $offtargetmitoInsertflag, $caculateMethod );
+	  findMedianMean( $offtargetmitoinsert, $offtargetmitoInsertflag,
+		$caculateMethod );
 
 	# if need to calculate the depth
 	if ($isdepth) {
@@ -328,7 +391,7 @@ sub getbammetric {
 			&storeData( $depth, $totaldepth, $caculateMethod );
 
 			#			$totaldepth += $depth;
-			if ( vec( $regionDatabaseRef->{$chr}, $pos, 2 ) == $inBedSign) {
+			if ( vec( $regionDatabaseRef->{$chr}, $pos, 2 ) == $inBedSign ) {
 				$ontargetnum++;
 				&storeData( $depth, $ontargetdepth, $caculateMethod );
 
@@ -339,14 +402,14 @@ sub getbammetric {
 				&storeData( $depth, $offtargetdepth, $caculateMethod );
 
 				#				$offtargetdepth += $depth;
-				if ( vec($regionDatabaseRef->{$chr},$pos,2)==3 ) {
+				if ( vec( $regionDatabaseRef->{$chr}, $pos, 2 ) == 3 ) {
 					$offtargetintronnum++;
 					&storeData( $depth, $offtargetintrondepth,
 						$caculateMethod );
 
 					#					$offtargetintrondepth += $depth;
 				}
-				elsif (! vec($regionDatabaseRef->{$chr},$pos,2)) {
+				elsif ( !vec( $regionDatabaseRef->{$chr}, $pos, 2 ) ) {
 					$offtargetintergenicnum++;
 					&storeData( $depth, $offtargetintergenicdepth,
 						$caculateMethod );
@@ -415,16 +478,17 @@ sub getbammetric {
 }
 
 sub initializeDatabase {
-	my ( $in, $databaseRef,$samtoolsBin ) = @_;
+	my ( $in, $databaseRef, $samtoolsBin ) = @_;
 	open( BAMHEAD, "$samtoolsBin view -H $in|" ) or die $!;
-	while(<BAMHEAD>) {
+	while (<BAMHEAD>) {
 		chomp;
 		if (/^\@SQ\tSN:(\w+)\tLN:(\d+)/) {
-			my $chr=$1;
-			$databaseRef->{$chr}="";
-			my $chrLength=$2;
-#			print "$chr\t$chrLength\n";
-			vec($databaseRef->{$chr},$chrLength,2)=0;
+			my $chr = $1;
+			$databaseRef->{$chr} = "";
+			my $chrLength = $2;
+
+			#			print "$chr\t$chrLength\n";
+			vec( $databaseRef->{$chr}, $chrLength, 2 ) = 0;
 		}
 	}
 }
@@ -473,7 +537,8 @@ sub loadgtf {
 		}
 	}
 	close IIN;
-#	pInfo("finish read gtf, now assign intron");
+
+	#	pInfo("finish read gtf, now assign intron");
 	foreach my $gene_id ( keys %transcripts ) {
 		my $start = $transcripts{$gene_id}->{'start'};
 		my $end   = $transcripts{$gene_id}->{'end'};
@@ -502,7 +567,8 @@ sub storeData {
 	}
 	else {                   #median
 		my $input = $_[0];
-#		if ($input>=1000) {$input=1000;}
+
+		#		if ($input>=1000) {$input=1000;}
 		${ $_[1] }{$input}++;
 	}
 }
@@ -532,9 +598,9 @@ sub findMedianMean {
 
 		if ( $arrayLength % 2 == 0 ) {
 			my $medianPre;
-			foreach my $key (sort {$a <=> $b} keys %{ $_[0] }) {
+			foreach my $key ( sort { $a <=> $b } keys %{ $_[0] } ) {
 				$totalCount += ${ $_[0] }{$key};
-					if ( $totalCount == $arrayLength / 2 ) {
+				if ( $totalCount == $arrayLength / 2 ) {
 					$medianPre = $key;
 				}
 				elsif ( $totalCount > $arrayLength / 2 ) {
@@ -546,37 +612,38 @@ sub findMedianMean {
 					}
 				}
 			}
-#			for ( my $count = 0 ; $count < scalar( @{ $_[0] } ) ; $count++ ) {
-#				if ( !defined( ${ $_[0] }[$count] ) ) { next; }
-#				$totalCount += ${ $_[0] }[$count];
-#				if ( $totalCount == $arrayLength / 2 ) {
-#					$medianPre = $count;
-#				}
-#				elsif ( $totalCount > $arrayLength / 2 ) {
-#					if ( defined $medianPre ) {
-#						return ( ( $medianPre + $count ) / 2 );
-#					}
-#					else {
-#						return ($count);
-#					}
-#				}
-#			}
+
+		  #			for ( my $count = 0 ; $count < scalar( @{ $_[0] } ) ; $count++ ) {
+		  #				if ( !defined( ${ $_[0] }[$count] ) ) { next; }
+		  #				$totalCount += ${ $_[0] }[$count];
+		  #				if ( $totalCount == $arrayLength / 2 ) {
+		  #					$medianPre = $count;
+		  #				}
+		  #				elsif ( $totalCount > $arrayLength / 2 ) {
+		  #					if ( defined $medianPre ) {
+		  #						return ( ( $medianPre + $count ) / 2 );
+		  #					}
+		  #					else {
+		  #						return ($count);
+		  #					}
+		  #				}
+		  #			}
 		}
 		else {
-			foreach my $key (sort {$a <=> $b} keys %{ $_[0] }) {
+			foreach my $key ( sort { $a <=> $b } keys %{ $_[0] } ) {
 				$totalCount += ${ $_[0] }{$key};
 				if ( $totalCount > $arrayLength / 2 ) {
 					return ($key);
 				}
 			}
-			
-#			for ( my $count = 0 ; $count < scalar( @{ $_[0] } ) ; $count++ ) {
-#				if ( !defined( ${ $_[0] }[$count] ) ) { next; }
-#				$totalCount += ${ $_[0] }[$count];
-#				if ( $totalCount > $arrayLength / 2 ) {
-#					return ($count);
-#				}
-#			}
+
+		  #			for ( my $count = 0 ; $count < scalar( @{ $_[0] } ) ; $count++ ) {
+		  #				if ( !defined( ${ $_[0] }[$count] ) ) { next; }
+		  #				$totalCount += ${ $_[0] }[$count];
+		  #				if ( $totalCount > $arrayLength / 2 ) {
+		  #					return ($count);
+		  #				}
+		  #			}
 		}
 	}
 }

@@ -21,33 +21,42 @@ sub vcfSummary {
 	my $cfgFile   = $config->{'cfgFile'};
 	my $method    = $config->{'method'};
 	my $resultDir = $config->{'resultDir'};
-	my $logFile = $config->{'log'};
+	my $logFile   = $config->{'log'};
+	my $rePlot    = $config->{'rePlot'};
 
-	my $RBin       = $config->{'RBin'};
-	my $annovarBin = $config->{'annovarBin'};
+	my $RBin           = $config->{'RBin'};
+	my $annovarBin     = $config->{'annovarBin'};
 	my $annovarConvert = $config->{'annovarConvert'};
-	my $annovarOption = $config->{'annovarOption'};
-	my $annovarDb  = $config->{'annovarDb'};
-	
+	my $annovarOption  = $config->{'annovarOption'};
+	my $annovarDb      = $config->{'annovarDb'};
+
 	my $usage =
 "Please use the follow command:\n perl qc3.pl -m v -i inputVcfFile -o outputDir [-s Method in consistence calculation] [-c filter config file] [-a annovar database]\nFor more information, plase read the readme file\n";
-	
+
 	die "$!\n$usage" if ( !defined($VCF) or !( -e $VCF ) or !( -e $cfgFile ) );
-	
+
 	$| = 1;
-	my $doAnnovar=1;
-	if ((grep -x "$_/$annovarBin", @PATH)) {
-	} elsif (-e $annovarBin) {
-		$annovarBin="perl $annovarBin";
-	} else {
-		$doAnnovar=0;
-		pInfo("Can't find annovar bin. Will not perform annovar annotation. You can read readme file to find how to download it",$logFile);
+	my $doAnnovar = 1;
+	if ( ( grep -x "$_/$annovarBin", @PATH ) ) {
 	}
-	if (!(defined $annovarDb) or !(-e $annovarDb)) {
-		$doAnnovar=0;
-		pInfo("Can't find annovar database. Will not perform annovar annotation. You can read readme file to find how to download it",$logFile);
+	elsif ( -e $annovarBin ) {
+		$annovarBin = "perl $annovarBin";
 	}
-	
+	else {
+		$doAnnovar = 0;
+		pInfo(
+"Can't find annovar bin. Will not perform annovar annotation. You can read readme file to find how to download it",
+			$logFile
+		);
+	}
+	if ( !( defined $annovarDb ) or !( -e $annovarDb ) ) {
+		$doAnnovar = 0;
+		pInfo(
+"Can't find annovar database. Will not perform annovar annotation. You can read readme file to find how to download it",
+			$logFile
+		);
+	}
+
 	my %IDList;
 	my $done_filter;
 	my @titles;
@@ -62,12 +71,10 @@ sub vcfSummary {
 	my %changNumber;
 	my %changes;
 	my %cfgFilter;
-#	my @filesAnnovar;
-#	my %fileHandlesAnn;
 	my %snpCount;
-	
+
 	open CFG, "<$cfgFile" or die $!;
-	pInfo("VariantFiltration based on $cfgFile",$logFile);
+	pInfo( "VariantFiltration based on $cfgFile", $logFile );
 	while (<CFG>) {
 		chomp;
 		if (/^#/) {
@@ -75,249 +82,292 @@ sub vcfSummary {
 		}
 		if (/[><=]+/) {
 			$cfgFilter{$`} = $& . $';
-#			print "$` $& $'\n";
+
+			#			print "$` $& $'\n";
 		}
 	}
 
 	my $filename         = basename($VCF);
 	my $annovarResultDir = "$resultDir/vcfAnnovarResult/";
 
-#test R, comment below code
-	open READ, "<$VCF" or die "can't read $VCF\n";
-	if ( !( -e ("$resultDir/vcfResult/") ) ) { mkdir "$resultDir/vcfResult/"; }
-	if ( !( -e $annovarResultDir ) ) { mkdir $annovarResultDir; }
-	open RESULT1, ">$resultDir/vcfResult/$filename.IDlistAll.txt"    or die $!;
-	open RESULT2, ">$resultDir/vcfResult/$filename.IDlistFilter.txt" or die $!;
-	open RESULT3, ">$resultDir/vcfResult/$filename.SampleNumber.txt" or die $!;
+	if ($rePlot) {    #re plot by R only, comment below codes
 
-	my $resultFile = "$resultDir/vcfResult/$filename.Method$method.txt";
-	open RESULT4, ">$resultFile" or die "can't write $resultFile\n";
-	open RESULT5, ">$resultDir/vcfResult/$filename.snpCount.txt" or die $!;
-	open RESULT6, ">$annovarResultDir$filename.pass" or die $!; #new vcf for annovar
-
-	while (<READ>) {    #read title and ID list
-		chomp;
-		s/\r//g;
-		if (/^##INFO=<ID=(\w+),/) {    #all IDs
-			$IDList{$1} = "";
-		}
-		elsif (/^##/) {
-			next;
-		}
-		elsif (/^#/) {                 #title
-			@titles = ( split /\t/, $_ );
-			$sampleSize = scalar(@titles) - 9;
-			pInfo("The VCF file has $sampleSize samples",$logFile);
-			last;
-		}
 	}
-	close(READ);
+	else {
 
-	print RESULT1 "CHROM\tPOS\tREF\tALT";
-	print RESULT2 "CHROM\tPOS\tREF\tALT";
-	foreach my $ID ( sort keys %IDList ) {
-		print RESULT1 "\t$ID";
-		print RESULT2 "\t$ID";
-	}
-	print RESULT1 "\n";
-	print RESULT2 "\n";
+		#test R, comment below code
+		open READ, "<$VCF" or die "can't read $VCF\n";
+		if ( !( -e ("$resultDir/vcfResult/") ) ) {
+			mkdir "$resultDir/vcfResult/";
+		}
+		if ( !( -e $annovarResultDir ) ) { mkdir $annovarResultDir; }
+		open RESULT1, ">$resultDir/vcfResult/$filename.IDlistAll.txt" or die $!;
+		open RESULT2, ">$resultDir/vcfResult/$filename.IDlistFilter.txt"
+		  or die $!;
+		open RESULT3, ">$resultDir/vcfResult/$filename.SampleNumber.txt"
+		  or die $!;
 
-	open READ, "<$VCF" or die "can't read $VCF\n";
-	while (<READ>) {    #read content
-		chomp;
-		s/\r//g;
-		if (/^#/ or $_ eq "") {
-			print RESULT6 "$_\n";
-			next;
-		}
-		my @lines = ( split /\t/, $_ );
-		if ( $lines[6] eq "LowQual" or &filter( $lines[7], \%cfgFilter ) == 0 )
-		{
-			$done_filter = 1;
-		}
-		else {
-			$done_filter = 0;
-			print RESULT2 "$lines[0]\t$lines[1]\t$lines[3]\t$lines[4]";
-			print RESULT6 "$_\n";
-		}
-		print RESULT1 "$lines[0]\t$lines[1]\t$lines[3]\t$lines[4]";
+		my $resultFile = "$resultDir/vcfResult/$filename.Method$method.txt";
+		open RESULT4, ">$resultFile" or die "can't write $resultFile\n";
+		open RESULT5, ">$resultDir/vcfResult/$filename.snpCount.txt" or die $!;
+		open RESULT6, ">$annovarResultDir$filename.pass"
+		  or die $!;    #new vcf for annovar
 
-		my @ID1 = ( split /;/, $lines[7] );
-		my %IDNumber;
-		foreach my $ID (@ID1) {
-			my @ID2 = ( split /=/, $ID );
-			$IDNumber{ $ID2[0] } = $ID2[1];
-		}
-		if ( $done_filter == 0 ) {
-			foreach my $ID ( sort keys %IDList ) {
-				if ( defined $IDNumber{$ID} ) {
-					print RESULT1 "\t$IDNumber{$ID}";
-					print RESULT2 "\t$IDNumber{$ID}";
-				}
-				else {
-					print RESULT1 "\t";
-					print RESULT2 "\t";
-				}
+		while (<READ>) {    #read title and ID list
+			chomp;
+			s/\r//g;
+			if (/^##INFO=<ID=(\w+),/) {    #all IDs
+				$IDList{$1} = "";
 			}
-			print RESULT1 "\n";
-			print RESULT2 "\n";
-		}
-		else {
-			foreach my $ID ( sort keys %IDList ) {
-				if ( defined $IDNumber{$ID} ) {
-					print RESULT1 "\t$IDNumber{$ID}";
-				}
-				else {
-					print RESULT1 "\t";
-				}
+			elsif (/^##/) {
+				next;
 			}
-			print RESULT1 "\n";
+			elsif (/^#/) {                 #title
+				@titles = ( split /\t/, $_ );
+				$sampleSize = scalar(@titles) - 9;
+				pInfo( "The VCF file has $sampleSize samples", $logFile );
+				last;
+			}
 		}
+		close(READ);
 
-		for ( my $x = 9 ; $x < ( 9 + $sampleSize ) ; $x++ ) {
-			if ( $lines[$x] eq './.' ) { next; }
-			elsif ( $lines[$x] =~ '0/1' ) {
-				if (   ( $lines[3] . $lines[4] eq "AG" )
-					or ( $lines[3] . $lines[4] eq "GA" )
-					or ( $lines[3] . $lines[4] eq "CT" )
-					or ( $lines[3] . $lines[4] eq "TC" ) )
-				{
-					$Sample2NumberAll{ $titles[$x] }{"Transitions"}++;
+		print RESULT1 "CHROM\tPOS\tREF\tALT";
+		print RESULT2 "CHROM\tPOS\tREF\tALT";
+		foreach my $ID ( sort keys %IDList ) {
+			print RESULT1 "\t$ID";
+			print RESULT2 "\t$ID";
+		}
+		print RESULT1 "\n";
+		print RESULT2 "\n";
+
+		open READ, "<$VCF" or die "can't read $VCF\n";
+		while (<READ>) {    #read content
+			chomp;
+			s/\r//g;
+			if ( /^#/ or $_ eq "" ) {
+				print RESULT6 "$_\n";
+				next;
+			}
+			my @lines = ( split /\t/, $_ );
+			if (   $lines[6] eq "LowQual"
+				or &filter( $lines[7], \%cfgFilter ) == 0 )
+			{
+				$done_filter = 1;
+			}
+			else {
+				$done_filter = 0;
+				print RESULT2 "$lines[0]\t$lines[1]\t$lines[3]\t$lines[4]";
+				print RESULT6 "$_\n";
+			}
+			print RESULT1 "$lines[0]\t$lines[1]\t$lines[3]\t$lines[4]";
+
+			my @ID1 = ( split /;/, $lines[7] );
+			my %IDNumber;
+			foreach my $ID (@ID1) {
+				my @ID2 = ( split /=/, $ID );
+				$IDNumber{ $ID2[0] } = $ID2[1];
+			}
+			if ( $done_filter == 0 ) {
+				foreach my $ID ( sort keys %IDList ) {
+					if ( defined $IDNumber{$ID} ) {
+						print RESULT1 "\t$IDNumber{$ID}";
+						print RESULT2 "\t$IDNumber{$ID}";
+					}
+					else {
+						print RESULT1 "\t";
+						print RESULT2 "\t";
+					}
+				}
+				print RESULT1 "\n";
+				print RESULT2 "\n";
+			}
+			else {
+				foreach my $ID ( sort keys %IDList ) {
+					if ( defined $IDNumber{$ID} ) {
+						print RESULT1 "\t$IDNumber{$ID}";
+					}
+					else {
+						print RESULT1 "\t";
+					}
+				}
+				print RESULT1 "\n";
+			}
+
+			for ( my $x = 9 ; $x < ( 9 + $sampleSize ) ; $x++ ) {
+				if ( $lines[$x] eq './.' ) { next; }
+				elsif ( $lines[$x] =~ '0/1' ) {
+					if (   ( $lines[3] . $lines[4] eq "AG" )
+						or ( $lines[3] . $lines[4] eq "GA" )
+						or ( $lines[3] . $lines[4] eq "CT" )
+						or ( $lines[3] . $lines[4] eq "TC" ) )
+					{
+						$Sample2NumberAll{ $titles[$x] }{"Transitions"}++;
+						if ( $done_filter == 0 ) {
+							$Sample2NumberFilter{ $titles[$x] }
+							  {"Transitions"}++;
+						}
+					}
+					else {
+						$Sample2NumberAll{ $titles[$x] }{"Transversions"}++;
+						if ( $done_filter == 0 ) {
+							$Sample2NumberFilter{ $titles[$x] }
+							  {"Transversions"}++;
+						}
+					}
+					$Sample2NumberAll{ $titles[$x] }{"01Number"}++;
 					if ( $done_filter == 0 ) {
-						$Sample2NumberFilter{ $titles[$x] }{"Transitions"}++;
+						$Sample2NumberFilter{ $titles[$x] }{"01Number"}++;
 					}
 				}
-				else {
-					$Sample2NumberAll{ $titles[$x] }{"Transversions"}++;
+				elsif ( $lines[$x] =~ '1/1' ) {
+					$Sample2NumberAll{ $titles[$x] }{"11Number"}++;
 					if ( $done_filter == 0 ) {
-						$Sample2NumberFilter{ $titles[$x] }{"Transversions"}++;
+						$Sample2NumberFilter{ $titles[$x] }{"11Number"}++;
 					}
 				}
-				$Sample2NumberAll{ $titles[$x] }{"01Number"}++;
-				if ( $done_filter == 0 ) {
-					$Sample2NumberFilter{ $titles[$x] }{"01Number"}++;
-				}
-			}
-			elsif ( $lines[$x] =~ '1/1' ) {
-				$Sample2NumberAll{ $titles[$x] }{"11Number"}++;
-				if ( $done_filter == 0 ) {
-					$Sample2NumberFilter{ $titles[$x] }{"11Number"}++;
-				}
-			}
-			if ( $done_filter == 0 ) {    #this line was kept
-				if ($lines[$x]=~'0/1' or $lines[$x]=~'1/1') { #count SNP for each sample in each chromosome
-					$snpCount{$lines[0]}{$titles[$x]}++; 
-				}
-				for ( my $y = ( $x + 1 ) ; $y < ( 9 + $sampleSize ) ; $y++ ) {
-					if ( $lines[$y] eq './.' ) { next; } else {
-						my @result =
-						  &caculate_ratio( $lines[$x], $lines[$y], $method );
-						$selected{ $titles[$x] }{ $titles[$y] }  += $result[0];
-						$total{ $titles[$x] }{ $titles[$y] }     += $result[1];
-						$selected{ $titles[$y] }{ $titles[$x] }  += $result[2];
-						$total{ $titles[$y] }{ $titles[$x] }     += $result[3];
-						$selected2{ $titles[$x] }{ $titles[$y] } += $result[4];
-						$total2{ $titles[$x] }{ $titles[$y] }    += $result[5];
+				if ( $done_filter == 0 ) {    #this line was kept
+					if ( $lines[$x] =~ '0/1' or $lines[$x] =~ '1/1' )
+					{    #count SNP for each sample in each chromosome
+						$snpCount{ $lines[0] }{ $titles[$x] }++;
+					}
+					for ( my $y = ( $x + 1 ) ; $y < ( 9 + $sampleSize ) ; $y++ )
+					{
+						if ( $lines[$y] eq './.' ) { next; }
+						else {
+							my @result =
+							  &caculate_ratio( $lines[$x], $lines[$y],
+								$method );
+							$selected{ $titles[$x] }{ $titles[$y] } +=
+							  $result[0];
+							$total{ $titles[$x] }{ $titles[$y] } += $result[1];
+							$selected{ $titles[$y] }{ $titles[$x] } +=
+							  $result[2];
+							$total{ $titles[$y] }{ $titles[$x] } += $result[3];
+							$selected2{ $titles[$x] }{ $titles[$y] } +=
+							  $result[4];
+							$total2{ $titles[$x] }{ $titles[$y] } += $result[5];
+						}
 					}
 				}
 			}
 		}
-	}
 
-	print RESULT3
+		print RESULT3
 "Sample\tTransitions:Transversions (Based on all SNPs)\tHeterozygous:Non-reference homozygous (Based on all SNPs)\tTransitions:Transversions (After filter)\tHeterozygous:Non-reference homozygous (After filter)\n";
-	foreach my $sample ( sort keys %Sample2NumberAll ) {
-		my $TTRatioAll =&myDivide($Sample2NumberAll{$sample}{"Transitions"},$Sample2NumberAll{$sample}{"Transversions"});
-		my $TTRatioFilter =&myDivide($Sample2NumberFilter{$sample}{"Transitions"},$Sample2NumberFilter{$sample}{"Transversions"});
-		my $Ratio0111All =&myDivide($Sample2NumberAll{$sample}{"01Number"},$Sample2NumberAll{$sample}{"11Number"});
-		my $Ratio0111Filter =&myDivide($Sample2NumberFilter{$sample}{"01Number"},$Sample2NumberFilter{$sample}{"11Number"});
-
-		printf RESULT3 (
-			"%s\t%.3f\t%.3f\t%.3f\t%.3f\n",
-			$sample, $TTRatioAll, $Ratio0111All, $TTRatioFilter,
-			$Ratio0111Filter
-		);
-	}
-
-	print RESULT4
-"FileTitle\tSampleA\tSampleB\tCountB2A\tCountA\tHeterozygous Consistency (CountB2A:CountA)\tCountA2B\tCountB\tHeterozygous Consistency (CountA2B:CountB)\tOverall Consistent Genotypes\tOverall Overlapped Genotypes\tOverall Consistency";
-	foreach my $change ( sort keys %changes ) {
-		print RESULT4 "\t$change";
-	}
-	print RESULT4 "\n";
-
-	my $fileName = basename($VCF);
-	foreach my $sample1 ( sort keys %selected2 ) {
-		foreach my $sample2 ( sort keys %{ $selected2{$sample1} } ) {
-			my ( $ratio1, $ratio2, $ratio3 ) = ( 0, 0, 0 );
-			$ratio1 =myDivide($selected{$sample1}{$sample2},$total{$sample1}{$sample2});
-			$ratio2 =myDivide($selected{$sample2}{$sample1},$total{$sample2}{$sample1});
-			$ratio3 =myDivide($selected2{$sample1}{$sample2},$total2{$sample1}{$sample2});
-
-			printf RESULT4 (
-				"%s\t%s\t%s\t%d\t%d\t%.3f\t%d\t%d\t%.3f\t%d\t%d\t%.3f",
-				$fileName,
-				$sample1,
-				$sample2,
-				$selected{$sample1}{$sample2},
-				$total{$sample1}{$sample2},
-				$ratio1,
-				$selected{$sample2}{$sample1},
-				$total{$sample2}{$sample1},
-				$ratio2,
-				$selected2{$sample1}{$sample2},
-				$total2{$sample1}{$sample2},
-				$ratio3
+		foreach my $sample ( sort keys %Sample2NumberAll ) {
+			my $TTRatioAll = &myDivide(
+				$Sample2NumberAll{$sample}{"Transitions"},
+				$Sample2NumberAll{$sample}{"Transversions"}
+			);
+			my $TTRatioFilter = &myDivide(
+				$Sample2NumberFilter{$sample}{"Transitions"},
+				$Sample2NumberFilter{$sample}{"Transversions"}
+			);
+			my $Ratio0111All = &myDivide(
+				$Sample2NumberAll{$sample}{"01Number"},
+				$Sample2NumberAll{$sample}{"11Number"}
+			);
+			my $Ratio0111Filter = &myDivide(
+				$Sample2NumberFilter{$sample}{"01Number"},
+				$Sample2NumberFilter{$sample}{"11Number"}
 			);
 
-			foreach
-			  my $change ( sort keys %changes )
-			{
-				if (exists ($changNumber{$sample1}{$sample2}{$change})) {
-					print RESULT4 "\t$changNumber{$sample1}{$sample2}{$change}";
-				} else {
-					print RESULT4 "\t0";
-				}
-			}
-			print RESULT4 "\n";
+			printf RESULT3 (
+				"%s\t%.3f\t%.3f\t%.3f\t%.3f\n",
+				$sample, $TTRatioAll, $Ratio0111All, $TTRatioFilter,
+				$Ratio0111Filter
+			);
 		}
-	}
-	
-	#export snp count
-	my $temp = ( sort keys %snpCount )[0];
-	print RESULT5 "Chromesome";
-	foreach my $sample (sort keys %{$snpCount{$temp}}) {
-		print RESULT5 "\t$sample";
-	}
-	print RESULT5 "\n";
-	foreach my $chrom (sort keys %snpCount) {
-		print RESULT5 "$chrom";
-		foreach my $sample (sort keys %{$snpCount{$chrom}}) {
-			print RESULT5 "\t$snpCount{$chrom}{$sample}";
+
+		print RESULT4
+"FileTitle\tSampleA\tSampleB\tCountB2A\tCountA\tHeterozygous Consistency (CountB2A:CountA)\tCountA2B\tCountB\tHeterozygous Consistency (CountA2B:CountB)\tOverall Consistent Genotypes\tOverall Overlapped Genotypes\tOverall Consistency";
+		foreach my $change ( sort keys %changes ) {
+			print RESULT4 "\t$change";
+		}
+		print RESULT4 "\n";
+
+		my $fileName = basename($VCF);
+		foreach my $sample1 ( sort keys %selected2 ) {
+			foreach my $sample2 ( sort keys %{ $selected2{$sample1} } ) {
+				my ( $ratio1, $ratio2, $ratio3 ) = ( 0, 0, 0 );
+				$ratio1 = myDivide( $selected{$sample1}{$sample2},
+					$total{$sample1}{$sample2} );
+				$ratio2 = myDivide( $selected{$sample2}{$sample1},
+					$total{$sample2}{$sample1} );
+				$ratio3 = myDivide(
+					$selected2{$sample1}{$sample2},
+					$total2{$sample1}{$sample2}
+				);
+
+				printf RESULT4 (
+					"%s\t%s\t%s\t%d\t%d\t%.3f\t%d\t%d\t%.3f\t%d\t%d\t%.3f",
+					$fileName,
+					$sample1,
+					$sample2,
+					$selected{$sample1}{$sample2},
+					$total{$sample1}{$sample2},
+					$ratio1,
+					$selected{$sample2}{$sample1},
+					$total{$sample2}{$sample1},
+					$ratio2,
+					$selected2{$sample1}{$sample2},
+					$total2{$sample1}{$sample2},
+					$ratio3
+				);
+
+				foreach my $change ( sort keys %changes ) {
+					if ( exists( $changNumber{$sample1}{$sample2}{$change} ) ) {
+						print RESULT4
+						  "\t$changNumber{$sample1}{$sample2}{$change}";
+					}
+					else {
+						print RESULT4 "\t0";
+					}
+				}
+				print RESULT4 "\n";
+			}
+		}
+
+		#export snp count
+		my $temp = ( sort keys %snpCount )[0];
+		print RESULT5 "Chromesome";
+		foreach my $sample ( sort keys %{ $snpCount{$temp} } ) {
+			print RESULT5 "\t$sample";
 		}
 		print RESULT5 "\n";
-	}
-	
-	#do annovar
-	
-	if ($doAnnovar) {
-		pInfo("do ANNOVAR annotation",$logFile);
-		system("$annovarConvert -format vcf4 $annovarResultDir$filename.pass -includeinfo > $annovarResultDir$filename.pass.avinput");
-		system("$annovarBin $annovarResultDir$filename.pass.avinput $annovarDb $annovarOption  --outfile $annovarResultDir$filename.pass.avinput.annovar");
-	}
+		foreach my $chrom ( sort keys %snpCount ) {
+			print RESULT5 "$chrom";
+			foreach my $sample ( sort keys %{ $snpCount{$chrom} } ) {
+				print RESULT5 "\t$snpCount{$chrom}{$sample}";
+			}
+			print RESULT5 "\n";
+		}
 
-	#end comment
+		#do annovar
+
+		if ($doAnnovar) {
+			pInfo( "do ANNOVAR annotation", $logFile );
+			system(
+"$annovarConvert -format vcf4 $annovarResultDir$filename.pass -includeinfo > $annovarResultDir$filename.pass.avinput"
+			);
+			system(
+"$annovarBin $annovarResultDir$filename.pass.avinput $annovarDb $annovarOption  --outfile $annovarResultDir$filename.pass.avinput.annovar"
+			);
+		}
+
+		#end comment
+	}
 
 	#plot by R
-	my $annovarBuildver="";
-	if ($annovarOption=~/-buildver (\S+) /) {
-		$annovarBuildver=$1;
+	my $annovarBuildver = "";
+	if ( $annovarOption =~ /-buildver (\S+) / ) {
+		$annovarBuildver = $1;
 	}
 	my $Rsource = dirname($0) . $rSourceLocation;
 	my $rResult = system(
 "cat $Rsource | $RBin --vanilla --slave --args $resultDir/$filename $annovarBuildver > $resultDir/vcfResult/vcfSummary.rLog"
 	);
-	pInfo("Finish vcf summary!",$logFile);
+	pInfo( "Finish vcf summary!", $logFile );
 	return ($rResult);
 }
 
@@ -429,18 +479,20 @@ sub caculate_ratio {
 }
 
 sub pInfo {
-	my $s = shift;
+	my $s       = shift;
 	my $logFile = shift;
 	print "[", scalar(localtime), "] $s\n";
 	print $logFile "[", scalar(localtime), "] $s\n";
 }
 
-sub myDivide{
-    my ($a,$b) = @_;
-    if(!(defined $a) or !(defined $b) or $b == 0){
-        return 'NA';
-#        return '0';
-    }else{
-        return ($a/$b);
-    }
+sub myDivide {
+	my ( $a, $b ) = @_;
+	if ( !( defined $a ) or !( defined $b ) or $b == 0 ) {
+		return 'NA';
+
+		#        return '0';
+	}
+	else {
+		return ( $a / $b );
+	}
 }
