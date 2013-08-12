@@ -7,16 +7,24 @@
 plot_dataFrame<-function(rawData,colBox=5:ncol(rawData),colList=NA,cex=1,dolog=F,res=150) {
 	row.names(rawData)<-gsub(".bam","",row.names(rawData))
 	temp<-strsplit(row.names(rawData),"/")
-	row.names(rawData)<-sapply(temp,function(x) x[length(x)])
-#	cex.axis<-c(cex,cex-0.3,cex)
+	if (length(unique(sapply(temp,function(x) x[length(x)])))<nrow(rawData)) {
+		print("The file names were same so that the path was also used to identify different samples. You can modify the sample names in the first column in bamSummary.txt manually and then use the -rp option to regenerate the report")
+		shortNames<-sapply(temp,function(x) x[length(x)])
+		for (i in 1:5) {
+			shortNames<-paste(sapply(temp,function(x) x[(length(x)-i)]),shortNames,sep="/")
+			if (length(unique(shortNames))==nrow(rawData)) {
+				row.names(rawData)<-shortNames
+				break;
+			}
+		}
+	} else {
+		row.names(rawData)<-sapply(temp,function(x) x[length(x)])
+	}
 	cex.axis<-c(cex,cex,cex-0.3,cex)
 	for (x in colBox) {
 		if (length(na.omit(as.numeric(rawData[,x])))<=1) {next;}
-#		png(paste("batch_",colnames(rawData)[x],".png",sep=""),width=1000,height=300,res=res)
 		png(paste("batch_",colnames(rawData)[x],".png",sep=""),width=1300,height=300,res=res)
-#		par(mfrow=c(1,3))
 		par(mfrow=c(1,4))
-#		par(mar=c(3,6,2,1))
 		par(mar=c(3,5,2,1))
 		for (y in 1:4) {
 			col<-rainbow(length(table(rawData[,y])))
@@ -28,7 +36,7 @@ plot_dataFrame<-function(rawData,colBox=5:ncol(rawData),colList=NA,cex=1,dolog=F
 				pvalue2<-fligner.test(rawData[,x],rawData[,y])$p.value
 			}
 			ylim<-c(min(rawData[,x],na.rm=T)-(max(rawData[,x],na.rm=T)-min(rawData[,x],na.rm=T))*0.27,max(rawData[,x],na.rm=T))
-#			boxplot(rawData[,x]~rawData[,y],las=1,main=paste(colnames(rawData)[x],colnames(rawData)[y],sep=" by "),border=col,cex.axis=cex.axis[y-1],cex.main=cex-0.3,yaxt="n",ylim=ylim)
+			if(length(which(is.finite(ylim)))!=2) {ylim=c(0,0)}
 			boxplot(rawData[,x]~rawData[,y],las=1,main=paste(colnames(rawData)[x],colnames(rawData)[y],sep=" by "),border=col,cex.axis=cex.axis[y],cex.main=cex-0.3,yaxt="n",ylim=ylim)
 			axis(2,cex.axis=cex,las=1)
 			if (length(unique(rawData[,y]))==1) {axis(1,at=1,labels=rawData[1,y],cex.axis=cex.axis[y])}

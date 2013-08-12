@@ -91,7 +91,7 @@ plot_fastqNucN<-function(rawData,rawDataN,cex=1,pairEnd=1,res=150,ylim=range(raw
 			temp<-t(apply(temp,1,function(x) tapply(x,subgroup,mean,na.rm=T)))
 		}
 		matplot(t(temp),lty=1,col=col,type="l",las=1,xlab="Base",ylab="Percenty",lwd=2,cex.axis=cex,cex.main=cex-0.1,main=basename(row.names(rawData)[selected]),ylim=ylim)
-		sigDiffNuc<-round(median(apply(temp[,-(1:10)],1,function(x) sd(x)),na.rm=T),3)
+		sigDiffNuc<-round(median(apply(temp[,-(1:10)],1,function(x) sd(x,na.rm=T)),na.rm=T),3)
 		legend("bottomright",legend=paste("SD=",sigDiffNuc,sep=""),bty="n",cex=cex)
 		
 		temp<-rbind(temp2[,(1:(ncol(temp2)/4))*4-3],temp2[,(1:(ncol(temp2)/4))*4-2],temp2[,(1:(ncol(temp2)/4))*4-1],temp2[,(1:(ncol(temp2)/4))*4])	
@@ -114,7 +114,8 @@ plot_fastqNucN<-function(rawData,rawDataN,cex=1,pairEnd=1,res=150,ylim=range(raw
 }
 
 resultDir<-commandArgs()[5]
-pairEnd<-commandArgs()[6]
+singleEnd<-commandArgs()[6]
+if (singleEnd ==0) {pairEnd<-1} else {pairEnd<-0}
 fileName<-paste(resultDir,'/fastqResult/fastqSummary.txt',sep="")
 if (!file.exists(fileName)) {
 	fileName<-paste(getwd(),'/',fileName,sep="")
@@ -133,12 +134,8 @@ oldwd<-getwd()
 setwd(figureDir)
 file.remove(list.files("."))
 plot_dataFrame(allResult)
-#plot_fastqScore(resultQuality,pairEnd=pairEnd,doSubgroup=F)
-#plot_fastqNuc(resultNuc,ylim=c(0.18,0.32),doSubgroup=F)
-#plot_fastqScore(resultQualityN,pairEnd=pairEnd,doSubgroup=F,filename="fastqScoreN.png")
 plot_fastqScoreN(rawData=resultQuality,rawDataN=resultQualityN,pairEnd=pairEnd,doSubgroup=F,filename="fastqScoreYN.png")
-#plot_fastqNuc(resultNucN,ylim=c(0.18,0.32),doSubgroup=F,filename="nucPercentyN.png")
-plot_fastqNucN(rawData=resultNuc,rawDataN=resultNucN,pairEnd=pairEnd,ylim=c(0.18,0.32),doSubgroup=F,filename="nucPercentyYN.png")
+plot_fastqNucN(rawData=resultNuc,rawDataN=resultNucN,pairEnd=pairEnd,ylim=c(0.15,0.4),doSubgroup=F,filename="nucPercentyYN.png")
 
 setwd(oldwd)
 

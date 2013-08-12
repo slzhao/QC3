@@ -58,11 +58,6 @@ h2 {
 </div>
 
 <div><h2 id="M150">Result Table</h2>
-<table align="center" style="border:#2894ff 1px solid;">
-<!-- TMPL_LOOP NAME=MAKETABLE1 --> <CSTM_ROW EVEN=even ODD=odd FIRST=first>
-   </tr>
-<!-- /TMPL_LOOP -->
-</table>
 <p>Coloum names:</p>
 <pre>
 On/Off target: Number of sequences mapped on/off the regions indicated in target region file
@@ -72,7 +67,13 @@ Off-target-mito: Number of sequences mapped off the regions indicated in target 
 MQ: Mapping quality of the sequences
 InsertSize: Length of sequence from the leftmost position to the rightmost position
 Depth: The reading depth of sequences
+On-target percent: Percent of target positions that were sequenced
 </pre>
+<table align="center" style="border:#2894ff 1px solid;">
+<!-- TMPL_LOOP NAME=MAKETABLE1 --> <CSTM_ROW EVEN=even ODD=odd FIRST=first>
+   </tr>
+<!-- /TMPL_LOOP -->
+</table>
 </div>
 
 <div><h2 id="M200">Distribution</h2>

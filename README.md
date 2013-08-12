@@ -1,7 +1,8 @@
 Table of Content
 ================
-* [Overview](#Overview)
+* [Introduction](#Introduction)
 * [Change log](#Change)
+ * [Release Version 1.00](#R100)
  * [Release candidate (RC) version 1.3](#RC13)
  * [Release candidate (RC) version 1.2](#RC12)
  * [Release candidate (RC) version 1.1](#RC11)
@@ -25,13 +26,23 @@ Table of Content
  * [Introduction for vcf QC result](#ivr)
 * [Contacts](#Contacts)
 
-<a name="Overview"/>
-# Overview #
-Say something
+<a name="Introduction"/>
+# Introduction #
+
+High throughput sequencing is the most effective way to screen for non-specific germline variants, somatic mutations, and structural variants. Some of the most popular sequencing paradigms in DNA sequencing are whole genome sequencing, exome sequencing, and target panel sequencing. While vastly informative, sequencing data poses significant bioinformatics challenges in areas such as data storage, computation time, and variant detection accuracy.  One of the easily overlooked challenges associated with sequencing is quality control Quality control for DNA sequencing data can be categorized into three stages: raw data, alignment, and variant calling. QC on raw sequencing data has been given more attention than QC on alignment and the variant calling. There are many QC tools aimed at raw data such as FastQC, FastQ Screen FastX-Toolkit, NGS QC Toolkit, RRINSEQ and QC-Chain. However, few tools have been developed for conducting quality control on alignment and variant calling.
+
+We present QC3, a quality control tool designed for DNA sequencing data for all aforementioned three stages. QC3 provides both graphic and tabulated reports for quality control results. It also offers several unique features such as separation of bad and good reads (based on Illumina’s filter), detection of batch effect, and cross contamination. The input of QC3 can be three types of data: FASTQ, Binary Alignment Map (BAM), and Variant Calling Format, respectively, corresponding to the three stages of raw data, alignment, and variant detection. QC3 is written with Perl and R and is freely available for public use. It can be downloaded from [github](https://github.com/slzhao/QC3).
+
 
 <a name="Change"/>
 # Change log #
 
+<a name="R100">
+## Release version 1.00 on August 09, 2013
+Release version 1.00
+ * Documents were improved;
+ * The codes in bam QC were improved;
+ 
 <a name="RC13">
 ## Release candidate (RC) version 1.3 on August 06, 2013
 Release candidate version 1.3 for test
@@ -134,7 +145,7 @@ The ANNOVAR database files were also needed for ANNOVAR annotation. Please refer
 
 <a name="drd"/>
 ## Download required database ##
-A gtf and/or a bed file was taken as database files in bam QC, and the position annotation for each sequence was exported from them. At least one of them should be provided in bam QC. These files could be downloaded at [UCSC table browser](http://genome.ucsc.edu/cgi-bin/hgTables?command=start). The format of these files were: 
+A gtf and/or a bed file was taken as database files in bam QC, and the position annotation for each sequence was exported from them. The chromosomes and positions information in these files should be exactly same with the bam files (for example, chromosome 1 can't be represented as chr1 in one file but 1 in another file). At least one of gtf/bed should be provided in bam QC. These files could be downloaded at [UCSC table browser](http://genome.ucsc.edu/cgi-bin/hgTables?command=start). The format of these files were: 
 
 	hg19_protein_coding.bed
 	Column1	    Column2         Column3
@@ -146,14 +157,16 @@ A gtf and/or a bed file was taken as database files in bam QC, and the position 
 
 <a name="Usage"/>
 # Usage #
-Example code for running QC with given example dataset could be:
+The usage of QC3 software could be:
 
-	perl qc3.pl -m module -i inputFile -o outputDir (some other parameters)
+	perl qc3.pl -m module -i inputFile -o outputDir [-t threads -rp] [some other parameters]
 	
-	-m [module]         QC module used. It should be f (fastq QC), b (bam QC), or v (vcf QC).
-	-i [inputFile]      Input file. It should be a file list including all analyzed files in fastq QC and bam QC. In vcf QC, it should be the vcf file.
-	-o [outputDir]      Output directory for QC result. If the directory doesn't exist, it would be created. If the directory already existed, the files in it would be deleted.
-	-t [int]            Threads used in analysis. The default value is 4. This parameter only valid for fastq and bam QC. Only one thread would be used in vcf QC.
+	-m [module]         Required. QC module used. It should be f (fastq QC), b (bam QC), or v (vcf QC).
+	-i [inputFile]      Required. Input file. It should be a file list including all analyzed files in fastq QC and bam QC. To analyze the pair-end fastq files in fastq QC, the two files for the same sample should be listed together in this file. In vcf QC, it should be a vcf file.
+	-o [outputDir]      Required. Output directory for QC result. If the directory doesn't exist, it would be created.
+	-t [int]            Optional. Threads used in analysis. The default value is 4. This parameter only valid for fastq and bam QC. Only one thread would be used in vcf QC.
+	-rp					Optional. Re-plot the figures. The program will not re-analysis the input files but the result files in output directory will be used to re-plot the figures and re-generate the report if this parameter is used. You can use this parameter when you want to slightly modify the report, such as changing sample names in the figures.
+	-h	                Optional. Show help information for each module.
 
 Here is more details for each module:
 
@@ -162,26 +175,26 @@ Here is more details for each module:
 
 	perl qc3.pl -m f -i inputFileList -o outputDir -t threads
 
-	-p				whether the fastq files were pair-end data. -p = pair-end.
+	-se				Optional. whether the fastq files were pair-end data. They were taken as pair-end by default, -se = single-end.
 
 <a name="bqc"/>
 ## bam QC
 
 	perl qc3.pl -m b -i inputFileList -o outputDir -t threads
 
-	-r  [database]	A targetregion file.
-	-g  [database]	A gtf file.
-	-cm [int]	    Calculation method for data summary, should be 1 or 2. Method 1 means mean and method 2 means median. The default value is 1.
-	-d				whether the depth in on-/off-target regions will be calculated, -d = will be calculated.
+	-r  [database]	Optional. A targetregion file. At least one targetregion file or gtf file should be provided.
+	-g  [database]	Optional. A gtf file. At least one targetregion file or gtf file should be provided.
+	-cm [int]	    Optional. Calculation method for data summary, should be 1 or 2. Method 1 means mean and method 2 means median. The default value is 1.
+	-d				Optional. whether the depth in on-/off-target regions will be calculated, It will not be calculated by default, -d = will be calculated.
 
 <a name="vqc"/>
 ## vcf QC
 
 	perl qc3.pl -m v -i inputFile -o outputDir
 
-	-s [int]		    Method used in consistence calculation, should be 1 or 2. In method 1, only the two samples will completely same allele will be taken as consist. In method 2, the two samples satisfy the criterion in method 1, or if the two samples were 0/0 vs 0/1 but 0/0 sample has some read counts in alternative allele, they will be taken as consistent. The default value is 1.
-	-c [database]	A file indicating the filter arguments for vcf files. If not specified, the default file 'GATK.cfg' in qc3 directory with GATK best practices recommended arguments will be used.
-	-a [database]	Directory of annovar database.
+	-s [int]		    Optional. Method used in consistence calculation, should be 1 or 2. First of all, if any of the two samples had less than 10 read depths in an allele, it will not be used in consistence calculation. In method 1, only the two samples will completely same allele will be taken as consist. In method 2, the two samples satisfy the criterion in method 1, or if the two samples were 0/0 vs 0/1 but 0/0 sample has some read counts in alternative allele, they will be taken as consistent. The default value is 1.
+	-c [database]	Optional. A file indicating the filter arguments for vcf files. If not specified, the default file 'GATK.cfg' in QC3 directory with GATK best practices recommended arguments will be used.
+	-a [database]	Optional. Directory of annovar database.
 
 <a name="Example"/>
 # Example #
@@ -205,7 +218,7 @@ You need to download and extract it to a directory. Then the example code for ru
 	#assume qc3.pl in qc3Dir, examples in exampleDir
 	cd exampleDir
 	cd fastq
-	perl qc3Dir/qc3.pl -m f -i example_fastq_list.txt -o example_fastq_result -p
+	perl qc3Dir/qc3.pl -m f -i example_fastq_list.txt -o example_fastq_result
 
 
 <a name="bqcE"/>

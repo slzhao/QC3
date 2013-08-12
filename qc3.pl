@@ -13,7 +13,7 @@ use source::fastqSummary;
 use source::bamSummary;
 use source::vcfSummary;
 
-my $version="RC 1.3";
+our $version="1.00";
 my %config;
 $config{'RBin'}        = "R";       #where the R bin file is
 $config{'annovarBin'}  = "table_annovar.pl";		#where the ANNOVAR bin file is
@@ -22,20 +22,39 @@ $config{'annovarOption'}  = "-buildver hg19 -protocol refGene,snp137 -operation 
 $config{'samtoolsBin'} = "samtools";	#where the SAMtools bin file is
 $config{'logFileName'} = "qc3Log.txt";	#name of the log file
 
+my $usageModule="
+Program: qc3.pl (a quality control tool for DNA sequencing data in raw data, alignment, and variant calling stages)
+Version: $version
+
+Usage:   perl qc3.pl -m module -i listfile -o outputDirectory [-t threads] [other options]
+
+Options:
+
+	-m	module             Required. QC module used. It should be f (fastq QC), b (bam QC), or v (vcf QC).
+	-i	input filelist     Required. Input file. It should be a file list including all analyzed files in fastq QC and bam QC. To analyze the pair-end fastq files in fastq QC, the two files for the same sample should be listed together in this file. In vcf QC, it should be a vcf file.
+	-o	output directory   Required. Output directory for QC result. If the directory doesn't exist, it would be created.
+	-t	threads            Optional. Threads used in analysis. The default value is 4. This parameter only valid for fastq and bam QC. Only one thread will be used in vcf QC.
+	
+	-h	help               Optional. Show this information.
+	
+For more information, please refer to the readme file in QC3 directory. Or visit the QC3 website at https://github.com/slzhao/QC3
+
+";
+
 my $commandline = "perl $0 "
   . join( " ", @ARGV )
   ;    #Output you input command in the report to reproduce you result
 my (
-	$module,           $filelist, $resultDir, $pairend,
+	$module,           $filelist, $resultDir, $singleEnd,
 	$targetregionfile, $gtffile,  $isdepth,   $caculateMethod,$cfgFile,
-	$method,           $maxThreads,$annovarDb,$rePlot
+	$method,           $maxThreads,$annovarDb,$rePlot,$showHelp
 ) = ();
 GetOptions(
 	"t=i" => \$maxThreads,
 	"m=s" => \$module,
 	"i=s" => \$filelist,
 	"o=s" => \$resultDir,
-	"p"   => \$pairend,
+	"se"   => \$singleEnd,
 
 	"r=s" => \$targetregionfile,
 	"g=s" => \$gtffile,
@@ -47,11 +66,27 @@ GetOptions(
 	"a=s" => \$annovarDb,
 	
 	"rp"   => \$rePlot,
+	"h"   => \$showHelp,
 );
-if ( !defined $module) {die ("Module (-m) must be specified\n");}
-if ( !defined $filelist or !defined $resultDir) {die ("Input file (-i) and Output directory (-o) must be provided\n");}
+if (defined $module and $showHelp) {
+	$config{'showHelp'}=$showHelp;
+	if ($module eq "f") {
+		my $rResult = &fasqSummary( $filelist, \%config );
+	} elsif ($module eq "b") {
+		my $rResult = &bamSummary( $filelist, \%config );
+	} elsif ($module eq "v") {
+		my $rResult = &vcfSummary( $filelist, \%config );
+	}
+} elsif ($showHelp) {die "$usageModule";}
 
-if ( !defined $pairend )    { $pairend              = 0; }
+if ( !defined $module) {
+	die ("Module (-m) is required and must be f (fastq), b (bam), and v (vcf)\n$usageModule");
+} elsif (!defined $filelist or !defined $resultDir) {
+	die ("Input file (-i) and Output directory (-o) must be provided\n$usageModule");
+} elsif (!(-s $filelist)) {
+	die ("Input file (-i) didn't exist or size equal 0\n$usageModule");
+}
+
 if ( !defined $isdepth )    { $isdepth              = 0; }
 if ( !defined $method ) { $method = 1; }
 if ( !( defined $cfgFile ) or $cfgFile eq '' ) {
@@ -60,6 +95,11 @@ if ( !( defined $cfgFile ) or $cfgFile eq '' ) {
 if ( !defined $maxThreads ) { $config{'maxThreads'} = 4; }
 else {
 	$config{'maxThreads'} = $maxThreads;
+}
+if ( !defined $singleEnd )    { 
+	$config{'singleEnd'} = 0;
+} else {
+	$config{'singleEnd'} = $singleEnd;
 }
 if ( !defined $caculateMethod ) { $config{'caculateMethod'} = 1; } #1 as mean 2 as median
 else {
@@ -89,12 +129,9 @@ if (defined $resultDir) {
 
 if ( $module eq "f" ) {
 	pInfo("Start fastq summary for $filelist",$config{'log'});
-	$config{'pairEnd'} = $pairend;
 	my $rResult = &fasqSummary( $filelist, \%config );
 	if ( $rResult != 0 ) {
-		print(
-"Something wrong in plotting figure. Please check the fastqSummary.rLog file!\n"
-		);
+		pInfo("Something wrong in plotting figure. Please check the fastqSummary.rLog file!",$config{'log'});
 	}
 
 	#report
@@ -119,9 +156,7 @@ elsif ( $module eq "b" ) {
 	$config{'isdepth'}          = $isdepth;
 	my $rResult = &bamSummary( $filelist, \%config );
 	if ( $rResult != 0 ) {
-		print(
-"Something wrong in plotting figure. Please check the bamSummary.rLog file!\n"
-		);
+		pInfo("Something wrong in plotting figure. Please check the bamSummary.rLog file!",$config{'log'});
 	}
 
 	#report
@@ -147,9 +182,7 @@ elsif ( $module eq "v" ) {
 	$config{'annovarDb'}   = $annovarDb;
 	my $rResult = &vcfSummary( $filelist, \%config );
 	if ( $rResult != 0 ) {
-		print(
-"Something wrong in plotting figure. Please check the vcfSummary.rLog file!\n"
-		);
+		pInfo("Something wrong in plotting figure. Please check the vcfSummary.rLog file!",$config{'log'});
 	}
 
 	#report
@@ -192,7 +225,7 @@ elsif ( $module eq "v" ) {
 	$reportFileName = "vcfReport.html";
 }
 else {
-	die "Module (-m) must be f (fastq), b (bam), and v (vcf)\n";
+	die "Module (-m) is required and must be f (fastq), b (bam), and v (vcf)\n$usageModule";
 }
 
 open REPORT, ">$resultDir/$reportFileName" or die "can't open $!\n";

@@ -18,16 +18,34 @@ sub fasqSummary {
 	# each line is a file name in $filelist
 	my ( $filelist, $config ) = @_;
 	my $resultDir  = $config->{'resultDir'};
-	my $pairEnd    = $config->{'pairEnd'};
+	my $singleEnd    = $config->{'singleEnd'};
 	my $RBin       = $config->{'RBin'};
 	my $maxThreads = $config->{'maxThreads'};
 	my $logFile    = $config->{'log'};
 	my $rePlot     = $config->{'rePlot'};
+	my $showHelp     = $config->{'showHelp'};
 
 	my $usage =
-"Please use the follow command:\n perl qc3.pl -m f -i inputFastqList -o outputDir [-t threads used] [-p pair-end]\nFor more information, plase read the readme file\n";
+"Program: qc3.pl (a quality control tool for DNA sequencing data in raw data, alignment, and variant calling stages)
+Version: $main::version
+
+Module: fastq QC
+Usage:   perl qc3.pl -m f -i fastqFileList -o outputDirectory [-t threads] [other options]
+
+Options:
+
+	-i	input filelist      Required. A list file for fastq files to be analyzed. QC3 also support .gz files.
+	-o	output directory    Required. Output directory for QC result. If the directory doesn't exist, it would be created.
+	-t	threads             Optional. Threads used in analysis. The default value is 4.
+	-se	                    Optional. whether the fastq files were pair-end data. They were taken as pair-end by default, -se = single-end.
+	
+	-h	                    Optional. Show this information.
+	
+For more information, please refer to the readme file in QC3 directory. Or visit the QC3 website at https://github.com/slzhao/QC3
+
+";
 	die "$!\n$usage"
-	  if ( !defined($filelist) or !-e $filelist or !defined($resultDir) );
+	  if ($showHelp);
 
 	if ( !( -e $resultDir . '/fastqResult/' ) ) {
 		mkdir $resultDir . '/fastqResult/';
@@ -117,7 +135,7 @@ sub fasqSummary {
 	my $Rsource =
 	  dirname($0) . "/source/rFunctions.R " . dirname($0) . $rSourceLocation;
 	my $rResult = system(
-"cat $Rsource | $RBin --vanilla --slave --args $resultDir $pairEnd > $resultDir/fastqResult/fastqSummary.rLog"
+"cat $Rsource | $RBin --vanilla --slave --args $resultDir $singleEnd > $resultDir/fastqResult/fastqSummary.rLog"
 	);
 	pInfo( "Finish fastq summary!", $logFile );
 	return ($rResult);
@@ -211,13 +229,14 @@ sub getmetric {
 	}
 	while ( my $line1 = <IIN> ) {
 		my $line2 = <IIN>;
+		chomp $line2;
 		<IIN>;
 		my $line4 = <IIN>;
 		$failed = ( split /:/, $line1 )[7];
 
 		$totalreads++;
 
-		$readlen = length($line2) - 1;    #note the "/n" at the end
+		$readlen = length($line2);
 
 		$totalnuclear += $readlen;
 
@@ -266,7 +285,7 @@ sub getmetric {
 		#        }
 	}
 	close IIN;
-
+	
 	#print to information file
 	foreach my $key ( 0 .. ( $readlen - 1 ) ) {
 		push @r2, $scoreSumBase[$key] / $totalreads - $offset;
@@ -277,7 +296,7 @@ sub getmetric {
 		  $nucSumBase[$key]{"C"} +
 		  $nucSumBase[$key]{"G"};    #percenty for each nuc, what about U?
 		foreach my $nuc ( "A", "T", "C", "G" ) {
-			push @r3, $nucSumBase[$key]{$nuc} / $totalNuc;
+			push @r3, &myDivide($nucSumBase[$key]{$nuc},$totalNuc);
 		}
 		$totalNuc =
 		  $nucSumBaseN[$key]{"A"} +
@@ -285,7 +304,7 @@ sub getmetric {
 		  $nucSumBaseN[$key]{"C"} +
 		  $nucSumBaseN[$key]{"G"};    #percenty for each nuc, what about U?
 		foreach my $nuc ( "A", "T", "C", "G" ) {
-			push @r5, $nucSumBaseN[$key]{$nuc} / $totalNuc;
+			push @r5, &myDivide($nucSumBaseN[$key]{$nuc},$totalNuc);
 		}
 	}
 
@@ -296,16 +315,31 @@ sub getmetric {
 	  );
 
 	#add bq
+	my $tempY=0;
+	my $tempN=0;
+	if ($totalreadsy==0) {
+		$tempY='NA';
+	} else {
+		$tempY=&myDivide($bqy,$totalreadsy)-$offset;
+	}
+	if ($totalreadsn==0) {
+		$tempN='NA';
+	} else {
+		$tempN=&myDivide($bqn,$totalreadsn)-$offset;
+	}
 	push @r1,
 	  (
-		$bq / $totalreads - $offset,
-		$bqy / $totalreadsy - $offset,
-		$bqn / $totalreadsn - $offset
+		&myDivide($bq,$totalreads)-$offset,
+		$tempY,
+		$tempN,
 	  );
 
 	#add gc
 	push @r1,
-	  ( $gc / $totalnuclear, $gcy / $totalnucleary, $gcn / $totalnuclearn );
+	  ( 
+	  &myDivide($gc,$totalnuclear),
+	  &myDivide($gcy,$totalnucleary),
+	  &myDivide($gcn,$totalnuclearn));
 
 	return ( \@r1, \@r2, \@r3, \@r4, \@r5 );
 }
@@ -344,4 +378,14 @@ sub pInfo {
 	my $logFile = shift;
 	print "[", scalar(localtime), "] $s\n";
 	print $logFile "[", scalar(localtime), "] $s\n";
+}
+
+sub myDivide {
+	my ( $a, $b ) = @_;
+	if ( !( defined $a ) or !( defined $b ) or $b == 0 ) {
+		return 'NA';
+	}
+	else {
+		return ( $a / $b );
+	}
 }

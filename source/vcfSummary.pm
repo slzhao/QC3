@@ -29,11 +29,31 @@ sub vcfSummary {
 	my $annovarConvert = $config->{'annovarConvert'};
 	my $annovarOption  = $config->{'annovarOption'};
 	my $annovarDb      = $config->{'annovarDb'};
+	
+	my $showHelp     = $config->{'showHelp'};
 
 	my $usage =
-"Please use the follow command:\n perl qc3.pl -m v -i inputVcfFile -o outputDir [-s Method in consistence calculation] [-c filter config file] [-a annovar database]\nFor more information, plase read the readme file\n";
+"Program: qc3.pl (a quality control tool for DNA sequencing data in raw data, alignment, and variant calling stages)
+Version: $main::version
 
-	die "$!\n$usage" if ( !defined($VCF) or !( -e $VCF ) or !( -e $cfgFile ) );
+Module: vcf QC
+Usage:   perl qc3.pl -m v -i vcfFile -o outputDirectory [other options]
+
+Options:
+
+	-i	input filelist          Required. A vcf file to be analyzed.
+	-o	output directory        Required. Output directory for QC result. If the directory doesn't exist, it would be created.
+	-s	method                  Optional. Method used in consistence calculation, should be 1 or 2.
+	-c	config file             Optional. A file indicating the filter arguments for vcf files. If not specified, the default file 'GATK.cfg' in QC3 directory with GATK best practices recommended arguments will be used.
+	-a	annotation directory	Optional. Directory of annovar database.
+
+	-h	                        Optional. Show this information.
+	
+For more information, please refer to the readme file in QC3 directory. Or visit the QC3 website at https://github.com/slzhao/QC3
+
+";
+
+	die "$!\n$usage" if ($showHelp or !( -e $cfgFile ) or ($method != 1 and $method != 2));
 
 	$| = 1;
 	my $doAnnovar = 1;
@@ -251,7 +271,8 @@ sub vcfSummary {
 				}
 			}
 		}
-
+		close(READ);
+		
 		print RESULT3
 "Sample\tTransitions:Transversions (Based on all SNPs)\tHeterozygous:Non-reference homozygous (Based on all SNPs)\tTransitions:Transversions (After filter)\tHeterozygous:Non-reference homozygous (After filter)\n";
 		foreach my $sample ( sort keys %Sample2NumberAll ) {
@@ -272,19 +293,21 @@ sub vcfSummary {
 				$Sample2NumberFilter{$sample}{"11Number"}
 			);
 
-			printf RESULT3 (
-				"%s\t%.3f\t%.3f\t%.3f\t%.3f\n",
-				$sample, $TTRatioAll, $Ratio0111All, $TTRatioFilter,
-				$Ratio0111Filter
-			);
+			printf RESULT3
+				"$sample\t$TTRatioAll\t$Ratio0111All\t$TTRatioFilter\t$Ratio0111Filter\n";
+#			printf RESULT3 (
+#				"%s\t%.3f\t%.3f\t%.3f\t%.3f\n",
+#				$sample, $TTRatioAll, $Ratio0111All, $TTRatioFilter,
+#				$Ratio0111Filter
+#			);
 		}
 
 		print RESULT4
-"FileTitle\tSampleA\tSampleB\tCountB2A\tCountA\tHeterozygous Consistency (CountB2A:CountA)\tCountA2B\tCountB\tHeterozygous Consistency (CountA2B:CountB)\tOverall Consistent Genotypes\tOverall Overlapped Genotypes\tOverall Consistency";
-		foreach my $change ( sort keys %changes ) {
-			print RESULT4 "\t$change";
-		}
-		print RESULT4 "\n";
+"FileTitle\tSampleA\tSampleB\tCountB2A\tCountA\tHeterozygous Consistency (CountB2A:CountA)\tCountA2B\tCountB\tHeterozygous Consistency (CountA2B:CountB)\tOverall Consistent Genotypes\tOverall Overlapped Genotypes\tOverall Consistency\n";
+#		foreach my $change ( sort keys %changes ) {
+#			print RESULT4 "\t$change";
+#		}
+#		print RESULT4 "\n";
 
 		my $fileName = basename($VCF);
 		foreach my $sample1 ( sort keys %selected2 ) {
@@ -299,31 +322,33 @@ sub vcfSummary {
 					$total2{$sample1}{$sample2}
 				);
 
-				printf RESULT4 (
-					"%s\t%s\t%s\t%d\t%d\t%.3f\t%d\t%d\t%.3f\t%d\t%d\t%.3f",
-					$fileName,
-					$sample1,
-					$sample2,
-					$selected{$sample1}{$sample2},
-					$total{$sample1}{$sample2},
-					$ratio1,
-					$selected{$sample2}{$sample1},
-					$total{$sample2}{$sample1},
-					$ratio2,
-					$selected2{$sample1}{$sample2},
-					$total2{$sample1}{$sample2},
-					$ratio3
-				);
+#				printf RESULT4 (
+#					"%s\t%s\t%s\t%d\t%d\t%.3f\t%d\t%d\t%.3f\t%d\t%d\t%.3f",
+#					$fileName,
+#					$sample1,
+#					$sample2,
+#					$selected{$sample1}{$sample2},
+#					$total{$sample1}{$sample2},
+#					$ratio1,
+#					$selected{$sample2}{$sample1},
+#					$total{$sample2}{$sample1},
+#					$ratio2,
+#					$selected2{$sample1}{$sample2},
+#					$total2{$sample1}{$sample2},
+#					$ratio3
+#				);
+				print RESULT4 
+					"$fileName\t$sample1\t$sample2\t$selected{$sample1}{$sample2}\t$total{$sample1}{$sample2}\t$ratio1\t$selected{$sample2}{$sample1}\t$total{$sample2}{$sample1}\t$ratio2\t$selected2{$sample1}{$sample2}\t$total2{$sample1}{$sample2}\t$ratio3";
 
-				foreach my $change ( sort keys %changes ) {
-					if ( exists( $changNumber{$sample1}{$sample2}{$change} ) ) {
-						print RESULT4
-						  "\t$changNumber{$sample1}{$sample2}{$change}";
-					}
-					else {
-						print RESULT4 "\t0";
-					}
-				}
+#				foreach my $change ( sort keys %changes ) {
+#					if ( exists( $changNumber{$sample1}{$sample2}{$change} ) ) {
+#						print RESULT4
+#						  "\t$changNumber{$sample1}{$sample2}{$change}";
+#					}
+#					else {
+#						print RESULT4 "\t0";
+#					}
+#				}
 				print RESULT4 "\n";
 			}
 		}
@@ -338,7 +363,11 @@ sub vcfSummary {
 		foreach my $chrom ( sort keys %snpCount ) {
 			print RESULT5 "$chrom";
 			foreach my $sample ( sort keys %{ $snpCount{$chrom} } ) {
-				print RESULT5 "\t$snpCount{$chrom}{$sample}";
+				if (exists $snpCount{$chrom}{$sample}) {
+					print RESULT5 "\t$snpCount{$chrom}{$sample}";
+				} else {
+					print RESULT5 "\t0";
+				}
 			}
 			print RESULT5 "\n";
 		}
@@ -489,8 +518,6 @@ sub myDivide {
 	my ( $a, $b ) = @_;
 	if ( !( defined $a ) or !( defined $b ) or $b == 0 ) {
 		return 'NA';
-
-		#        return '0';
 	}
 	else {
 		return ( $a / $b );

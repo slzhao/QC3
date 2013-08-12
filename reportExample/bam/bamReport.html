@@ -60,11 +60,22 @@ h2 {
 </div>
 
 <div><h2 id="M100">Command</h2>
-<p>The report was generated at Wed Aug  7 10:57:36 2013. Here is your command for generating this report, keep it in order to reproduce the result.</p>
+<p>The report was generated at Fri Aug  9 10:56:01 2013. Here is your command for generating this report, keep it in order to reproduce the result.</p>
 <pre>perl /home/zhaos/source/perl_cqs/software_QC/RC2/qc3.pl -m b -rp -i sample_bam_list.txt -t 12 -r /data/cqs/guoy1/reference/annotation/hg19/hg19_protein_coding.bed -g /data/cqs/guoy1/reference/annotation/hg19/Homo_sapiens.GRCh37.63_protein_coding_chr1-22-X-Y-M.gtf -o ../sample_report/sample_bam_result_mean -d</pre>
 </div>
 
 <div><h2 id="M150">Result Table</h2>
+<p>Coloum names:</p>
+<pre>
+On/Off target: Number of sequences mapped on/off the regions indicated in target region file
+Off-target-intron: Number of sequences mapped off the regions indicated in target region file, and on the intron regions indicated in gtf file
+Off-target-intergenic: Number of sequences mapped off the regions indicated in target region file, and on the intergenic regions indicated in gtf file
+Off-target-mito: Number of sequences mapped off the regions indicated in target region file, and on the mitochondria regions
+MQ: Mapping quality of the sequences
+InsertSize: Length of sequence from the leftmost position to the rightmost position
+Depth: The reading depth of sequences
+On-target percent: Percent of target positions that were sequenced
+</pre>
 <table align="center" style="border:#2894ff 1px solid;">
  
                  <tr class="first">
@@ -100,6 +111,9 @@ h2 {
       <td align="center">Off-target-intron(Mean Depth)</td>
       <td align="center">Off-target-intergenic(Mean Depth)</td>
       <td align="center">Off-target-mito(Mean Depth)</td>
+      <td align="center">On-target percent (Depth larger than 0)</td>
+      <td align="center">On-target percent (Depth larger than 10)</td>
+      <td align="center">On-target percent (Depth larger than 30)</td>
    </tr>
  
                  
@@ -137,6 +151,9 @@ h2 {
       <td align="center">11.56</td>
       <td align="center">3.28</td>
       <td align="center">188.24</td>
+      <td align="center">0.60</td>
+      <td align="center">0.47</td>
+      <td align="center">0.35</td>
    </tr>
  
                  
@@ -174,6 +191,9 @@ h2 {
       <td align="center">10.99</td>
       <td align="center">3.08</td>
       <td align="center">605.78</td>
+      <td align="center">0.73</td>
+      <td align="center">0.52</td>
+      <td align="center">0.46</td>
    </tr>
  
                  
@@ -206,11 +226,14 @@ h2 {
       <td align="center">179.29</td>
       <td align="center">180.87</td>
       <td align="center">14.83</td>
-      <td align="center">103.58</td>
+      <td align="center">103.59</td>
       <td align="center">6.82</td>
       <td align="center">10.87</td>
       <td align="center">2.87</td>
       <td align="center">302.98</td>
+      <td align="center">0.70</td>
+      <td align="center">0.51</td>
+      <td align="center">0.44</td>
    </tr>
  
                  
@@ -243,11 +266,14 @@ h2 {
       <td align="center">188.62</td>
       <td align="center">189.25</td>
       <td align="center">14.34</td>
-      <td align="center">84.45</td>
+      <td align="center">84.46</td>
       <td align="center">6.82</td>
       <td align="center">10.73</td>
       <td align="center">2.84</td>
       <td align="center">686.41</td>
+      <td align="center">0.67</td>
+      <td align="center">0.50</td>
+      <td align="center">0.41</td>
    </tr>
  
                  
@@ -285,6 +311,9 @@ h2 {
       <td align="center">11.74</td>
       <td align="center">2.90</td>
       <td align="center">418.01</td>
+      <td align="center">0.66</td>
+      <td align="center">0.50</td>
+      <td align="center">0.43</td>
    </tr>
  
                  
@@ -316,12 +345,15 @@ h2 {
       <td align="center">187.73</td>
       <td align="center">181.13</td>
       <td align="center">181.40</td>
-      <td align="center">12.12</td>
+      <td align="center">12.13</td>
       <td align="center">79.75</td>
       <td align="center">5.73</td>
       <td align="center">8.91</td>
       <td align="center">2.63</td>
       <td align="center">532.15</td>
+      <td align="center">0.69</td>
+      <td align="center">0.50</td>
+      <td align="center">0.43</td>
    </tr>
  
                  
@@ -354,11 +386,14 @@ h2 {
       <td align="center">178.33</td>
       <td align="center">178.36</td>
       <td align="center">13.93</td>
-      <td align="center">86.39</td>
+      <td align="center">86.40</td>
       <td align="center">6.44</td>
       <td align="center">10.07</td>
       <td align="center">2.74</td>
       <td align="center">526.76</td>
+      <td align="center">0.67</td>
+      <td align="center">0.50</td>
+      <td align="center">0.42</td>
    </tr>
  
                  
@@ -396,6 +431,9 @@ h2 {
       <td align="center">10.53</td>
       <td align="center">2.76</td>
       <td align="center">153.30</td>
+      <td align="center">0.63</td>
+      <td align="center">0.49</td>
+      <td align="center">0.40</td>
    </tr>
  
                  
@@ -433,6 +471,9 @@ h2 {
       <td align="center">12.95</td>
       <td align="center">3.56</td>
       <td align="center">228.56</td>
+      <td align="center">0.63</td>
+      <td align="center">0.50</td>
+      <td align="center">0.40</td>
    </tr>
  
                  
@@ -470,6 +511,9 @@ h2 {
       <td align="center">11.45</td>
       <td align="center">2.88</td>
       <td align="center">192.87</td>
+      <td align="center">0.67</td>
+      <td align="center">0.51</td>
+      <td align="center">0.44</td>
    </tr>
  
                  
@@ -502,11 +546,14 @@ h2 {
       <td align="center">181.78</td>
       <td align="center">183.10</td>
       <td align="center">18.19</td>
-      <td align="center">109.97</td>
+      <td align="center">109.98</td>
       <td align="center">8.24</td>
       <td align="center">13.15</td>
       <td align="center">3.18</td>
       <td align="center">137.03</td>
+      <td align="center">0.67</td>
+      <td align="center">0.51</td>
+      <td align="center">0.45</td>
    </tr>
  
                  
@@ -544,6 +591,9 @@ h2 {
       <td align="center">11.36</td>
       <td align="center">2.91</td>
       <td align="center">224.20</td>
+      <td align="center">0.65</td>
+      <td align="center">0.50</td>
+      <td align="center">0.42</td>
    </tr>
  
                  
@@ -577,10 +627,13 @@ h2 {
       <td align="center">206.81</td>
       <td align="center">20.97</td>
       <td align="center">93.98</td>
-      <td align="center">10.10</td>
+      <td align="center">10.11</td>
       <td align="center">15.28</td>
       <td align="center">3.97</td>
       <td align="center">786.22</td>
+      <td align="center">0.64</td>
+      <td align="center">0.51</td>
+      <td align="center">0.42</td>
    </tr>
  
                  
@@ -618,6 +671,9 @@ h2 {
       <td align="center">1.04</td>
       <td align="center">1.03</td>
       <td align="center">1.24</td>
+      <td align="center">0.01</td>
+      <td align="center">0.00</td>
+      <td align="center">0</td>
    </tr>
  
                  
@@ -649,12 +705,15 @@ h2 {
       <td align="center">247.33</td>
       <td align="center">240.69</td>
       <td align="center">247.76</td>
-      <td align="center">12.84</td>
+      <td align="center">12.85</td>
       <td align="center">80.60</td>
       <td align="center">6.81</td>
       <td align="center">11.15</td>
       <td align="center">2.57</td>
       <td align="center">303.99</td>
+      <td align="center">0.68</td>
+      <td align="center">0.51</td>
+      <td align="center">0.44</td>
    </tr>
  
                  
@@ -687,11 +746,14 @@ h2 {
       <td align="center">225.05</td>
       <td align="center">226.07</td>
       <td align="center">8.87</td>
-      <td align="center">65.58</td>
+      <td align="center">65.59</td>
       <td align="center">4.66</td>
       <td align="center">7.41</td>
       <td align="center">2.18</td>
       <td align="center">329.92</td>
+      <td align="center">0.70</td>
+      <td align="center">0.49</td>
+      <td align="center">0.40</td>
    </tr>
  
                  
@@ -729,6 +791,9 @@ h2 {
       <td align="center">14.50</td>
       <td align="center">4.01</td>
       <td align="center">238.89</td>
+      <td align="center">0.62</td>
+      <td align="center">0.50</td>
+      <td align="center">0.41</td>
    </tr>
  
                  
@@ -764,8 +829,11 @@ h2 {
       <td align="center">82.60</td>
       <td align="center">6.51</td>
       <td align="center">10.60</td>
-      <td align="center">2.65</td>
+      <td align="center">2.66</td>
       <td align="center">459.12</td>
+      <td align="center">0.68</td>
+      <td align="center">0.51</td>
+      <td align="center">0.43</td>
    </tr>
  
                  
@@ -803,6 +871,9 @@ h2 {
       <td align="center">7.00</td>
       <td align="center">2.19</td>
       <td align="center">791.34</td>
+      <td align="center">0.70</td>
+      <td align="center">0.48</td>
+      <td align="center">0.40</td>
    </tr>
  
                  
@@ -840,6 +911,9 @@ h2 {
       <td align="center">8.09</td>
       <td align="center">2.29</td>
       <td align="center">354.91</td>
+      <td align="center">0.64</td>
+      <td align="center">0.47</td>
+      <td align="center">0.37</td>
    </tr>
  
                  
@@ -873,10 +947,13 @@ h2 {
       <td align="center">194.66</td>
       <td align="center">21.82</td>
       <td align="center">125.69</td>
-      <td align="center">10.80</td>
+      <td align="center">10.81</td>
       <td align="center">17.84</td>
       <td align="center">4.09</td>
       <td align="center">1267.68</td>
+      <td align="center">0.58</td>
+      <td align="center">0.44</td>
+      <td align="center">0.37</td>
    </tr>
  
                  
@@ -908,12 +985,15 @@ h2 {
       <td align="center">190.16</td>
       <td align="center">187.55</td>
       <td align="center">187.10</td>
-      <td align="center">10.59</td>
+      <td align="center">10.60</td>
       <td align="center">77.94</td>
       <td align="center">5.10</td>
       <td align="center">8.11</td>
       <td align="center">2.35</td>
       <td align="center">385.64</td>
+      <td align="center">0.68</td>
+      <td align="center">0.49</td>
+      <td align="center">0.41</td>
    </tr>
  
                  
@@ -946,11 +1026,14 @@ h2 {
       <td align="center">192.73</td>
       <td align="center">201.75</td>
       <td align="center">13.44</td>
-      <td align="center">93.74</td>
+      <td align="center">93.75</td>
       <td align="center">6.60</td>
       <td align="center">10.75</td>
       <td align="center">2.66</td>
       <td align="center">296.70</td>
+      <td align="center">0.67</td>
+      <td align="center">0.50</td>
+      <td align="center">0.43</td>
    </tr>
  
                  
@@ -982,12 +1065,15 @@ h2 {
       <td align="center">192.22</td>
       <td align="center">180.27</td>
       <td align="center">188.93</td>
-      <td align="center">9.71</td>
+      <td align="center">9.72</td>
       <td align="center">73.73</td>
       <td align="center">5.10</td>
-      <td align="center">7.78</td>
+      <td align="center">7.79</td>
       <td align="center">2.70</td>
       <td align="center">313.44</td>
+      <td align="center">0.67</td>
+      <td align="center">0.48</td>
+      <td align="center">0.39</td>
    </tr>
  
                  
@@ -1025,6 +1111,9 @@ h2 {
       <td align="center">13.59</td>
       <td align="center">3.82</td>
       <td align="center">83.94</td>
+      <td align="center">0.61</td>
+      <td align="center">0.48</td>
+      <td align="center">0.39</td>
    </tr>
  
                  
@@ -1062,6 +1151,9 @@ h2 {
       <td align="center">15.34</td>
       <td align="center">4.08</td>
       <td align="center">202.80</td>
+      <td align="center">0.64</td>
+      <td align="center">0.51</td>
+      <td align="center">0.43</td>
    </tr>
  
                  
@@ -1095,10 +1187,13 @@ h2 {
       <td align="center">192.79</td>
       <td align="center">15.92</td>
       <td align="center">58.86</td>
-      <td align="center">7.72</td>
+      <td align="center">7.73</td>
       <td align="center">11.26</td>
       <td align="center">3.29</td>
       <td align="center">205.15</td>
+      <td align="center">0.60</td>
+      <td align="center">0.47</td>
+      <td align="center">0.35</td>
    </tr>
  
                  
@@ -1132,10 +1227,13 @@ h2 {
       <td align="center">194.92</td>
       <td align="center">27.74</td>
       <td align="center">131.42</td>
-      <td align="center">13.11</td>
+      <td align="center">13.12</td>
       <td align="center">20.17</td>
       <td align="center">5.30</td>
       <td align="center">396.56</td>
+      <td align="center">0.63</td>
+      <td align="center">0.52</td>
+      <td align="center">0.45</td>
    </tr>
  
                  
@@ -1173,6 +1271,9 @@ h2 {
       <td align="center">12.48</td>
       <td align="center">3.63</td>
       <td align="center">129.80</td>
+      <td align="center">0.62</td>
+      <td align="center">0.49</td>
+      <td align="center">0.37</td>
    </tr>
  
                  
@@ -1205,24 +1306,17 @@ h2 {
       <td align="center">205.85</td>
       <td align="center">208.26</td>
       <td align="center">20.35</td>
-      <td align="center">67.63</td>
-      <td align="center">10.22</td>
+      <td align="center">67.64</td>
+      <td align="center">10.23</td>
       <td align="center">14.67</td>
       <td align="center">4.24</td>
       <td align="center">105.11</td>
+      <td align="center">0.59</td>
+      <td align="center">0.48</td>
+      <td align="center">0.36</td>
    </tr>
 
 </table>
-<p>Coloum names:</p>
-<pre>
-On/Off target: Number of sequences mapped on/off the regions indicated in target region file
-Off-target-intron: Number of sequences mapped off the regions indicated in target region file, and on the intron regions indicated in gtf file
-Off-target-intergenic: Number of sequences mapped off the regions indicated in target region file, and on the intergenic regions indicated in gtf file
-Off-target-mito: Number of sequences mapped off the regions indicated in target region file, and on the mitochondria regions
-MQ: Mapping quality of the sequences
-InsertSize: Length of sequence from the leftmost position to the rightmost position
-Depth: The reading depth of sequences
-</pre>
 </div>
 
 <div><h2 id="M200">Distribution</h2>

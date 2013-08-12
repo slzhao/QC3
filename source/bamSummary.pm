@@ -35,15 +35,33 @@ sub bamSummary {
 
 	my $maxThreads = $config->{'maxThreads'};
 	my $rePlot     = $config->{'rePlot'};
+	my $showHelp     = $config->{'showHelp'};
 
 	my $usage =
-"Please use the follow command:\n perl qc3.pl -m b -i inputBamList -o outputDir [-r targetregion file] [-g gtf file] [-cm data summary method] [-d depth caculation]\nFor more information, plase read the readme file\n";
+"Program: qc3.pl (a quality control tool for DNA sequencing data in raw data, alignment, and variant calling stages)
+Version: $main::version
 
+Module:  bam QC
+Usage:   perl qc3.pl -m b -i bamFileList -o outputDirectory [-t threads] [other options]
+
+Options:
+
+	-i	input filelist      Required. A list file for bam files to be analyzed.
+	-o	output directory    Required. Output directory for QC result. If the directory doesn't exist, it would be created.
+	-t	threads             Optional. Threads used in analysis. The default value is 4.
+	-r	region file         Optional. A targetregion file. At least one targetregion file or gtf file should be provided.
+	-g	region file         Optional. A gtf file. At least one targetregion file or gtf file should be provided.
+	-cm	method	            Optional. Calculation method for data summary, should be 1 or 2. Method 1 means mean and method 2 means median. The default value is 1.
+	-d	                    Optional. whether the depth in on-/off-target regions will be calculated, It will not be calculated by default, -d = will be calculated.
+	
+	-h	                    Optional. Show this information.
+		
+For more information, please refer to the readme file in QC3 directory. Or visit the QC3 website at https://github.com/slzhao/QC3
+
+";
+	
 	die "$!\n$usage"
-	  if ( !defined($filelist)
-		or !-e $filelist
-		or !defined($resultDir)
-		or ( defined($targetregionfile)  and !-e $targetregionfile )
+	  if ($showHelp or ( defined($targetregionfile)  and !-e $targetregionfile )
 		or ( defined($gtffile)           and !-e $gtffile )
 		or ( !defined($targetregionfile) and !defined($gtffile) ) );
 	if ( !( -e $resultDir . '/bamResult/' ) ) {
@@ -74,7 +92,7 @@ sub bamSummary {
 		my %regionDatabase;
 		open( BAMFILE1, $filelist ) or die $!;
 		my $bamFile1 = <BAMFILE1>;
-		&initializeDatabase( $bamFile1, \%regionDatabase, $samtoolsBin );
+		&initializeDatabase( $bamFile1, \%regionDatabase, $samtoolsBin);
 		close(BAMFILE1);
 		my $inBedSign = 1;    #1=10 in bed; 2=01 in exon; 3=11 in intron
 
@@ -100,7 +118,48 @@ sub bamSummary {
 			pInfo( "No gtf file", $logFile );
 		}
 
-		# 3) read bam file
+		# 3) count total exon length
+		my $totalExonLength = 0;
+		if ($isdepth) {
+#			pInfo( "Count total exome length", $logFile );
+#			foreach my $chr ( keys %chrLength ) {
+#				for ( my $pos = 0 ; $pos <= $chrLength{$chr} ; $pos++ ) {
+#					if ( vec( $regionDatabase{$chr}, $pos, 2 ) == $inBedSign ) {
+#						$totalExonLength++;
+#					}
+#				}
+#			}
+#			pInfo( "Method1 Length: $totalExonLength", $logFile );
+			$totalExonLength = 0;
+			my $example = "";
+			vec( $example, 0, 2 ) = $inBedSign;
+			vec( $example, 1, 2 ) = $inBedSign;
+			my ($find11) = unpack( 'h', $example );
+			my $find01 = "";
+
+			foreach my $x ( 0 .. 3 ) {
+				if ( $x eq $inBedSign ) { next; }
+				my $example = "";
+				vec( $example, 0, 2 ) = $x;
+				vec( $example, 1, 2 ) = $inBedSign;
+				my ($hex) = unpack( 'h', $example );
+				$find01  = $find01 . $hex;
+				$example = "";
+				vec( $example, 0, 2 ) = $inBedSign;
+				vec( $example, 1, 2 ) = $x;
+				($hex) = unpack( 'h', $example );
+				$find01 = $find01 . $hex;
+			}
+			foreach my $chr ( keys %regionDatabase ) {
+				my ($hex) = unpack( 'h*', $regionDatabase{$chr} );
+				my $num1 = eval "\$hex =~ tr/[$find11]//";
+				my $num2 = eval "\$hex =~ tr/[$find01]//";
+				$totalExonLength = $totalExonLength + 2 * $num1 + $num2;
+			}
+#			pInfo( "Method2 Length: $totalExonLength", $logFile );
+		}
+
+		# 4) read bam file
 		pInfo( "Read bam file and write out", $logFile );
 		open( IN,  $filelist )      or die $!;
 		open( OUT, ">$outputFile" ) or die $!;
@@ -141,7 +200,10 @@ sub bamSummary {
 				"Off-target($methodText Depth)",
 				"Off-target-intron($methodText Depth)",
 				"Off-target-intergenic($methodText Depth)",
-				"Off-target-mito($methodText Depth)\n"
+				"Off-target-mito($methodText Depth)",
+				"On-target percent (Depth larger than 0)",
+				"On-target percent (Depth larger than 10)",
+				"On-target percent (Depth larger than 30)\n"
 			  );
 		}
 		else {
@@ -165,8 +227,11 @@ sub bamSummary {
 			#multi threads
 			if ( scalar( threads->list() ) < $maxThreads ) {
 				pInfo( "Processing $f ", $logFile );
-				my ($t) = threads->new( \&getbammetric, $f, \%regionDatabase,
-					$inBedSign, $isdepth, $samtoolsBin, $caculateMethod );
+				my ($t) = threads->new(
+					\&getbammetric,  $f,         \%regionDatabase,
+					$inBedSign,      $isdepth,   $samtoolsBin,
+					$caculateMethod, $totalExonLength
+				);
 			}
 			else {
 				foreach my $thread ( threads->list() ) {
@@ -174,9 +239,11 @@ sub bamSummary {
 					print OUT join "\t", (@metric);
 					print OUT "\n";
 					pInfo( "Processing $f ", $logFile );
-					my ($t) =
-					  threads->new( \&getbammetric, $f, \%regionDatabase,
-						$inBedSign, $isdepth, $samtoolsBin, $caculateMethod );
+					my ($t) = threads->new(
+						\&getbammetric,  $f,         \%regionDatabase,
+						$inBedSign,      $isdepth,   $samtoolsBin,
+						$caculateMethod, $totalExonLength
+					);
 					last;
 				}
 			}
@@ -189,9 +256,10 @@ sub bamSummary {
 			print OUT "\n";
 		}
 		close OUT;
+
 		#end comment by test R
 	}
-	
+
 	#plot by R
 	my $Rsource =
 	  dirname($0) . "/source/rFunctions.R " . dirname($0) . $rSourceLocation;
@@ -204,7 +272,7 @@ sub bamSummary {
 
 sub getbammetric {
 	my ( $in, $regionDatabaseRef, $inBedSign, $isdepth, $samtoolsBin,
-		$caculateMethod )
+		$caculateMethod, $totalExonLength )
 	  = @_;
 	my ( $total, $ontarget, $offtarget, $ummapped, $offtargetintron,
 		$offtargetintergenic, $offtargetmito )
@@ -246,7 +314,8 @@ sub getbammetric {
 		else { print "$_\n"; }
 		my $insert     = $line[8];
 		my $insertflag = 0;
-		if ( $insert =~ /^\d+$/ and ( $flag & $flag_read_mapped_proper_pair ) )
+		if ( $insert =~ /^\d+$/
+			and (  $flag & $flag_read_mapped_proper_pair ) )
 		{
 			$insertflag = 1;
 		}
@@ -381,46 +450,42 @@ sub getbammetric {
 		my ( $totaldepth, $ontargetdepth, $offtargetdepth,
 			$offtargetintrondepth, $offtargetintergenicdepth,
 			$offtargetmitodepth );
-		my ( $totalnum, $ontargetnum, $offtargetnum, $offtargetintronnum,
-			$offtargetintergenicnum, $offtargetmitonum )
-		  = ( 0, 0, 0, 0, 0, 0 );    # used as denominator
+		my (
+			$totalnum,               $ontargetnum,
+			$ontargetD10num,         $ontargetD30num,
+			$offtargetnum,           $offtargetintronnum,
+			$offtargetintergenicnum, $offtargetmitonum
+		) = ( 0, 0, 0, 0, 0, 0, 0, 0 );    # used as denominator
 		while (<DEPTH>) {
 			s/\r|\n//g;
 			my ( $chr, $pos, $depth ) = split "\t";
+			if ( !$depth ) { next; }
 			$totalnum++;
 			&storeData( $depth, $totaldepth, $caculateMethod );
 
-			#			$totaldepth += $depth;
 			if ( vec( $regionDatabaseRef->{$chr}, $pos, 2 ) == $inBedSign ) {
 				$ontargetnum++;
 				&storeData( $depth, $ontargetdepth, $caculateMethod );
 
-				#				$ontargetdepth += $depth;
+				if ( $depth > 10 ) { $ontargetD10num++; }
+				if ( $depth > 30 ) { $ontargetD30num++; }
 			}
 			else {
 				$offtargetnum++;
 				&storeData( $depth, $offtargetdepth, $caculateMethod );
-
-				#				$offtargetdepth += $depth;
 				if ( vec( $regionDatabaseRef->{$chr}, $pos, 2 ) == 3 ) {
 					$offtargetintronnum++;
 					&storeData( $depth, $offtargetintrondepth,
 						$caculateMethod );
-
-					#					$offtargetintrondepth += $depth;
 				}
 				elsif ( !vec( $regionDatabaseRef->{$chr}, $pos, 2 ) ) {
 					$offtargetintergenicnum++;
 					&storeData( $depth, $offtargetintergenicdepth,
 						$caculateMethod );
-
-					#					$offtargetintergenicdepth += $depth;
 				}
 				if ( $chr =~ /M/i ) {
 					$offtargetmitonum++;
 					&storeData( $depth, $offtargetmitodepth, $caculateMethod );
-
-					#					$offtargetmitodepth += $depth;
 				}
 			}
 		}
@@ -441,6 +506,10 @@ sub getbammetric {
 		  findMedianMean( $offtargetmitodepth, $offtargetmitonum,
 			$caculateMethod );
 
+		my $exonRatio1 = $ontargetnum / $totalExonLength;
+		my $exonRatio2 = $ontargetD10num / $totalExonLength;
+		my $exonRatio3 = $ontargetD30num / $totalExonLength;
+
 		return (
 			$in,                        $instrument,
 			$runNumber,                 $flowcell,
@@ -456,7 +525,9 @@ sub getbammetric {
 			$offtargetintergenicinsert, $offtargetmitoinsert,
 			$totaldepth,                $ontargetdepth,
 			$offtargetdepth,            $offtargetintrondepth,
-			$offtargetintergenicdepth,  $offtargetmitodepth
+			$offtargetintergenicdepth,  $offtargetmitodepth,
+			$exonRatio1,                $exonRatio2,
+			$exonRatio3
 		);
 	}
 	else {
@@ -486,8 +557,6 @@ sub initializeDatabase {
 			my $chr = $1;
 			$databaseRef->{$chr} = "";
 			my $chrLength = $2;
-
-			#			print "$chr\t$chrLength\n";
 			vec( $databaseRef->{$chr}, $chrLength, 2 ) = 0;
 		}
 	}
@@ -499,8 +568,10 @@ sub loadbed {
 	while (<IIN>) {
 		s/\r|\n//g;
 		my ( $chr, $start, $end ) = split "\t";
-		foreach ( my $i = $start + 1 ; $i <= $end ; $i++ ) {
-			vec( $ref->{$chr}, $i * 2, 1 ) = 1;    #10 in bed
+		if ( exists $ref->{$chr} ) {
+			foreach ( my $i = $start + 1 ; $i <= $end ; $i++ ) {
+				vec( $ref->{$chr}, $i * 2, 1 ) = 1;    #10 in bed
+			}
 		}
 	}
 	close IIN;
@@ -516,23 +587,25 @@ sub loadgtf {
 		  ( split( /\t/, $_ ) )[ ( 0, 2, 3, 4, 8 ) ];
 
 		if ( $feature eq "exon" ) {
-			foreach my $temp ( $start .. $end ) {
-				if ( !vec( $ref->{$chr}, $temp, 2 ) ) {    #not in bed file
-					vec( $ref->{$chr}, $temp, 2 ) = 2;     #01 in exon
+			if ( exists $ref->{$chr} ) {
+				foreach my $temp ( $start .. $end ) {
+					if ( !vec( $ref->{$chr}, $temp, 2 ) ) {    #not in bed file
+						vec( $ref->{$chr}, $temp, 2 ) = 2;     #01 in exon
+					}
 				}
-			}
 
-			my $gene_id = ( split( / \"|\"; /, $attributes ) )[1];
-			$transcripts{$gene_id}->{'chr'} = $chr;
-			if ( !exists( $transcripts{$gene_id}->{'start'} )
-				or $start < $transcripts{$gene_id}->{'start'} )
-			{
-				$transcripts{$gene_id}->{'start'} = $start;
-			}
-			if ( !exists( $transcripts{$gene_id}->{'end'} )
-				or $end > $transcripts{$gene_id}->{'end'} )
-			{
-				$transcripts{$gene_id}->{'end'} = $end;
+				my $gene_id = ( split( / \"|\"; /, $attributes ) )[1];
+				$transcripts{$gene_id}->{'chr'} = $chr;
+				if ( !exists( $transcripts{$gene_id}->{'start'} )
+					or $start < $transcripts{$gene_id}->{'start'} )
+				{
+					$transcripts{$gene_id}->{'start'} = $start;
+				}
+				if ( !exists( $transcripts{$gene_id}->{'end'} )
+					or $end > $transcripts{$gene_id}->{'end'} )
+				{
+					$transcripts{$gene_id}->{'end'} = $end;
+				}
 			}
 		}
 	}

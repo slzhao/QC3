@@ -58,11 +58,6 @@ h2 {
 </div>
 
 <div><h2 id="M200">Result Table</h2>
-<table align="center" style="border:#2894ff 1px solid;">
-<!-- TMPL_LOOP NAME=MAKETABLE1 --> <CSTM_ROW EVEN=even ODD=odd FIRST=first>
-   </tr>
-<!-- /TMPL_LOOP -->
-</table>
 <p>Column description</p>
 <pre>
 TotalReads: Total reads in fastq file
@@ -70,6 +65,11 @@ Reads(Y) or (N): Y if the read fails filter (read is bad), N otherwise
 BQ: base quality score
 GC: GC content
 </pre>
+<table align="center" style="border:#2894ff 1px solid;">
+<!-- TMPL_LOOP NAME=MAKETABLE1 --> <CSTM_ROW EVEN=even ODD=odd FIRST=first>
+   </tr>
+<!-- /TMPL_LOOP -->
+</table>
 </div>
 
 <div><h2 id="M200">Sequence quality and content</h2>

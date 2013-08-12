@@ -15,10 +15,15 @@ dir.create(figureDir, showWarnings = FALSE)
 oldwd<-getwd()
 setwd(figureDir)
 file.remove(list.files("."))
-if (ncol(allResult)==29) {
+if (ncol(allResult)>=29) {
 	colList<-list(5:11,c(12:14,NA,15:17),c(18:20,NA,21:23),c(24:26,NA,27:29))
 } else {
 	colList<-list(5:11,c(12:14,NA,15:17),c(18:20,NA,21:23))
 }
-plot_dataFrame(allResult,colList=colList)
+if (ncol(allResult)>29) {
+	colBox<-5:29
+} else {
+	colBox<-5:ncol(allResult)
+}
+plot_dataFrame(allResult,colBox=colBox,colList=colList)
 setwd(oldwd)
