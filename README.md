@@ -92,7 +92,7 @@ Otherwise, it may look like this
 	ok   File::Basename
 	ok   FindBin
 	ok   Getopt::Long
-	fail HTML::Template is not usable (it or a sub-module is missing)
+	fail HTML::Template
 	ok   source::bamSummary
 	ok   source::fastqSummary
 	ok   source::makeReport
@@ -165,7 +165,7 @@ The usage of QC3 software could be:
 	-i [inputFile]      Required. Input file. It should be a file list including all analyzed files in fastq QC and bam QC. To analyze the pair-end fastq files in fastq QC, the two files for the same sample should be listed together in this file. In vcf QC, it should be a vcf file.
 	-o [outputDir]      Required. Output directory for QC result. If the directory doesn't exist, it would be created.
 	-t [int]            Optional. Threads used in analysis. The default value is 4. This parameter only valid for fastq and bam QC. Only one thread would be used in vcf QC.
-	-rp					Optional. Re-plot the figures. The program will not re-analysis the input files but the result files in output directory will be used to re-plot the figures and re-generate the report if this parameter is used. You can use this parameter when you want to slightly modify the report, such as changing sample names in the figures.
+	-rp					Optional. Re-plot the figures. The program will not re-analyze the input files but the result files in output directory will be used to re-plot the figures and re-generate the report if this parameter is used. You can use this parameter when you want to slightly modify the report, such as changing sample names in the figures.
 	-h	                Optional. Show help information for each module.
 
 Here is more details for each module:
@@ -192,7 +192,7 @@ Here is more details for each module:
 
 	perl qc3.pl -m v -i inputFile -o outputDir
 
-	-s [int]		    Optional. Method used in consistence calculation, should be 1 or 2. First of all, if any of the two samples had less than 10 read depths in an allele, it will not be used in consistence calculation. In method 1, only the two samples will completely same allele will be taken as consist. In method 2, the two samples satisfy the criterion in method 1, or if the two samples were 0/0 vs 0/1 but 0/0 sample has some read counts in alternative allele, they will be taken as consistent. The default value is 1.
+	-s [int]			Optional. Method used in consistence calculation, should be 1 or 2. First of all, if any of the two samples had less than 10 read depths in an allele, it will not be used in consistence calculation. In method 1, only the two samples will completely same allele will be taken as consistent. In method 2, the two samples satisfy the criterion in method 1, or if the two samples were 0/0 vs 0/1 but 0/0 sample has some read counts in alternative allele, they will be taken as consistent. The default value is 1.
 	-c [database]	Optional. A file indicating the filter arguments for vcf files. If not specified, the default file 'GATK.cfg' in QC3 directory with GATK best practices recommended arguments will be used.
 	-a [database]	Optional. Directory of annovar database.
 
