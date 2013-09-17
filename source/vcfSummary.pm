@@ -41,7 +41,7 @@ Usage:   perl qc3.pl -m v -i vcfFile -o outputDirectory [other options]
 
 Options:
 
-	-i	input filelist          Required. A vcf file to be analyzed.
+	-i	vcfFile                 Required. A vcf file to be analyzed.
 	-o	output directory        Required. Output directory for QC result. If the directory doesn't exist, it would be created.
 	-s	method                  Optional. Method used in consistence calculation, should be 1 or 2.
 	-c	config file             Optional. A file indicating the filter arguments for vcf files. If not specified, the default file 'GATK.cfg' in QC3 directory with GATK best practices recommended arguments will be used.

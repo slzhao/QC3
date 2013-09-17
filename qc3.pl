@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use threads;
+use threads::shared;
 use File::Basename;
 use HTML::Template;
 use Getopt::Long;
@@ -13,7 +14,7 @@ use source::fastqSummary;
 use source::bamSummary;
 use source::vcfSummary;
 
-our $version="1.00";
+our $version="1.03";
 my %config;
 $config{'RBin'}        = "R";       #where the R bin file is
 $config{'annovarBin'}  = "table_annovar.pl";		#where the ANNOVAR bin file is
@@ -41,6 +42,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 
 ";
 
+$| = 1;
 my $commandline = "perl $0 "
   . join( " ", @ARGV )
   ;    #Output you input command in the report to reproduce you result
@@ -49,6 +51,8 @@ my (
 	$targetregionfile, $gtffile,  $isdepth,   $caculateMethod,$cfgFile,
 	$method,           $maxThreads,$annovarDb,$rePlot,$showHelp
 ) = ();
+our @log : shared;
+
 GetOptions(
 	"t=i" => \$maxThreads,
 	"m=s" => \$module,
@@ -71,7 +75,7 @@ GetOptions(
 if (defined $module and $showHelp) {
 	$config{'showHelp'}=$showHelp;
 	if ($module eq "f") {
-		my $rResult = &fasqSummary( $filelist, \%config );
+		my $rResult = &fastqSummary( $filelist, \%config );
 	} elsif ($module eq "b") {
 		my $rResult = &bamSummary( $filelist, \%config );
 	} elsif ($module eq "v") {
@@ -124,14 +128,14 @@ my $template;
 my $reportFileName;
 
 if (defined $resultDir) {
-	open $config{'log'}, ">$resultDir/".$config{'logFileName'} or die "can't open log file. $!\n";
+	open LOG, ">$resultDir/".$config{'logFileName'} or die "can't open log file. $!\n";
 }
 
 if ( $module eq "f" ) {
-	pInfo("Start fastq summary for $filelist",$config{'log'});
-	my $rResult = &fasqSummary( $filelist, \%config );
+	pInfo("Start fastq summary for $filelist",\@log);
+	my $rResult = &fastqSummary( $filelist, \%config );
 	if ( $rResult != 0 ) {
-		pInfo("Something wrong in plotting figure. Please check the fastqSummary.rLog file!",$config{'log'});
+		pInfo("Something wrong in plotting figure. Please check the fastqSummary.rLog file!",\@log);
 	}
 
 	#report
@@ -150,13 +154,13 @@ if ( $module eq "f" ) {
 	$reportFileName = "fastqReport.html";
 }
 elsif ( $module eq "b" ) {
-	pInfo("Start bam summary for $filelist",$config{'log'});
+	pInfo("Start bam summary for $filelist",\@log);
 	$config{'targetregionfile'} = $targetregionfile;
 	$config{'gtffile'}          = $gtffile;
 	$config{'isdepth'}          = $isdepth;
 	my $rResult = &bamSummary( $filelist, \%config );
 	if ( $rResult != 0 ) {
-		pInfo("Something wrong in plotting figure. Please check the bamSummary.rLog file!",$config{'log'});
+		pInfo("Something wrong in plotting figure. Please check the bamSummary.rLog file!",\@log);
 	}
 
 	#report
@@ -176,13 +180,13 @@ elsif ( $module eq "b" ) {
 	$reportFileName = "bamReport.html";
 }
 elsif ( $module eq "v" ) {
-	pInfo("Start vcf summary for $filelist",$config{'log'});
+	pInfo("Start vcf summary for $filelist",\@log);
 	$config{'cfgFile'} = $cfgFile;
 	$config{'method'}  = $method;
 	$config{'annovarDb'}   = $annovarDb;
 	my $rResult = &vcfSummary( $filelist, \%config );
 	if ( $rResult != 0 ) {
-		pInfo("Something wrong in plotting figure. Please check the vcfSummary.rLog file!",$config{'log'});
+		pInfo("Something wrong in plotting figure. Please check the vcfSummary.rLog file!",\@log);
 	}
 
 	#report
@@ -231,11 +235,16 @@ else {
 open REPORT, ">$resultDir/$reportFileName" or die "can't open $!\n";
 print REPORT $template->output;
 
-pInfo ("Success!",$config{'log'});
+pInfo ("Success!",\@log);
+#pInfo (join("",@log),$config{'log'});
+foreach my $log (@log) {
+	print LOG $log;
+}
 
 sub pInfo {
 	my $s = shift;
-	my $logFile = shift;
 	print "[", scalar(localtime), "] $s\n";
-	print $logFile "[", scalar(localtime), "] $s\n";
+	push @{$_[1]}, "[".scalar(localtime)."] $s\n";
+#	my $logFile = shift;
+#	print $logFile "[", scalar(localtime), "] $s\n";
 }

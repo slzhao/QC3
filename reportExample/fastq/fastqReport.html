@@ -60,11 +60,18 @@ h2 {
 </div>
 
 <div><h2 id="M100">Command</h2>
-<p>The report was generated at Wed Aug  7 10:57:23 2013. Here is your command for generating this report, keep it in order to reproduce the result.</p>
-<pre>perl /home/zhaos/source/perl_cqs/software_QC/RC2/qc3.pl -m f -rp -t 12 -p -i sample_fastq_list.txt -o ../sample_report/sample_fastq_result</pre>
+<p>The report was generated at Tue Aug 20 15:39:17 2013. Here is your command for generating this report, keep it in order to reproduce the result.</p>
+<pre>perl /home/zhaos/source/perl_cqs/software_QC/RC2/qc3.pl -m f -t 12 -i sample_fastq_list.txt -o ../sample_report/sample_fastq_result</pre>
 </div>
 
 <div><h2 id="M200">Result Table</h2>
+<p>Column description</p>
+<pre>
+TotalReads: Total reads in fastq file
+Reads(Y) or (N): Y if the read fails filter (read is bad), N otherwise
+BQ: base quality score
+GC: GC content
+</pre>
 <table align="center" style="border:#2894ff 1px solid;">
  
                  <tr class="first">
@@ -1347,13 +1354,6 @@ h2 {
    </tr>
 
 </table>
-<p>Column description</p>
-<pre>
-TotalReads: Total reads in fastq file
-Reads(Y) or (N): Y if the read fails filter (read is bad), N otherwise
-BQ: base quality score
-GC: GC content
-</pre>
 </div>
 
 <div><h2 id="M200">Sequence quality and content</h2>

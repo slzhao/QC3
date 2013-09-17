@@ -147,11 +147,11 @@ The ANNOVAR database files were also needed for ANNOVAR annotation. Please refer
 ## Download required database ##
 A gtf and/or a bed file was taken as database files in bam QC, and the position annotation for each sequence was exported from them. The chromosomes and positions information in these files should be exactly same with the bam files (for example, chromosome 1 can't be represented as chr1 in one file but 1 in another file). At least one of gtf/bed should be provided in bam QC. These files could be downloaded at [UCSC table browser](http://genome.ucsc.edu/cgi-bin/hgTables?command=start). The format of these files were: 
 
-	hg19_protein_coding.bed
+	bed file:
 	Column1	    Column2         Column3
 	Chromosome	StartPosition	EndPosition
 
-	Homo_sapiens.GRCh37.63_protein_coding_chr1-22-X-Y-M.gtf
+	gtf file:
 	Column1   	...	Column3	Column4	        Column5	...
 	Chromosome	...	exon	StartPosition	EndPosition	...
 

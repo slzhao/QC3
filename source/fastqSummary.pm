@@ -5,15 +5,24 @@ use warnings;
 use Exporter;
 use File::Basename;
 use threads;
+use threads::shared;
 
 our @ISA    = qw(Exporter);
-our @EXPORT = qw(fasqSummary);
+our @EXPORT = qw(fastqSummary);
+
+my $rSourceLocation = '/source/fastq_plot_byPerl.R';
+my $current : shared;
+my @resultOut : shared;
+my @result1 : shared;
+my @result2 : shared;
+my @result3 : shared;
+my @result4 : shared;
+
+my $logRef=\@main::log;
 
 1;
 
-my $rSourceLocation = '/source/fastq_plot_byPerl.R';
-
-sub fasqSummary {
+sub fastqSummary {
 
 	# each line is a file name in $filelist
 	my ( $filelist, $config ) = @_;
@@ -21,7 +30,7 @@ sub fasqSummary {
 	my $singleEnd    = $config->{'singleEnd'};
 	my $RBin       = $config->{'RBin'};
 	my $maxThreads = $config->{'maxThreads'};
-	my $logFile    = $config->{'log'};
+#	$logFile    = $config->{'log'};
 	my $rePlot     = $config->{'rePlot'};
 	my $showHelp     = $config->{'showHelp'};
 
@@ -58,6 +67,39 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 	}
 	else {
 		#test R, comment below code
+		
+		open( IN,           $filelist )                 or die $!;
+		my @fileList;   #get file list
+		while ( my $f = <IN> ) {
+			$f =~ s/\r|\n//g;
+			if ( !-e $f ) {
+				pInfo( "$f doesn't exist", $logRef );
+				next;
+			}
+			push @fileList, $f;
+		}
+		close IN;
+		
+		my @threads; #open threads and get results
+		$current = 0;
+		foreach my $x ( 1 .. $maxThreads ) {
+			push @threads, threads->new( \&fastqProcess, $x, \@fileList,$logRef );
+		}
+		
+		foreach my $thread (@threads) {
+			my $threadNum = $thread->join;
+			pInfo( "Thread $threadNum finished", $logRef );
+		}
+#		while (my $thread=shift @threads) {
+#			if ($thread->is_joinable()) {
+#				my $threadNum = $thread->join;
+#				pInfo( "Thread $threadNum finished", $logFile );
+#			} else {
+#				push @threads,$thread;
+#			}
+#		}
+		
+		#write results to file
 		open OUT, ">$outputFile" or die $!;
 		print OUT join "\t",
 		  (
@@ -66,7 +108,6 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 			"BQ",      "BQ(Y)",      "BQ(N)",     "GC",
 			"GC(Y)",   "GC(N)\n"
 		  );
-		open( IN,           $filelist )                 or die $!;
 		open( INFORMATION1, ">$outputFile.score.txt" )  or die $!;
 		open( INFORMATION2, ">$outputFile.nuc.txt" )    or die $!;
 		open( INFORMATION3, ">$outputFile.scoreN.txt" ) or die $!;
@@ -76,58 +117,26 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 		print INFORMATION3 "File\n";
 		print INFORMATION4 "File\tA1\tT1\tC1\tG1\n";
 
-		while ( my $f = <IN> ) {
-			$f =~ s/\r|\n//g;
-			if ( !-e $f ) {
-				pInfo( "$f doesn't exist", $logFile );
-				next;
-			}
-			if ( scalar( threads->list() ) < $maxThreads ) {
-				pInfo( "Processing $f ", $logFile );
-				my ($t) = threads->new( \&getmetric, $f );
-			}
-			else {
-				foreach my $thread ( threads->list() ) {
-					my ( $metric, $info1, $info2, $info3, $info4 ) =
-					  $thread->join;
-					print OUT join "\t", ( @{$metric} );
-					print OUT "\n";
-					print INFORMATION1 join "\t", ( @{$info1} );
-					print INFORMATION1 "\n";
-					print INFORMATION2 join "\t", ( @{$info2} );
-					print INFORMATION2 "\n";
-					print INFORMATION3 join "\t", ( @{$info3} );
-					print INFORMATION3 "\n";
-					print INFORMATION4 join "\t", ( @{$info4} );
-					print INFORMATION4 "\n";
-					pInfo( "Processing $f ", $logFile );
-					my ($t) = threads->new( \&getmetric, $f );
-					last;
-				}
-			}
+		foreach my $result (@resultOut) {
+			print OUT "$result\n";
 		}
-		close IN;
-
-		#join all left threads
-		foreach my $thread ( threads->list() ) {
-			my ( $metric, $info1, $info2, $info3, $info4 ) = $thread->join;
-			print OUT join "\t", ( @{$metric} );
-			print OUT "\n";
-			print INFORMATION1 join "\t", ( @{$info1} );
-			print INFORMATION1 "\n";
-			print INFORMATION2 join "\t", ( @{$info2} );
-			print INFORMATION2 "\n";
-			print INFORMATION3 join "\t", ( @{$info3} );
-			print INFORMATION3 "\n";
-			print INFORMATION4 join "\t", ( @{$info4} );
-			print INFORMATION4 "\n";
+		foreach my $result (@result1) {
+			print INFORMATION1 "$result\n";
+		}
+		foreach my $result (@result2) {
+			print INFORMATION2 "$result\n";
+		}
+		foreach my $result (@result3) {
+			print INFORMATION3 "$result\n";
+		}
+		foreach my $result (@result4) {
+			print INFORMATION4 "$result\n";
 		}
 		close OUT;
 		close INFORMATION1;
 		close INFORMATION2;
 		close INFORMATION3;
 		close INFORMATION4;
-
 		#test R, end comment
 	}
 
@@ -137,9 +146,50 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 	my $rResult = system(
 "cat $Rsource | $RBin --vanilla --slave --args $resultDir $singleEnd > $resultDir/fastqResult/fastqSummary.rLog"
 	);
-	pInfo( "Finish fastq summary!", $logFile );
+	pInfo( "Finish fastq summary!", $logRef );
 	return ($rResult);
 }
+
+sub fastqProcess {
+	my ($threadNum, $fileListRef,$logRef)= @_;
+	pInfo( "Thread $threadNum stared", $logRef );
+	while (1) {
+		my $file;
+		my $current_temp;
+		{
+			lock $current;
+			$current_temp = $current;
+			++$current;
+		}
+		return $threadNum unless $current_temp < @{$fileListRef};
+		$file = ${$fileListRef}[$current_temp];
+
+		pInfo( "Thread $threadNum processing $file", $logRef );
+		my ( $metric, $info1, $info2, $info3, $info4 ) =&getmetric($file);
+		{
+			lock @resultOut;
+			$resultOut[$current_temp] = join "\t", ( @{$metric} );
+		}
+		{
+			lock @result1;
+			$result1[$current_temp] = join "\t", ( @{$info1} );
+		}
+		{
+			lock @result2;
+			$result2[$current_temp] = join "\t", ( @{$info2} );
+		}
+		{
+			lock @result3;
+			$result3[$current_temp] = join "\t", ( @{$info3} );
+		}
+		{
+			lock @result4;
+			$result4[$current_temp] = join "\t", ( @{$info4} );
+		}
+	}
+}
+
+
 
 sub getmetric {
 	my ($in)       = @_;
@@ -374,10 +424,14 @@ sub guessoffset {
 }
 
 sub pInfo {
-	my $s       = shift;
-	my $logFile = shift;
+	my $s       = $_[0];
 	print "[", scalar(localtime), "] $s\n";
-	print $logFile "[", scalar(localtime), "] $s\n";
+	
+	lock $_[1];
+	{
+		lock @{$_[1]};
+		push @{$_[1]}, "[".scalar(localtime)."] $s\n";
+	}
 }
 
 sub myDivide {
