@@ -1,0 +1,12 @@
+#where the R bin file is
+RBin="R"
+#where the ANNOVAR bin file is
+annovarBin="table_annovar.pl"
+#where the ANNOVAR convert bin file is
+annovarConvert="convert2annovar.pl"
+#other options for ANNOVAR
+annovarOption="-buildver hg19 -protocol refGene,snp137 -operation g,f --remove"
+#where the SAMtools bin file is
+samtoolsBin="samtools"
+#name of the log file
+logFileName="qc3Log.txt"

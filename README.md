@@ -1,7 +1,9 @@
 Table of Content
 ================
 * [Introduction](#Introduction)
+* [Download](#download)
 * [Change log](#Change)
+ * [Release Version 1.10](#R110)
  * [Release Version 1.00](#R100)
  * [Release candidate (RC) version 1.3](#RC13)
  * [Release candidate (RC) version 1.2](#RC12)
@@ -33,9 +35,30 @@ High throughput sequencing is the most effective way to screen for non-specific 
 
 We present QC3, a quality control tool designed for DNA sequencing data for all aforementioned three stages. QC3 provides both graphic and tabulated reports for quality control results. It also offers several unique features such as separation of bad and good reads (based on Illumina’s filter), detection of batch effect, and cross contamination. The input of QC3 can be three types of data: FASTQ, Binary Alignment Map (BAM), and Variant Calling Format, respectively, corresponding to the three stages of raw data, alignment, and variant detection. QC3 is written with Perl and R and is freely available for public use. It can be downloaded from [github](https://github.com/slzhao/QC3).
 
+<a name="Download"/>
+# Download #
+
+You can directly download QC3 from [github](https://github.com/slzhao/QC3) by the following commands (If git has already been installed in your computer).
+
+	#The source codes of QC3 software will be downloaded to your current directory
+	git clone https://github.com/slzhao/QC3.git
+
+Or you can also download the zip file of QC3 from [github](https://github.com/slzhao/QC3/archive/master.zip).
+
+	#The zip file of QC3 software will be downloaded to your current directory
+	wget https://github.com/slzhao/QC3/archive/master.zip
+	#A directory named QC3-master will be generated and the source codes will be extracted there
+	unzip master
 
 <a name="Change"/>
 # Change log #
+
+<a name="R110">
+## Release version 1.10 on September 24, 2013
+Release version 1.10
+ * A configure file was provided so that the parameters of QC3 could be easily modified;
+ * Some codes were updated to improve the performance;
+ * Documents were improved;
 
 <a name="R100">
 ## Release version 1.00 on August 09, 2013
@@ -68,11 +91,13 @@ Release candidate version 1.0 for test
 <a name="Prerequisites"/>
 # Prerequisites #
 <a name="irpp"/>
-## Install required perl packages ##
+## Install Perl and required Perl packages ##
 
-There are several other packages needed to be installed on your computer.
+Perl is a highly capable, widely used, feature-rich programming language. It could be downloaded [here](http://www.perl.org/get.html).
 
-	#go the the folder where your software is.
+If Perl has already been installed on your computer, no other Perl module was needed to run QC3 in most cases. And you can run the following commands to make sure all the required modules have been installed.
+
+	#go the the folder where your QC3 software is.
 	#And test whether all the required modules have been installed.
 	bash test.modules
 
@@ -86,6 +111,8 @@ The successful output would look like this
 	ok   source::fastqSummary
 	ok   source::makeReport
 	ok   source::vcfSummary
+	ok   threads
+	ok   threads::shared
 
 Otherwise, it may look like this
 
@@ -97,6 +124,8 @@ Otherwise, it may look like this
 	ok   source::fastqSummary
 	ok   source::makeReport
 	ok   source::vcfSummary
+	ok   threads
+	ok   threads::shared
 
 Then you need to install the missing packages from [CPAN](http://www.cpan.org/). A program was also provided to make the package installation more convenient.
 	
@@ -110,9 +139,10 @@ Then you need to install the missing packages from [CPAN](http://www.cpan.org/).
 
 R is a free software environment for statistical computing and graphics. It could be downloaded [here](http://www.r-project.org/).
 
-After you install R and add R bin file to your Path, the software can find and use R automatically. Or you can change the qc3.pl script and tell the program where the R is on your computer. Here is the line you need to modify.
+After you install R and add R bin file to your Path, the software can find and use R automatically. Or you can modify the config.txt file in the software directory and tell the program where the R is on your computer. Here is the line you need to modify.
 
-	$config{'RBin'}        = "R";       #where the R bin file is
+	#where the R bin file is
+	RBin="R"
 
 ### samtools ###
 
@@ -120,7 +150,8 @@ SAM Tools provide various utilities for manipulating alignments in the SAM forma
 
 After you install SAMtools and add SAMtools bin file to your Path, the software can find and use SAMtools automatically. Or you can change the qc3.pl script and tell the program where the SAMtools is on your computer. Here is the line you need to modify.
 
-	$config{'samtoolsBin'} = "samtools";	#where the SAMtools bin file is
+	#where the SAMtools bin file is
+	samtoolsBin="samtools"
 
 
 ### annovar ###
@@ -131,11 +162,14 @@ ANNOVAR is an efficient software tool to utilize update-to-date information to f
 
 After you install ANNOVAR and add ANNOVAR bin file to your Path, the software can find and use ANNOVAR automatically. Or you can change the qc3.pl script and tell the program where the ANNOVAR is on your computer. Here is the line you need to modify.
 
-	$config{'annovarBin'}  = "annotate_variation.pl";		#where the ANNOVAR bin file is
-	$config{'annovarConvert'}  = "convert2annovar.pl";		#where the ANNOVAR convert bin file is
-	$config{'annovarOption'}  = "-buildver hg19 -protocol refGene,snp137 -operation g,f --remove --otherinfo "; #other options for ANNOVAR
+	#where the ANNOVAR bin file is
+	annovarBin="table_annovar.pl"
+	#where the ANNOVAR convert bin file is
+	annovarConvert="convert2annovar.pl"
+	#other options for ANNOVAR
+	annovarOption="-buildver hg19 -protocol refGene,snp137 -operation g,f --remove"
 
-The ANNOVAR database files were also needed for ANNOVAR annotation. Please refer to the [ANNOVAR document](http://www.openbioinformatics.org/annovar/annovar_db.html) for the  database preparation. Or you can simply use the following codes to prepare ANNOVAR database files.
+The ANNOVAR database files were also needed for ANNOVAR annotation. Please refer to the [ANNOVAR document](http://www.openbioinformatics.org/annovar/annovar_db.html) for the  database preparation. Or you can simply use the following commands to prepare ANNOVAR database files.
 
 	#assume ANNOVAR was installed and added to Path. Then you want to download ANNOVAR database in annovarDatabase directory.
 	mkdir annovarDatabase

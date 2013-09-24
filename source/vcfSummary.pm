@@ -14,14 +14,15 @@ use Env '@PATH';
 1;
 
 my $rSourceLocation = '/source/vcf_plot_byPerl.R';
+my $logRef=\@main::log;
 
 sub vcfSummary {
 
 	my ( $VCF, $config ) = @_;
-	my $cfgFile   = $config->{'cfgFile'};
+	my $vcfCfgFile   = $config->{'vcfCfgFile'};
 	my $method    = $config->{'method'};
 	my $resultDir = $config->{'resultDir'};
-	my $logFile   = $config->{'log'};
+#	my $logFile   = $config->{'log'};
 	my $rePlot    = $config->{'rePlot'};
 
 	my $RBin           = $config->{'RBin'};
@@ -53,7 +54,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 
 ";
 
-	die "$!\n$usage" if ($showHelp or !( -e $cfgFile ) or ($method != 1 and $method != 2));
+	die "$!\n$usage" if ($showHelp or !( -e $vcfCfgFile ) or ($method != 1 and $method != 2));
 
 	$| = 1;
 	my $doAnnovar = 1;
@@ -66,14 +67,14 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 		$doAnnovar = 0;
 		pInfo(
 "Can't find annovar bin. Will not perform annovar annotation. You can read readme file to find how to download it",
-			$logFile
+			$logRef
 		);
 	}
 	if ( !( defined $annovarDb ) or !( -e $annovarDb ) ) {
 		$doAnnovar = 0;
 		pInfo(
 "Can't find annovar database. Will not perform annovar annotation. You can read readme file to find how to download it",
-			$logFile
+			$logRef
 		);
 	}
 
@@ -93,8 +94,8 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 	my %cfgFilter;
 	my %snpCount;
 
-	open CFG, "<$cfgFile" or die $!;
-	pInfo( "VariantFiltration based on $cfgFile", $logFile );
+	open CFG, "<$vcfCfgFile" or die "Can't read $vcfCfgFile\n$!";
+	pInfo( "VariantFiltration based on $vcfCfgFile", $logRef );
 	while (<CFG>) {
 		chomp;
 		if (/^#/) {
@@ -145,7 +146,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 			elsif (/^#/) {                 #title
 				@titles = ( split /\t/, $_ );
 				$sampleSize = scalar(@titles) - 9;
-				pInfo( "The VCF file has $sampleSize samples", $logFile );
+				pInfo( "The VCF file has $sampleSize samples", $logRef );
 				last;
 			}
 		}
@@ -375,7 +376,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 		#do annovar
 
 		if ($doAnnovar) {
-			pInfo( "do ANNOVAR annotation", $logFile );
+			pInfo( "do ANNOVAR annotation", $logRef );
 			system(
 "$annovarConvert -format vcf4 $annovarResultDir$filename.pass -includeinfo > $annovarResultDir$filename.pass.avinput"
 			);
@@ -396,7 +397,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 	my $rResult = system(
 "cat $Rsource | $RBin --vanilla --slave --args $resultDir/$filename $annovarBuildver > $resultDir/vcfResult/vcfSummary.rLog"
 	);
-	pInfo( "Finish vcf summary!", $logFile );
+	pInfo( "Finish vcf summary!", $logRef );
 	return ($rResult);
 }
 
@@ -507,11 +508,16 @@ sub caculate_ratio {
 	);
 }
 
+#sub pInfo {
+#	my $s       = shift;
+#	my $logFile = shift;
+#	print "[", scalar(localtime), "] $s\n";
+#	print $logFile "[", scalar(localtime), "] $s\n";
+#}
 sub pInfo {
-	my $s       = shift;
-	my $logFile = shift;
+	my $s = shift;
 	print "[", scalar(localtime), "] $s\n";
-	print $logFile "[", scalar(localtime), "] $s\n";
+	push @{$_[1]}, "[".scalar(localtime)."] $s\n";
 }
 
 sub myDivide {

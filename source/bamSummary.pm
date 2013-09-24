@@ -5,8 +5,7 @@ use warnings;
 
 #use forks;
 use threads;
-
-#use threads::shared;
+use threads::shared;
 use Exporter;
 use File::Basename;
 
@@ -18,6 +17,10 @@ our @EXPORT = qw(bamSummary);
 1;
 
 my $rSourceLocation = '/source/bam_plot_byPerl.R';
+my $current : shared;
+my @resultOut : shared;
+
+my $logRef=\@main::log;
 
 sub bamSummary {
 
@@ -82,7 +85,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 		if ( $isdepth == 1 ) {
 			pInfo(
 "Will calculate the depth in on-/off-target regions. It will take a long time. You can turn it off without -d in your command line",
-				$logFile
+				$logRef
 			);
 		}
 		else {
@@ -98,24 +101,24 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 
 		# 1) Load targetregionfile
 		if ( defined($targetregionfile) ) {
-			pInfo( "Load target region file '$targetregionfile'", $logFile );
+			pInfo( "Load target region file '$targetregionfile'", $logRef );
 			loadbed( $targetregionfile, \%regionDatabase );
 		}
 		else {
 			$inBedSign = 2;
 			pInfo(
 "No targetregion file, will use exon regions in gtf file instead",
-				$logFile
+				$logRef
 			);
 		}
 
 		# 2) Load gtf file
 		if ( defined($gtffile) ) {
-			pInfo( "Load gtf file '$gtffile'", $logFile );
+			pInfo( "Load gtf file '$gtffile'", $logRef );
 			loadgtf( $gtffile, \%regionDatabase );
 		}
 		else {
-			pInfo( "No gtf file", $logFile );
+			pInfo( "No gtf file", $logRef );
 		}
 
 		# 3) count total exon length
@@ -160,7 +163,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 		}
 
 		# 4) read bam file
-		pInfo( "Read bam file and write out", $logFile );
+		pInfo( "Read bam file and write out", $logRef );
 		open( IN,  $filelist )      or die $!;
 		open( OUT, ">$outputFile" ) or die $!;
 
@@ -209,54 +212,33 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 		else {
 			print OUT "\n";
 		}
+		my @fileList;   #get file list
 		while ( my $f = <IN> ) {
 			$f =~ s/\r|\n//g;
 			if ( !-e $f ) {
-				pInfo( "$f doesn't exist", $logFile );
+				pInfo( "$f doesn't exist", $logRef );
 				next;
 			}
-
-			#		#single threads
-			#		pInfo( "Processing $f ", $logFile );
-			#		my @metric =
-			#		  &getbammetric( $f, \%regionDatabase, $inBedSign, $isdepth,
-			#			$samtoolsBin, $caculateMethod );
-			#		print OUT join "\t", (@metric);
-			#		print OUT "\n";
-
-			#multi threads
-			if ( scalar( threads->list() ) < $maxThreads ) {
-				pInfo( "Processing $f ", $logFile );
-				my ($t) = threads->new(
-					\&getbammetric,  $f,         \%regionDatabase,
-					$inBedSign,      $isdepth,   $samtoolsBin,
-					$caculateMethod, $totalExonLength
-				);
-			}
-			else {
-				foreach my $thread ( threads->list() ) {
-					my @metric = $thread->join;
-					print OUT join "\t", (@metric);
-					print OUT "\n";
-					pInfo( "Processing $f ", $logFile );
-					my ($t) = threads->new(
-						\&getbammetric,  $f,         \%regionDatabase,
-						$inBedSign,      $isdepth,   $samtoolsBin,
-						$caculateMethod, $totalExonLength
-					);
-					last;
-				}
-			}
+			push @fileList, $f;
 		}
-
-		#join all left threads
-		foreach my $thread ( threads->list() ) {
-			my @metric = $thread->join;
-			print OUT join "\t", (@metric);
-			print OUT "\n";
+		close(IN);
+		
+		my @threads; #open threads and get results
+		$current = 0;
+		foreach my $x ( 1 .. $maxThreads ) {
+			push @threads, threads->new( \&bamProcess, $x, \@fileList,\%regionDatabase,
+						$inBedSign,      $isdepth,   $samtoolsBin,
+						$caculateMethod, $totalExonLength,$logRef );
+		}
+		
+		foreach my $thread (@threads) {
+			my $threadNum = $thread->join;
+			pInfo( "Thread $threadNum finished", $logRef );
+		}
+		foreach my $result (@resultOut) {
+			print OUT "$result\n";
 		}
 		close OUT;
-
 		#end comment by test R
 	}
 
@@ -266,7 +248,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 	my $rResult = system(
 "cat $Rsource | $RBin --vanilla --slave --args $resultDir 1>$resultDir/bamResult/bamSummary.rLog 2>$resultDir/bamResult/bamSummary.rLog"
 	);
-	pInfo( "Finish bam summary!", $logFile );
+	pInfo( "Finish bam summary!", $logRef );
 	return ($rResult);
 }
 
@@ -510,8 +492,7 @@ sub getbammetric {
 		my $exonRatio2 = $ontargetD10num / $totalExonLength;
 		my $exonRatio3 = $ontargetD30num / $totalExonLength;
 
-		return (
-			$in,                        $instrument,
+		my @returnValue=($in,                        $instrument,
 			$runNumber,                 $flowcell,
 			$lane,                      $total,
 			$ontarget,                  $offtarget,
@@ -527,12 +508,11 @@ sub getbammetric {
 			$offtargetdepth,            $offtargetintrondepth,
 			$offtargetintergenicdepth,  $offtargetmitodepth,
 			$exonRatio1,                $exonRatio2,
-			$exonRatio3
-		);
+			$exonRatio3);
+		return (\@returnValue);
 	}
 	else {
-		return (
-			$in,                        $instrument,
+		my @returnValue=($in,                        $instrument,
 			$runNumber,                 $flowcell,
 			$lane,                      $total,
 			$ontarget,                  $offtarget,
@@ -545,6 +525,36 @@ sub getbammetric {
 			$offtargetinsert,           $offtargetintroninsert,
 			$offtargetintergenicinsert, $offtargetmitoinsert
 		);
+		return (\@returnValue);
+	}
+}
+
+
+sub bamProcess {
+	my ($threadNum, $fileListRef,$regionDatabaseRef,
+						$inBedSign,      $isdepth,   $samtoolsBin,
+						$caculateMethod, $totalExonLength,$logRef)= @_;
+	pInfo( "Thread $threadNum stared", $logRef );
+	while (1) {
+		my $file;
+		my $current_temp;
+		{
+			lock $current;
+			$current_temp = $current;
+			++$current;
+		}
+		return $threadNum unless $current_temp < @{$fileListRef};
+		$file = ${$fileListRef}[$current_temp];
+
+		pInfo( "Thread $threadNum processing $file", $logRef );
+		my ( $metric ) =&getbammetric($file, $regionDatabaseRef,
+                                                $inBedSign,      $isdepth,   $samtoolsBin,
+                                                $caculateMethod, $totalExonLength);
+		#return result here
+		{
+			lock @resultOut;
+			$resultOut[$current_temp] = join "\t", ( @{$metric} );
+		}
 	}
 }
 
@@ -626,11 +636,21 @@ sub loadgtf {
 	undef(%transcripts);
 }
 
+#sub pInfo {
+#	my $s       = shift;
+#	my $logFile = shift;
+#	print "[", scalar(localtime), "] $s\n";
+#	print $logFile "[", scalar(localtime), "] $s\n";
+#}
 sub pInfo {
-	my $s       = shift;
-	my $logFile = shift;
+	my $s       = $_[0];
 	print "[", scalar(localtime), "] $s\n";
-	print $logFile "[", scalar(localtime), "] $s\n";
+	
+	lock $_[1];
+	{
+		lock @{$_[1]};
+		push @{$_[1]}, "[".scalar(localtime)."] $s\n";
+	}
 }
 
 sub storeData {

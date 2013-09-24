@@ -69,7 +69,7 @@ sub build_template {
 	foreach my $key ( keys %hash ) {
 		$template->param( $key => $hash{$key} );
 	}
-#	unlink "$templateName.temp";
+	unlink "$templateName.temp";
 	return ($template);
 }
 

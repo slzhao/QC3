@@ -14,14 +14,17 @@ use source::fastqSummary;
 use source::bamSummary;
 use source::vcfSummary;
 
-our $version="1.03";
+our $version="1.10";
+
+my $qc3ConfigFile=dirname($0) ."/config.txt";
 my %config;
-$config{'RBin'}        = "R";       #where the R bin file is
-$config{'annovarBin'}  = "table_annovar.pl";		#where the ANNOVAR bin file is
-$config{'annovarConvert'}  = "convert2annovar.pl";		#where the ANNOVAR convert bin file is
-$config{'annovarOption'}  = "-buildver hg19 -protocol refGene,snp137 -operation g,f --remove"; #other options for ANNOVAR
-$config{'samtoolsBin'} = "samtools";	#where the SAMtools bin file is
-$config{'logFileName'} = "qc3Log.txt";	#name of the log file
+
+#$config{'RBin'}        = "R";       #where the R bin file is
+#$config{'annovarBin'}  = "table_annovar.pl";		#where the ANNOVAR bin file is
+#$config{'annovarConvert'}  = "convert2annovar.pl";		#where the ANNOVAR convert bin file is
+#$config{'annovarOption'}  = "-buildver hg19 -protocol refGene,snp137 -operation g,f --remove"; #other options for ANNOVAR
+#$config{'samtoolsBin'} = "samtools";	#where the SAMtools bin file is
+#$config{'logFileName'} = "qc3Log.txt";	#name of the log file
 
 my $usageModule="
 Program: qc3.pl (a quality control tool for DNA sequencing data in raw data, alignment, and variant calling stages)
@@ -48,7 +51,7 @@ my $commandline = "perl $0 "
   ;    #Output you input command in the report to reproduce you result
 my (
 	$module,           $filelist, $resultDir, $singleEnd,
-	$targetregionfile, $gtffile,  $isdepth,   $caculateMethod,$cfgFile,
+	$targetregionfile, $gtffile,  $isdepth,   $caculateMethod,$vcfCfgFile,
 	$method,           $maxThreads,$annovarDb,$rePlot,$showHelp
 ) = ();
 our @log : shared;
@@ -65,7 +68,7 @@ GetOptions(
 	"d"   => \$isdepth,
 	"cm=i"   => \$caculateMethod,
 
-	"c:s" => \$cfgFile,
+	"c:s" => \$vcfCfgFile,
 	"s=i" => \$method,
 	"a=s" => \$annovarDb,
 	
@@ -83,6 +86,16 @@ if (defined $module and $showHelp) {
 	}
 } elsif ($showHelp) {die "$usageModule";}
 
+open QC3CFG, "<$qc3ConfigFile" or die "Can't read $qc3ConfigFile\n$!";
+while (<QC3CFG>) {
+	chomp;
+	if (/^#/) {
+		next;
+	}
+	my @lines=( split /[="]/, $_);
+	$config{$lines[0]} = $lines[2];
+}
+
 if ( !defined $module) {
 	die ("Module (-m) is required and must be f (fastq), b (bam), and v (vcf)\n$usageModule");
 } elsif (!defined $filelist or !defined $resultDir) {
@@ -93,8 +106,8 @@ if ( !defined $module) {
 
 if ( !defined $isdepth )    { $isdepth              = 0; }
 if ( !defined $method ) { $method = 1; }
-if ( !( defined $cfgFile ) or $cfgFile eq '' ) {
-		$cfgFile = dirname($0) . '/GATK.cfg';
+if ( !( defined $vcfCfgFile ) or $vcfCfgFile eq '' ) {
+		$vcfCfgFile = dirname($0) . '/GATK.cfg';
 }
 if ( !defined $maxThreads ) { $config{'maxThreads'} = 4; }
 else {
@@ -181,7 +194,7 @@ elsif ( $module eq "b" ) {
 }
 elsif ( $module eq "v" ) {
 	pInfo("Start vcf summary for $filelist",\@log);
-	$config{'cfgFile'} = $cfgFile;
+	$config{'vcfCfgFile'} = $vcfCfgFile;
 	$config{'method'}  = $method;
 	$config{'annovarDb'}   = $annovarDb;
 	my $rResult = &vcfSummary( $filelist, \%config );
@@ -191,7 +204,7 @@ elsif ( $module eq "v" ) {
 
 	#report
 	my $vcfFileName = basename($filelist);
-	my $cfgFileContent=&file2text($cfgFile);
+	my $cfgFileContent=&file2text($vcfCfgFile);
 	my $table1 =
 	  &file2table("$resultDir/vcfResult/$vcfFileName.SampleNumber.txt",'',1);
 	my $table2 =
@@ -214,7 +227,7 @@ elsif ( $module eq "v" ) {
 	${$reportHash}{'MAKETABLE2'} = $table2;
 	${$reportHash}{'MAKETABLE3'} = $table3;
 	${$reportHash}{'MAKETABLE4'} = $table4;
-	${$reportHash}{'FILTERFILE'}   = $cfgFile;
+	${$reportHash}{'FILTERFILE'}   = $vcfCfgFile;
 	${$reportHash}{'FILTERFILECONTENT'}   = $cfgFileContent;
 	${$reportHash}{'FIG'}    = "./vcfFigure/$vcfFileName.Method$method.txt.png";
 	${$reportHash}{'FIGNUMBER'} = "./vcfFigure/$vcfFileName.sampleNumber.png";
