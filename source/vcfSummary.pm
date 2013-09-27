@@ -66,14 +66,14 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 	else {
 		$doAnnovar = 0;
 		pInfo(
-"Can't find annovar bin. Will not perform annovar annotation. You can read readme file to find how to download it",
+"Can't find ANNOVAR bin. Will not perform ANNOVAR annotation but other functions will work well. You can read readme file to find how to download ANNOVAR",
 			$logRef
 		);
 	}
 	if ( !( defined $annovarDb ) or !( -e $annovarDb ) ) {
 		$doAnnovar = 0;
 		pInfo(
-"Can't find annovar database. Will not perform annovar annotation. You can read readme file to find how to download it",
+"Can't find ANNOVAR database. Will not perform ANNOVAR annotation but other functions will work well. You can read readme file to find how to download ANNOVAR",
 			$logRef
 		);
 	}

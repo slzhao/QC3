@@ -148,7 +148,7 @@ After you install R and add R bin file to your Path, the software can find and u
 
 SAM Tools provide various utilities for manipulating alignments in the SAM format, including sorting, merging, indexing and generating alignments in a per-position format. It could be downloaded [here](http://samtools.sourceforge.net/).
 
-After you install SAMtools and add SAMtools bin file to your Path, the software can find and use SAMtools automatically. Or you can change the qc3.pl script and tell the program where the SAMtools is on your computer. Here is the line you need to modify.
+After you install SAMtools and add SAMtools bin file to your Path, the software can find and use SAMtools automatically. Or you can modify the config.txt file in the software directory and tell the program where the SAMtools is on your computer. Here is the line you need to modify.
 
 	#where the SAMtools bin file is
 	samtoolsBin="samtools"
@@ -160,7 +160,7 @@ After you install SAMtools and add SAMtools bin file to your Path, the software 
 
 ANNOVAR is an efficient software tool to utilize update-to-date information to functionally annotate genetic variants detected from diverse genomes. We used ANNOVAR for annotation in vcf QC. It could be downloaded from [ANNOVAR website](http://www.openbioinformatics.org/annovar/).
 
-After you install ANNOVAR and add ANNOVAR bin file to your Path, the software can find and use ANNOVAR automatically. Or you can change the qc3.pl script and tell the program where the ANNOVAR is on your computer. Here is the line you need to modify.
+After you install ANNOVAR and add ANNOVAR bin file to your Path, the software can find and use ANNOVAR automatically. Or you can modify the config.txt file in the software directory  and tell the program where the ANNOVAR is on your computer. Here is the line you need to modify.
 
 	#where the ANNOVAR bin file is
 	annovarBin="table_annovar.pl"
@@ -226,7 +226,7 @@ Here is more details for each module:
 
 	perl qc3.pl -m v -i inputFile -o outputDir
 
-	-s [int]			Optional. Method used in consistence calculation, should be 1 or 2. First of all, if any of the two samples had less than 10 read depths in an allele, it will not be used in consistence calculation. In method 1, only the two samples will completely same allele will be taken as consistent. In method 2, the two samples satisfy the criterion in method 1, or if the two samples were 0/0 vs 0/1 but 0/0 sample has some read counts in alternative allele, they will be taken as consistent. The default value is 1.
+	-s [int]			Optional. Method used in consistence calculation, should be 1 or 2. First of all, if any of the two samples had less than 10 read depths in an allele, it will not be used in consistence calculation. In method 1, only the two samples with completely same allele will be taken as consistent. In method 2, the two samples satisfy the criterion in method 1, or if the two samples were 0/0 vs 0/1 but 0/0 sample has some read counts in alternative allele, they will be taken as consistent. The default value is 1.
 	-c [database]	Optional. A file indicating the filter arguments for vcf files. If not specified, the default file 'GATK.cfg' in QC3 directory with GATK best practices recommended arguments will be used.
 	-a [database]	Optional. Directory of annovar database.
 
