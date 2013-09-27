@@ -53,7 +53,7 @@ Options:
 For more information, please refer to the readme file in QC3 directory. Or visit the QC3 website at https://github.com/slzhao/QC3
 
 ";
-	die "$!\n$usage"
+	die "\n$usage"
 	  if ($showHelp);
 
 	if ( !( -e $resultDir . '/fastqResult/' ) ) {

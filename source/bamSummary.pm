@@ -63,8 +63,8 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 
 ";
 	
-	die "$!\n$usage"
-	  if ($showHelp or ( defined($targetregionfile)  and !-e $targetregionfile )
+	die "\n$usage" if ($showHelp);
+	die "Can't find targetregion file(-r) or gtf file(-g). You need to specify at least one of them\n$usage" if (( defined($targetregionfile)  and !-e $targetregionfile )
 		or ( defined($gtffile)           and !-e $gtffile )
 		or ( !defined($targetregionfile) and !defined($gtffile) ) );
 	if ( !( -e $resultDir . '/bamResult/' ) ) {

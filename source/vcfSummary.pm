@@ -54,7 +54,9 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 
 ";
 
-	die "$!\n$usage" if ($showHelp or !( -e $vcfCfgFile ) or ($method != 1 and $method != 2));
+	die "\n$usage" if ($showHelp);
+	die "Can't find the vcf QC config file\n$usage" if (!( -e $vcfCfgFile ));
+	die "Method(-s) should be 1 or 2\n$usage" if ($method != 1 and $method != 2);
 
 	$| = 1;
 	my $doAnnovar = 1;
