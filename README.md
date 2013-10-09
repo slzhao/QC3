@@ -31,9 +31,9 @@ Table of Content
 <a name="Introduction"/>
 # Introduction #
 
-High throughput sequencing is the most effective way to screen for non-specific germline variants, somatic mutations, and structural variants. Some of the most popular sequencing paradigms in DNA sequencing are whole genome sequencing, exome sequencing, and target panel sequencing. While vastly informative, sequencing data poses significant bioinformatics challenges in areas such as data storage, computation time, and variant detection accuracy.  One of the easily overlooked challenges associated with sequencing is quality control Quality control for DNA sequencing data can be categorized into three stages: raw data, alignment, and variant calling. QC on raw sequencing data has been given more attention than QC on alignment and the variant calling. There are many QC tools aimed at raw data such as FastQC, FastQ Screen FastX-Toolkit, NGS QC Toolkit, RRINSEQ and QC-Chain. However, few tools have been developed for conducting quality control on alignment and variant calling.
+High throughput sequencing is the most effective way to screen for non-specific germline variants, somatic mutations, and structural variants. Some of the most popular sequencing paradigms in DNA sequencing are whole genome sequencing, exome sequencing, and target panel sequencing. While vastly informative, sequencing data poses significant bioinformatics challenges in areas such as data storage, computation time, and variant detection accuracy.  One of the easily overlooked challenges associated with sequencing is quality control Quality control (QC) for DNA sequencing can be categorized based on three stages: raw data, alignment, and variant calling. QC on raw sequencing data has been given more attention than QC on alignment and the variant calling. There are many QC tools aimed at raw data such as FastQC, FastQ Screen FastX-Toolkit, NGS QC Toolkit, RRINSEQ and QC-Chain. However, few tools have been developed for conducting quality control on alignment and variant calling.
 
-We present QC3, a quality control tool designed for DNA sequencing data for all aforementioned three stages. QC3 provides both graphic and tabulated reports for quality control results. It also offers several unique features such as separation of bad and good reads (based on Illumina’s filter), detection of batch effect, and cross contamination. The input of QC3 can be three types of data: FASTQ, Binary Alignment Map (BAM), and Variant Calling Format, respectively, corresponding to the three stages of raw data, alignment, and variant detection. QC3 is written with Perl and R and is freely available for public use. It can be downloaded from [github](https://github.com/slzhao/QC3).
+We present QC3, a quality control tool designed for DNA sequencing data for all  the aforementioned three stages. QC3 provides both graphic and tabulated reports for quality control results. It also offers several unique features such as separation of bad and good reads (based on Illumina’s filter), detection of batch effect, and cross contamination. The input of QC3 takes three types of data: FASTQ, Binary Alignment Map (BAM), and Variant Calling Format, respectively, corresponding to the three stages of raw data, alignment, and variant detection. QC3 is written with Perl and R and is freely available for public use. It can be downloaded from [QC3 website on github](https://github.com/slzhao/QC3).
 
 <a name="Download"/>
 # Download #
@@ -93,7 +93,7 @@ Release candidate version 1.0 for test
 <a name="irpp"/>
 ## Install Perl and required Perl packages ##
 
-Perl is a highly capable, widely used, feature-rich programming language. It could be downloaded [here](http://www.perl.org/get.html).
+Perl is a highly capable, widely used, feature-rich programming language. It could be downloaded [Perl website](http://www.perl.org/get.html).
 
 If Perl has already been installed on your computer, no other Perl module was needed to run QC3 in most cases. And you can run the following commands to make sure all the required modules have been installed.
 
@@ -114,7 +114,7 @@ The successful output would look like this
 	ok   threads
 	ok   threads::shared
 
-Otherwise, it may look like this
+Otherwise, for example, if HTML::Template package was missing, it may look like this
 
 	ok   File::Basename
 	ok   FindBin
@@ -137,7 +137,7 @@ Then you need to install the missing packages from [CPAN](http://www.cpan.org/).
 
 ### R ###
 
-R is a free software environment for statistical computing and graphics. It could be downloaded [here](http://www.r-project.org/).
+R is a free software environment for statistical computing and graphics. It could be downloaded from [R website](http://www.r-project.org/).
 
 After you install R and add R bin file to your Path, the software can find and use R automatically. Or you can modify the config.txt file in the software directory and tell the program where the R is on your computer. Here is the line you need to modify.
 
@@ -146,7 +146,7 @@ After you install R and add R bin file to your Path, the software can find and u
 
 ### samtools ###
 
-SAM Tools provide various utilities for manipulating alignments in the SAM format, including sorting, merging, indexing and generating alignments in a per-position format. It could be downloaded [here](http://samtools.sourceforge.net/).
+SAM Tools provide various utilities for manipulating alignments in the SAM format, including sorting, merging, indexing and generating alignments in a per-position format. It could be downloaded from [SAM Tools website](http://samtools.sourceforge.net/).
 
 After you install SAMtools and add SAMtools bin file to your Path, the software can find and use SAMtools automatically. Or you can modify the config.txt file in the software directory and tell the program where the SAMtools is on your computer. Here is the line you need to modify.
 
@@ -196,7 +196,7 @@ The usage of QC3 software could be:
 	perl qc3.pl -m module -i inputFile -o outputDir [-t threads -rp] [some other parameters]
 	
 	-m [module]         Required. QC module used. It should be f (fastq QC), b (bam QC), or v (vcf QC).
-	-i [inputFile]      Required. Input file. It should be a file list including all analyzed files in fastq QC and bam QC. To analyze the pair-end fastq files in fastq QC, the two files for the same sample should be listed together in this file. In vcf QC, it should be a vcf file.
+	-i [inputFile]      Required. Input file. In fastq QC or bam QC, it should be a file listing all analyzed files (supports .fastq, .fastq.gz, and .bam files). To analyze the pair-end fastq files in fastq QC, the two files for the same sample should be listed together in this file. In vcf QC, it should be a vcf file.
 	-o [outputDir]      Required. Output directory for QC result. If the directory doesn't exist, it would be created.
 	-t [int]            Optional. Threads used in analysis. The default value is 4. This parameter only valid for fastq and bam QC. Only one thread would be used in vcf QC.
 	-rp					Optional. Re-plot the figures. The program will not re-analyze the input files but the result files in output directory will be used to re-plot the figures and re-generate the report if this parameter is used. You can use this parameter when you want to slightly modify the report, such as changing sample names in the figures.
@@ -209,7 +209,7 @@ Here is more details for each module:
 
 	perl qc3.pl -m f -i inputFileList -o outputDir -t threads
 
-	-se				Optional. whether the fastq files were pair-end data. They were taken as pair-end by default, -se = single-end.
+	-se				Optional. Indicating the fastq files were single-end data. QC3 takes fastq files as pair-end data by default.
 
 <a name="bqc"/>
 ## bam QC
@@ -219,14 +219,14 @@ Here is more details for each module:
 	-r  [database]	Optional. A targetregion file. At least one targetregion file or gtf file should be provided.
 	-g  [database]	Optional. A gtf file. At least one targetregion file or gtf file should be provided.
 	-cm [int]	    Optional. Calculation method for data summary, should be 1 or 2. Method 1 means mean and method 2 means median. The default value is 1.
-	-d				Optional. whether the depth in on-/off-target regions will be calculated, It will not be calculated by default, -d = will be calculated.
+	-d				Optional. The depth in on-/off-target regions will be calculated. QC3 will not calculate depth by default, because it may take a long time.
 
 <a name="vqc"/>
 ## vcf QC
 
 	perl qc3.pl -m v -i inputFile -o outputDir
 
-	-s [int]			Optional. Method used in consistence calculation, should be 1 or 2. First of all, if any of the two samples had less than 10 read depths in an allele, it will not be used in consistence calculation. In method 1, only the two samples with completely same allele will be taken as consistent. In method 2, the two samples satisfy the criterion in method 1, or if the two samples were 0/0 vs 0/1 but 0/0 sample has some read counts in alternative allele, they will be taken as consistent. The default value is 1.
+	-s [int]			Optional. Method used in consistence calculation, should be 1 or 2. In method 1, only the two samples with completely same allele will be taken as consistent. In method 2, the two samples satisfy the criterion in method 1, or if the two samples were 0/0 vs 0/1 but 0/0 sample has some read counts in alternative allele, they will be taken as consistent. Besides, consistence calculation in either method 1 or 2 only uses the alleles with at least 10 read depths in any of the two samples. The default value is 1.
 	-c [database]	Optional. A file indicating the filter arguments for vcf files. If not specified, the default file 'GATK.cfg' in QC3 directory with GATK best practices recommended arguments will be used.
 	-a [database]	Optional. Directory of annovar database.
 
@@ -235,7 +235,7 @@ Here is more details for each module:
 
 The example files can be downloaded at [sourceforge](http://sourceforge.net/projects/qc3/files/).
 
-You need to download and extract it to a directory. Then the example code for running QC with given example data set could be:
+You need to download and extract it to a directory. Then the example code for running QC3 with given example data set could be:
 
 <a name="ded"/>
 ## download example data ##

@@ -55,7 +55,7 @@ Options:
 	-r	region file         Optional. A targetregion file. At least one targetregion file or gtf file should be provided.
 	-g	region file         Optional. A gtf file. At least one targetregion file or gtf file should be provided.
 	-cm	method	            Optional. Calculation method for data summary, should be 1 or 2. Method 1 means mean and method 2 means median. The default value is 1.
-	-d	                    Optional. whether the depth in on-/off-target regions will be calculated, It will not be calculated by default, -d = will be calculated.
+	-d	                    Optional. The depth in on-/off-target regions will be calculated. QC3 will not calculate depth by default, because it may take a long time.
 	
 	-h	                    Optional. Show this information.
 		

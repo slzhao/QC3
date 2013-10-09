@@ -14,7 +14,7 @@ use source::fastqSummary;
 use source::bamSummary;
 use source::vcfSummary;
 
-our $version="1.11";
+our $version="1.12";
 
 my $qc3ConfigFile=dirname($0) ."/config.txt";
 my %config;
@@ -35,7 +35,7 @@ Usage:   perl qc3.pl -m module -i listfile -o outputDirectory [-t threads] [othe
 Options:
 
 	-m	module             Required. QC module used. It should be f (fastq QC), b (bam QC), or v (vcf QC).
-	-i	input filelist     Required. Input file. It should be a file list including all analyzed files in fastq QC and bam QC. To analyze the pair-end fastq files in fastq QC, the two files for the same sample should be listed together in this file. In vcf QC, it should be a vcf file.
+	-i	input filelist     Required. Input file. In fastq QC or bam QC, it should be a file listing all analyzed files (supports .fastq, .fastq.gz, and .bam files). To analyze the pair-end fastq files in fastq QC, the two files for the same sample should be listed together in this file. In vcf QC, it should be a vcf file.
 	-o	output directory   Required. Output directory for QC result. If the directory doesn't exist, it would be created.
 	-t	threads            Optional. Threads used in analysis. The default value is 4. This parameter only valid for fastq and bam QC. Only one thread will be used in vcf QC.
 	
@@ -85,7 +85,6 @@ if (defined $module and $showHelp) {
 		my $rResult = &vcfSummary( $filelist, \%config );
 	}
 } elsif ($showHelp) {die "$usageModule";}
-
 open QC3CFG, "<$qc3ConfigFile" or die "Can't read $qc3ConfigFile\n$!";
 while (<QC3CFG>) {
 	chomp;
@@ -95,7 +94,10 @@ while (<QC3CFG>) {
 	my @lines=( split /[="]/, $_);
 	$config{$lines[0]} = $lines[2];
 }
-
+my $detectR=`which $config{"RBin"}`;
+if ($detectR eq '') {
+	die "Can't find R. Please install R or modify the RBin in config.txt.\n$usageModule";
+}
 if ( !defined $module) {
 	die ("Module (-m) is required and must be f (fastq), b (bam), and v (vcf)\n$usageModule");
 } elsif (!defined $filelist or !defined $resultDir) {

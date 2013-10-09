@@ -46,7 +46,7 @@ Options:
 	-i	input filelist      Required. A list file for fastq files to be analyzed. QC3 also support .gz files.
 	-o	output directory    Required. Output directory for QC result. If the directory doesn't exist, it would be created.
 	-t	threads             Optional. Threads used in analysis. The default value is 4.
-	-se	                    Optional. whether the fastq files were pair-end data. They were taken as pair-end by default, -se = single-end.
+	-se	                    Optional. Indicating the fastq files were single-end data. QC3 takes fastq files as pair-end data by default.
 	
 	-h	                    Optional. Show this information.
 	
