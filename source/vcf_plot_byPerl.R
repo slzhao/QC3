@@ -13,8 +13,8 @@ changeTable<-function(consistence,x,y,z) {
 	for (i in 1:nrow(consistence)) {
 		result[consistence[i,x],consistence[i,y]]<-consistence[i,z]
 	}
-	result_sort<-result[order(apply(result,1,function(x) length(which(is.na(x))))),]
-	result_sort<-result_sort[,order(apply(result,2,function(x) length(which(is.na(x)))))]
+	result_sort<-result[order(apply(result,1,function(x) length(which(is.na(x))))),,drop=F]
+	result_sort<-result_sort[,order(apply(result,2,function(x) length(which(is.na(x))))),drop=F]
 	return(result_sort)
 }
 col_by_value<-function(pcorr,col,range=NA,breaks=NA,cex.axis=2,las=1,...) {
@@ -50,8 +50,8 @@ showConsistence<-function(consistence,cex=1) {
 		image(as.matrix(temp2),xaxt="n",yaxt="n",col=rev(unique(sort(col1[,x]))),main=colnames(consistence)[colPlot[x]],cex.main=cex)
 #		axis(1,at=1/(ncol(temp2)-1)*(0:(ncol(temp2)-1)),labels=abbreviate(row.names(temp2), minlength = 10),las=2,cex.axis=cex)#note colnames and row.names had been changed here
 #		axis(2,at=1/(nrow(temp2)-1)*(0:(nrow(temp2)-1)),labels=abbreviate(colnames(temp2), minlength = 10),las=2,cex.axis=cex)
-		axis(1,at=1/(ncol(temp2)-1)*(0:(ncol(temp2)-1)),labels=row.names(temp2),las=2,cex.axis=cex)
-		axis(2,at=1/(nrow(temp2)-1)*(0:(nrow(temp2)-1)),labels=colnames(temp2),las=2,cex.axis=cex)
+		axis(1,at=1/(max(ncol(temp2)-1,1))*(0:(ncol(temp2)-1)),labels=row.names(temp2),las=2,cex.axis=cex)
+		axis(2,at=1/(max(nrow(temp2)-1,1))*(0:(nrow(temp2)-1)),labels=colnames(temp2),las=2,cex.axis=cex)
 	}
 }
 read.bigFile<-function(myfile,header = TRUE,type="txt",skip=0,preRow=20,knownColC=NULL,...) {
