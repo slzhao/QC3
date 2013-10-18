@@ -14,7 +14,7 @@ use source::fastqSummary;
 use source::bamSummary;
 use source::vcfSummary;
 
-our $version="1.12";
+our $version="1.13";
 
 my $qc3ConfigFile=dirname($0) ."/config.txt";
 my %config;

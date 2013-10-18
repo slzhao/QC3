@@ -14,24 +14,25 @@ use Env '@PATH';
 1;
 
 my $rSourceLocation = '/source/vcf_plot_byPerl.R';
-my $logRef=\@main::log;
+my $logRef          = \@main::log;
 
 sub vcfSummary {
 
 	my ( $VCF, $config ) = @_;
-	my $vcfCfgFile   = $config->{'vcfCfgFile'};
-	my $method    = $config->{'method'};
-	my $resultDir = $config->{'resultDir'};
-#	my $logFile   = $config->{'log'};
-	my $rePlot    = $config->{'rePlot'};
+	my $vcfCfgFile = $config->{'vcfCfgFile'};
+	my $method     = $config->{'method'};
+	my $resultDir  = $config->{'resultDir'};
+
+	#	my $logFile   = $config->{'log'};
+	my $rePlot = $config->{'rePlot'};
 
 	my $RBin           = $config->{'RBin'};
 	my $annovarBin     = $config->{'annovarBin'};
 	my $annovarConvert = $config->{'annovarConvert'};
 	my $annovarOption  = $config->{'annovarOption'};
 	my $annovarDb      = $config->{'annovarDb'};
-	
-	my $showHelp     = $config->{'showHelp'};
+
+	my $showHelp = $config->{'showHelp'};
 
 	my $usage =
 "Program: qc3.pl (a quality control tool for DNA sequencing data in raw data, alignment, and variant calling stages)
@@ -55,8 +56,9 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 ";
 
 	die "\n$usage" if ($showHelp);
-	die "Can't find the vcf QC config file\n$usage" if (!( -e $vcfCfgFile ));
-	die "Method(-s) should be 1 or 2\n$usage" if ($method != 1 and $method != 2);
+	die "Can't find the vcf QC config file\n$usage" if ( !( -e $vcfCfgFile ) );
+	die "Method(-s) should be 1 or 2\n$usage"
+	  if ( $method != 1 and $method != 2 );
 
 	$| = 1;
 	my $doAnnovar = 1;
@@ -172,110 +174,153 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 				next;
 			}
 			my @lines = ( split /\t/, $_ );
-			if (   $lines[6] eq "LowQual"
-				or &filter( $lines[7], \%cfgFilter ) == 0 )
-			{
-				$done_filter = 1;
-			}
-			else {
-				$done_filter = 0;
-				print RESULT2 "$lines[0]\t$lines[1]\t$lines[3]\t$lines[4]";
-				print RESULT6 "$_\n";
-			}
-			print RESULT1 "$lines[0]\t$lines[1]\t$lines[3]\t$lines[4]";
 
-			my @ID1 = ( split /;/, $lines[7] );
-			my %IDNumber;
-			foreach my $ID (@ID1) {
-				my @ID2 = ( split /=/, $ID );
-				$IDNumber{ $ID2[0] } = $ID2[1];
-			}
-			if ( $done_filter == 0 ) {
-				foreach my $ID ( sort keys %IDList ) {
-					if ( defined $IDNumber{$ID} ) {
-						print RESULT1 "\t$IDNumber{$ID}";
-						print RESULT2 "\t$IDNumber{$ID}";
-					}
-					else {
-						print RESULT1 "\t";
-						print RESULT2 "\t";
-					}
+			my @line4S=($lines[4]);
+			my @line7S=($lines[7]);
+			my $line47Length = 1;
+			if ( $lines[4] =~ /,/ ) {    #such as A,C
+				@line4S = split( /,/, $lines[4] );
+				$line47Length = scalar @line4S;
+				foreach my $x ( 0 .. ( $line47Length - 1 ) ) {
+							$line7S[$x] ="";
 				}
-				print RESULT1 "\n";
-				print RESULT2 "\n";
-			}
-			else {
-				foreach my $ID ( sort keys %IDList ) {
-					if ( defined $IDNumber{$ID} ) {
-						print RESULT1 "\t$IDNumber{$ID}";
-					}
-					else {
-						print RESULT1 "\t";
-					}
-				}
-				print RESULT1 "\n";
-			}
-
-			for ( my $x = 9 ; $x < ( 9 + $sampleSize ) ; $x++ ) {
-				if ( $lines[$x] eq './.' ) { next; }
-				elsif ( $lines[$x] =~ '0/1' ) {
-					if (   ( $lines[3] . $lines[4] eq "AG" )
-						or ( $lines[3] . $lines[4] eq "GA" )
-						or ( $lines[3] . $lines[4] eq "CT" )
-						or ( $lines[3] . $lines[4] eq "TC" ) )
-					{
-						$Sample2NumberAll{ $titles[$x] }{"Transitions"}++;
-						if ( $done_filter == 0 ) {
-							$Sample2NumberFilter{ $titles[$x] }
-							  {"Transitions"}++;
+				my @temp1 = split( /;/, $lines[7] );
+				foreach my $temp (@temp1) {
+					if ( $temp =~ /=/ && $temp =~ /,/ ) {
+						my @temp2 = split( /=|,/, $temp );
+						foreach my $x ( 0 .. ( $line47Length - 1 ) ) {
+							$line7S[$x] =
+							    $line7S[$x]
+							  . $temp2[0] . '='
+							  . $temp2[ $x + 1 ] . ';';
 						}
 					}
 					else {
-						$Sample2NumberAll{ $titles[$x] }{"Transversions"}++;
-						if ( $done_filter == 0 ) {
-							$Sample2NumberFilter{ $titles[$x] }
-							  {"Transversions"}++;
+						foreach my $x ( 0 .. ( $line47Length - 1 ) ) {
+							$line7S[$x] = $line7S[$x] . $temp. ';';
 						}
 					}
-					$Sample2NumberAll{ $titles[$x] }{"01Number"}++;
-					if ( $done_filter == 0 ) {
-						$Sample2NumberFilter{ $titles[$x] }{"01Number"}++;
-					}
 				}
-				elsif ( $lines[$x] =~ '1/1' ) {
-					$Sample2NumberAll{ $titles[$x] }{"11Number"}++;
-					if ( $done_filter == 0 ) {
-						$Sample2NumberFilter{ $titles[$x] }{"11Number"}++;
-					}
+			}
+			foreach my $x ( 0 .. ( $line47Length - 1 ) ) {
+				$lines[4] = $line4S[$x];
+				$lines[7] = $line7S[$x];
+
+				if (   $lines[6] eq "LowQual"
+					or &filter( $lines[7], \%cfgFilter ) == 0 )
+				{
+					$done_filter = 1;
 				}
-				if ( $done_filter == 0 ) {    #this line was kept
-					if ( $lines[$x] =~ '0/1' or $lines[$x] =~ '1/1' )
-					{    #count SNP for each sample in each chromosome
-						$snpCount{ $lines[0] }{ $titles[$x] }++;
-					}
-					for ( my $y = ( $x + 1 ) ; $y < ( 9 + $sampleSize ) ; $y++ )
-					{
-						if ( $lines[$y] eq './.' ) { next; }
+				else {
+					$done_filter = 0;
+					print RESULT2 "$lines[0]\t$lines[1]\t$lines[3]\t$lines[4]";
+					print RESULT6 join("\t",@lines)."\n";
+				}
+				print RESULT1 "$lines[0]\t$lines[1]\t$lines[3]\t$lines[4]";
+
+				my @ID1 = ( split /;/, $lines[7] );
+				my %IDNumber;
+				foreach my $ID (@ID1) {
+					my @ID2 = ( split /=/, $ID );
+					$IDNumber{ $ID2[0] } = $ID2[1];
+				}
+				if ( $done_filter == 0 ) {
+					foreach my $ID ( sort keys %IDList ) {
+						if ( defined $IDNumber{$ID} ) {
+							print RESULT1 "\t$IDNumber{$ID}";
+							print RESULT2 "\t$IDNumber{$ID}";
+						}
 						else {
-							my @result =
-							  &caculate_ratio( $lines[$x], $lines[$y],
-								$method );
-							$selected{ $titles[$x] }{ $titles[$y] } +=
-							  $result[0];
-							$total{ $titles[$x] }{ $titles[$y] } += $result[1];
-							$selected{ $titles[$y] }{ $titles[$x] } +=
-							  $result[2];
-							$total{ $titles[$y] }{ $titles[$x] } += $result[3];
-							$selected2{ $titles[$x] }{ $titles[$y] } +=
-							  $result[4];
-							$total2{ $titles[$x] }{ $titles[$y] } += $result[5];
+							print RESULT1 "\t";
+							print RESULT2 "\t";
+						}
+					}
+					print RESULT1 "\n";
+					print RESULT2 "\n";
+				}
+				else {
+					foreach my $ID ( sort keys %IDList ) {
+						if ( defined $IDNumber{$ID} ) {
+							print RESULT1 "\t$IDNumber{$ID}";
+						}
+						else {
+							print RESULT1 "\t";
+						}
+					}
+					print RESULT1 "\n";
+				}
+
+				for ( my $x = 9 ; $x < ( 9 + $sampleSize ) ; $x++ ) {
+					if ( $lines[$x] eq './.' ) { next; }
+					$lines[$x]=~/(\d)\/(\d)/;
+					my $allele1=$1;
+					my $allele2=$2;
+					if ( $allele1 ne $allele2 ) {
+						if (   ( $lines[3] . $lines[4] eq "AG" )
+							or ( $lines[3] . $lines[4] eq "GA" )
+							or ( $lines[3] . $lines[4] eq "CT" )
+							or ( $lines[3] . $lines[4] eq "TC" ) )
+						{
+							$Sample2NumberAll{ $titles[$x] }{"Transitions"}++;
+							if ( $done_filter == 0 ) {
+								$Sample2NumberFilter{ $titles[$x] }
+								  {"Transitions"}++;
+							}
+						}
+						else {
+							$Sample2NumberAll{ $titles[$x] }{"Transversions"}++;
+							if ( $done_filter == 0 ) {
+								$Sample2NumberFilter{ $titles[$x] }
+								  {"Transversions"}++;
+							}
+						}
+						$Sample2NumberAll{ $titles[$x] }{"01Number"}++;
+						if ( $done_filter == 0 ) {
+							$Sample2NumberFilter{ $titles[$x] }{"01Number"}++;
+						}
+					}	elsif ( ($allele1 eq $allele2) and ($allele2+$allele2)>0) {
+						$Sample2NumberAll{ $titles[$x] }{"11Number"}++;
+						if ( $done_filter == 0 ) {
+							$Sample2NumberFilter{ $titles[$x] }{"11Number"}++;
+						}
+					}
+					
+					if ( $done_filter == 0 ) {    #this line was kept
+						if ( ($allele2+$allele2)>0 )
+						{    #count SNP for each sample in each chromosome
+							$snpCount{ $lines[0] }{ $titles[$x] }++;
+						}
+						for (
+							my $y = ( $x + 1 ) ;
+							$y < ( 9 + $sampleSize ) ;
+							$y++
+						  )
+						{
+							if ( $lines[$y] eq './.' ) { next; }
+							else {
+								my @result =
+								  &caculate_ratio( $lines[$x], $lines[$y],
+									$method );
+								$selected{ $titles[$x] }{ $titles[$y] } +=
+								  $result[0];
+								$total{ $titles[$x] }{ $titles[$y] } +=
+								  $result[1];
+								$selected{ $titles[$y] }{ $titles[$x] } +=
+								  $result[2];
+								$total{ $titles[$y] }{ $titles[$x] } +=
+								  $result[3];
+								$selected2{ $titles[$x] }{ $titles[$y] } +=
+								  $result[4];
+								$total2{ $titles[$x] }{ $titles[$y] } +=
+								  $result[5];
+							}
 						}
 					}
 				}
 			}
 		}
 		close(READ);
-		
+
 		print RESULT3
 "Sample\tTransitions:Transversions (Based on all SNPs)\tHeterozygous:Non-reference homozygous (Based on all SNPs)\tTransitions:Transversions (After filter)\tHeterozygous:Non-reference homozygous (After filter)\n";
 		foreach my $sample ( sort keys %Sample2NumberAll ) {
@@ -297,20 +342,22 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 			);
 
 			printf RESULT3
-				"$sample\t$TTRatioAll\t$Ratio0111All\t$TTRatioFilter\t$Ratio0111Filter\n";
-#			printf RESULT3 (
-#				"%s\t%.3f\t%.3f\t%.3f\t%.3f\n",
-#				$sample, $TTRatioAll, $Ratio0111All, $TTRatioFilter,
-#				$Ratio0111Filter
-#			);
+"$sample\t$TTRatioAll\t$Ratio0111All\t$TTRatioFilter\t$Ratio0111Filter\n";
+
+			#			printf RESULT3 (
+			#				"%s\t%.3f\t%.3f\t%.3f\t%.3f\n",
+			#				$sample, $TTRatioAll, $Ratio0111All, $TTRatioFilter,
+			#				$Ratio0111Filter
+			#			);
 		}
 
 		print RESULT4
 "FileTitle\tSampleA\tSampleB\tCountB2A\tCountA\tHeterozygous Consistency (CountB2A:CountA)\tCountA2B\tCountB\tHeterozygous Consistency (CountA2B:CountB)\tOverall Consistent Genotypes\tOverall Overlapped Genotypes\tOverall Consistency\n";
-#		foreach my $change ( sort keys %changes ) {
-#			print RESULT4 "\t$change";
-#		}
-#		print RESULT4 "\n";
+
+		#		foreach my $change ( sort keys %changes ) {
+		#			print RESULT4 "\t$change";
+		#		}
+		#		print RESULT4 "\n";
 
 		my $fileName = basename($VCF);
 		foreach my $sample1 ( sort keys %selected2 ) {
@@ -325,33 +372,33 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 					$total2{$sample1}{$sample2}
 				);
 
-#				printf RESULT4 (
-#					"%s\t%s\t%s\t%d\t%d\t%.3f\t%d\t%d\t%.3f\t%d\t%d\t%.3f",
-#					$fileName,
-#					$sample1,
-#					$sample2,
-#					$selected{$sample1}{$sample2},
-#					$total{$sample1}{$sample2},
-#					$ratio1,
-#					$selected{$sample2}{$sample1},
-#					$total{$sample2}{$sample1},
-#					$ratio2,
-#					$selected2{$sample1}{$sample2},
-#					$total2{$sample1}{$sample2},
-#					$ratio3
-#				);
-				print RESULT4 
-					"$fileName\t$sample1\t$sample2\t$selected{$sample1}{$sample2}\t$total{$sample1}{$sample2}\t$ratio1\t$selected{$sample2}{$sample1}\t$total{$sample2}{$sample1}\t$ratio2\t$selected2{$sample1}{$sample2}\t$total2{$sample1}{$sample2}\t$ratio3";
+				#				printf RESULT4 (
+				#					"%s\t%s\t%s\t%d\t%d\t%.3f\t%d\t%d\t%.3f\t%d\t%d\t%.3f",
+				#					$fileName,
+				#					$sample1,
+				#					$sample2,
+				#					$selected{$sample1}{$sample2},
+				#					$total{$sample1}{$sample2},
+				#					$ratio1,
+				#					$selected{$sample2}{$sample1},
+				#					$total{$sample2}{$sample1},
+				#					$ratio2,
+				#					$selected2{$sample1}{$sample2},
+				#					$total2{$sample1}{$sample2},
+				#					$ratio3
+				#				);
+				print RESULT4
+"$fileName\t$sample1\t$sample2\t$selected{$sample1}{$sample2}\t$total{$sample1}{$sample2}\t$ratio1\t$selected{$sample2}{$sample1}\t$total{$sample2}{$sample1}\t$ratio2\t$selected2{$sample1}{$sample2}\t$total2{$sample1}{$sample2}\t$ratio3";
 
-#				foreach my $change ( sort keys %changes ) {
-#					if ( exists( $changNumber{$sample1}{$sample2}{$change} ) ) {
-#						print RESULT4
-#						  "\t$changNumber{$sample1}{$sample2}{$change}";
-#					}
-#					else {
-#						print RESULT4 "\t0";
-#					}
-#				}
+			  #				foreach my $change ( sort keys %changes ) {
+			  #					if ( exists( $changNumber{$sample1}{$sample2}{$change} ) ) {
+			  #						print RESULT4
+			  #						  "\t$changNumber{$sample1}{$sample2}{$change}";
+			  #					}
+			  #					else {
+			  #						print RESULT4 "\t0";
+			  #					}
+			  #				}
 				print RESULT4 "\n";
 			}
 		}
@@ -366,9 +413,10 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 		foreach my $chrom ( sort keys %snpCount ) {
 			print RESULT5 "$chrom";
 			foreach my $sample ( sort keys %{ $snpCount{$chrom} } ) {
-				if (exists $snpCount{$chrom}{$sample}) {
+				if ( exists $snpCount{$chrom}{$sample} ) {
 					print RESULT5 "\t$snpCount{$chrom}{$sample}";
-				} else {
+				}
+				else {
 					print RESULT5 "\t0";
 				}
 			}
@@ -411,8 +459,10 @@ sub filter {
 
 	my @filter1 = ( split /;/, $input );
 	foreach my $filter (@filter1) {
-		my @filter2 = ( split /=/, $filter );
-		$filter{ $filter2[0] } = $filter2[1];
+		if ($filter=~/=/) {
+			my @filter2 = ( split /=/, $filter );
+			$filter{ $filter2[0] } = $filter2[1];
+		}
 	}
 
 	#if keep this line:
@@ -443,7 +493,19 @@ sub caculate_ratio {
 	my @lines2 = ( split /;|:|,|\//, $sample2 );
 
 	#deepth <10
-	if ( ( $lines1[2] + $lines1[3] ) < 10 or ( $lines2[2] + $lines2[3] ) < 10 )
+	my $sum1=0;
+	my $sum2=0;
+	if ($lines1[0] eq $lines1[1]) {
+		$sum1=$lines1[2+$lines1[0]];
+	} else {
+		$sum1=$lines1[2+$lines1[0]] + $lines1[2+$lines1[1]];
+	}
+	if ($lines2[0] eq $lines2[1]) {
+		$sum2=$lines2[2+$lines2[0]];
+	} else {
+		$sum2=$lines2[2+$lines2[0]] + $lines2[2+$lines2[1]];
+	}
+	if ( $sum1<10 or $sum2<10 )
 	{
 		(
 			$a2bSelected, $a2bTotal,   $b2aSelected,
@@ -453,16 +515,16 @@ sub caculate_ratio {
 	else {
 		$abTotal = 1;
 		if ( $method == 1 ) {
-			if ( ( $lines1[0] == $lines2[0] ) and ( $lines1[1] == $lines2[1] ) )
+			if ( ( $lines1[0] eq $lines2[0] ) and ( $lines1[1] eq $lines2[1] ) )
 			{
 				$fenzi = 1;
 			}
 		}
 		elsif ( $method == 2 ) {
 			if (
-				$lines1[0] == $lines2[0]
-				and (  ( $lines1[1] == $lines2[1] )
-					or ( $lines1[3] * $lines2[3] > 0 ) )
+				$lines1[0] eq $lines2[0]
+				and (  ( $lines1[1] eq $lines2[1] )
+					or ( $lines1[2+$lines1[1]] * $lines2[2+$lines2[1]] > 0 ) )
 			  )
 			{
 				$fenzi = 1;
@@ -474,7 +536,7 @@ sub caculate_ratio {
 		else { $abSelected = 0; }
 
 		#Samples A
-		if ( ( $lines1[0] + $lines1[1] ) == 1 ) {
+		if ( $lines1[0] ne $lines1[1] ) {
 			$a2bTotal = 1;
 			if ( $fenzi == 1 ) {
 				$a2bSelected = 1;
@@ -489,7 +551,7 @@ sub caculate_ratio {
 		}
 
 		#Samples B
-		if ( ( $lines2[0] + $lines2[1] ) == 1 ) {
+		if ( $lines2[0] ne $lines2[1] ) {
 			$b2aTotal = 1;
 			if ( $fenzi == 1 ) {
 				$b2aSelected = 1;
@@ -519,7 +581,7 @@ sub caculate_ratio {
 sub pInfo {
 	my $s = shift;
 	print "[", scalar(localtime), "] $s\n";
-	push @{$_[1]}, "[".scalar(localtime)."] $s\n";
+	push @{ $_[1] }, "[" . scalar(localtime) . "] $s\n";
 }
 
 sub myDivide {
