@@ -182,7 +182,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 				@line4S = split( /,/, $lines[4] );
 				$line47Length = scalar @line4S;
 				foreach my $x ( 0 .. ( $line47Length - 1 ) ) {
-							$line7S[$x] ="";
+					$line7S[$x] ="";
 				}
 				my @temp1 = split( /;/, $lines[7] );
 				foreach my $temp (@temp1) {
@@ -214,7 +214,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 				else {
 					$done_filter = 0;
 					print RESULT2 "$lines[0]\t$lines[1]\t$lines[3]\t$lines[4]";
-					print RESULT6 join("\t",@lines)."\n";
+					print RESULT6 join("\t",@lines )."\n";
 				}
 				print RESULT1 "$lines[0]\t$lines[1]\t$lines[3]\t$lines[4]";
 
@@ -278,15 +278,18 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 						if ( $done_filter == 0 ) {
 							$Sample2NumberFilter{ $titles[$x] }{"01Number"}++;
 						}
-					}	elsif ( ($allele1 eq $allele2) and ($allele2+$allele2)>0) {
+					}
+					elsif ( ( $allele1 eq $allele2 )
+						and ( $allele2 + $allele2 ) > 0 )
+					{
 						$Sample2NumberAll{ $titles[$x] }{"11Number"}++;
 						if ( $done_filter == 0 ) {
 							$Sample2NumberFilter{ $titles[$x] }{"11Number"}++;
 						}
 					}
-					
+
 					if ( $done_filter == 0 ) {    #this line was kept
-						if ( ($allele2+$allele2)>0 )
+						if ( ( $allele2 + $allele2 ) > 0 )
 						{    #count SNP for each sample in each chromosome
 							$snpCount{ $lines[0] }{ $titles[$x] }++;
 						}
@@ -459,7 +462,7 @@ sub filter {
 
 	my @filter1 = ( split /;/, $input );
 	foreach my $filter (@filter1) {
-		if ($filter=~/=/) {
+		if ( $filter =~ /=/ ) {
 			my @filter2 = ( split /=/, $filter );
 			$filter{ $filter2[0] } = $filter2[1];
 		}
@@ -493,20 +496,21 @@ sub caculate_ratio {
 	my @lines2 = ( split /;|:|,|\//, $sample2 );
 
 	#deepth <10
-	my $sum1=0;
-	my $sum2=0;
-	if ($lines1[0] eq $lines1[1]) {
-		$sum1=$lines1[2+$lines1[0]];
-	} else {
-		$sum1=$lines1[2+$lines1[0]] + $lines1[2+$lines1[1]];
+	my $sum1 = 0;
+	my $sum2 = 0;
+	if ( $lines1[0] eq $lines1[1] ) {
+		$sum1 = $lines1[ 2 + $lines1[0] ];
 	}
-	if ($lines2[0] eq $lines2[1]) {
-		$sum2=$lines2[2+$lines2[0]];
-	} else {
-		$sum2=$lines2[2+$lines2[0]] + $lines2[2+$lines2[1]];
+	else {
+		$sum1 = $lines1[ 2 + $lines1[0] ] + $lines1[ 2 + $lines1[1] ];
 	}
-	if ( $sum1<10 or $sum2<10 )
-	{
+	if ( $lines2[0] eq $lines2[1] ) {
+		$sum2 = $lines2[ 2 + $lines2[0] ];
+	}
+	else {
+		$sum2 = $lines2[ 2 + $lines2[0] ] + $lines2[ 2 + $lines2[1] ];
+	}
+	if ( $sum1 < 10 or $sum2 < 10 ) {
 		(
 			$a2bSelected, $a2bTotal,   $b2aSelected,
 			$b2aTotal,    $abSelected, $abTotal
@@ -524,7 +528,8 @@ sub caculate_ratio {
 			if (
 				$lines1[0] eq $lines2[0]
 				and (  ( $lines1[1] eq $lines2[1] )
-					or ( $lines1[2+$lines1[1]] * $lines2[2+$lines2[1]] > 0 ) )
+#				 or ( $lines1[3] * $lines2[3] > 0 ) )
+					or (( $lines1[2+$lines1[1]] * $lines2[2+$lines1[1]]) > 0  and ( $lines1[2+$lines2[1]] * $lines2[2+$lines2[1]]) > 0 ))
 			  )
 			{
 				$fenzi = 1;
