@@ -72,8 +72,9 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 		my @fileList;   #get file list
 		while ( my $f = <IN> ) {
 			$f =~ s/\r|\n//g;
-			if ( !-e $f ) {
-				pInfo( "$f doesn't exist", $logRef );
+			my @fileLable=( split /\t/, $f );
+			if ( !-e $fileLable[0] ) {
+				pInfo( "$fileLable[0] doesn't exist", $logRef );
 				next;
 			}
 			push @fileList, $f;
@@ -193,11 +194,17 @@ sub fastqProcess {
 
 sub getmetric {
 	my ($in)       = @_;
-	my @r1         = ($in);    #return values
-	my @r2         = ($in);    #return values
-	my @r3         = ($in);    #return values
-	my @r4         = ($in);    #return values
-	my @r5         = ($in);    #return values
+	my @fileLable=( split /\t/, $in );
+	$in=$fileLable[0];
+	my $label=$in;
+	if (defined $fileLable[1]) {
+		$label=$fileLable[1];
+	}
+	my @r1         = ($label);    #return values
+	my @r2         = ($label);    #return values
+	my @r3         = ($label);    #return values
+	my @r4         = ($label);    #return values
+	my @r5         = ($label);    #return values
 	my $instrument = "";
 	my $run        = "";
 	my $flowcell   = "";

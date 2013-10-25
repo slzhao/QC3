@@ -20,7 +20,7 @@ my $rSourceLocation = '/source/bam_plot_byPerl.R';
 my $current : shared;
 my @resultOut : shared;
 
-my $logRef=\@main::log;
+my $logRef = \@main::log;
 
 sub bamSummary {
 
@@ -38,7 +38,7 @@ sub bamSummary {
 
 	my $maxThreads = $config->{'maxThreads'};
 	my $rePlot     = $config->{'rePlot'};
-	my $showHelp     = $config->{'showHelp'};
+	my $showHelp   = $config->{'showHelp'};
 
 	my $usage =
 "Program: qc3.pl (a quality control tool for DNA sequencing data in raw data, alignment, and variant calling stages)
@@ -62,10 +62,12 @@ Options:
 For more information, please refer to the readme file in QC3 directory. Or visit the QC3 website at https://github.com/slzhao/QC3
 
 ";
-	
+
 	die "\n$usage" if ($showHelp);
-	die "Can't find targetregion file(-r) or gtf file(-g). You need to specify at least one of them\n$usage" if (( defined($targetregionfile)  and !-e $targetregionfile )
-		or ( defined($gtffile)           and !-e $gtffile )
+	die
+"Can't find targetregion file(-r) or gtf file(-g). You need to specify at least one of them\n$usage"
+	  if ( ( defined($targetregionfile) and !-e $targetregionfile )
+		or ( defined($gtffile) and !-e $gtffile )
 		or ( !defined($targetregionfile) and !defined($gtffile) ) );
 	if ( !( -e $resultDir . '/bamResult/' ) ) {
 		mkdir $resultDir . '/bamResult/';
@@ -95,7 +97,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 		my %regionDatabase;
 		open( BAMFILE1, $filelist ) or die $!;
 		my $bamFile1 = <BAMFILE1>;
-		&initializeDatabase( $bamFile1, \%regionDatabase, $samtoolsBin);
+		&initializeDatabase( $bamFile1, \%regionDatabase, $samtoolsBin );
 		close(BAMFILE1);
 		my $inBedSign = 1;    #1=10 in bed; 2=01 in exon; 3=11 in intron
 
@@ -124,15 +126,16 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 		# 3) count total exon length
 		my $totalExonLength = 0;
 		if ($isdepth) {
-#			pInfo( "Count total exome length", $logFile );
-#			foreach my $chr ( keys %chrLength ) {
-#				for ( my $pos = 0 ; $pos <= $chrLength{$chr} ; $pos++ ) {
-#					if ( vec( $regionDatabase{$chr}, $pos, 2 ) == $inBedSign ) {
-#						$totalExonLength++;
-#					}
-#				}
-#			}
-#			pInfo( "Method1 Length: $totalExonLength", $logFile );
+
+			#			pInfo( "Count total exome length", $logFile );
+			#			foreach my $chr ( keys %chrLength ) {
+			#				for ( my $pos = 0 ; $pos <= $chrLength{$chr} ; $pos++ ) {
+			#					if ( vec( $regionDatabase{$chr}, $pos, 2 ) == $inBedSign ) {
+			#						$totalExonLength++;
+			#					}
+			#				}
+			#			}
+			#			pInfo( "Method1 Length: $totalExonLength", $logFile );
 			$totalExonLength = 0;
 			my $example = "";
 			vec( $example, 0, 2 ) = $inBedSign;
@@ -159,7 +162,8 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 				my $num2 = eval "\$hex =~ tr/[$find01]//";
 				$totalExonLength = $totalExonLength + 2 * $num1 + $num2;
 			}
-#			pInfo( "Method2 Length: $totalExonLength", $logFile );
+
+			#			pInfo( "Method2 Length: $totalExonLength", $logFile );
 		}
 
 		# 4) read bam file
@@ -174,20 +178,20 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 			"Run",
 			"Flowcell",
 			"Lane",
-			"Total Reads",
+			"Unmapped",
+			"Total Mapped",
 			"On-target",
 			"Off-target",
-			"Unmapped",
 			"Off-target-intron",
 			"Off-target-intergenic",
 			"Off-target-mito",
-			"Total Reads($methodText MQ)",
+			"Total Mapped($methodText MQ)",
 			"On-target($methodText MQ)",
 			"Off-target($methodText MQ)",
 			"Off-target-intron($methodText MQ)",
 			"Off-target-intergenic($methodText MQ)",
 			"Off-target-mito($methodText MQ)",
-			"Total Reads($methodText InsertSize)",
+			"Total Mapped($methodText InsertSize)",
 			"On-target($methodText InsertSize)",
 			"Off-target($methodText InsertSize)",
 			"Off-target-intron($methodText InsertSize)",
@@ -212,25 +216,30 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 		else {
 			print OUT "\n";
 		}
-		my @fileList;   #get file list
+		my @fileList;    #get file list
 		while ( my $f = <IN> ) {
 			$f =~ s/\r|\n//g;
-			if ( !-e $f ) {
-				pInfo( "$f doesn't exist", $logRef );
+			my @fileLable = ( split /\t/, $f );
+			if ( !-e $fileLable[0] ) {
+				pInfo( "$fileLable[0] doesn't exist", $logRef );
 				next;
 			}
 			push @fileList, $f;
 		}
 		close(IN);
-		
-		my @threads; #open threads and get results
+
+		my @threads;     #open threads and get results
 		$current = 0;
 		foreach my $x ( 1 .. $maxThreads ) {
-			push @threads, threads->new( \&bamProcess, $x, \@fileList,\%regionDatabase,
-						$inBedSign,      $isdepth,   $samtoolsBin,
-						$caculateMethod, $totalExonLength,$logRef );
+			push @threads,
+			  threads->new(
+				\&bamProcess,     $x,              \@fileList,
+				\%regionDatabase, $inBedSign,      $isdepth,
+				$samtoolsBin,     $caculateMethod, $totalExonLength,
+				$logRef
+			  );
 		}
-		
+
 		foreach my $thread (@threads) {
 			my $threadNum = $thread->join;
 			pInfo( "Thread $threadNum finished", $logRef );
@@ -239,6 +248,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 			print OUT "$result\n";
 		}
 		close OUT;
+
 		#end comment by test R
 	}
 
@@ -275,6 +285,12 @@ sub getbammetric {
 		$offtargetinsert,           $offtargetintroninsert,
 		$offtargetintergenicinsert, $offtargetmitoinsert
 	);
+	my @fileLable = ( split /\t/, $in );
+	$in = $fileLable[0];
+	my $label = $in;
+	if ( defined $fileLable[1] ) {
+		$label = $fileLable[1];
+	}
 	open( BAMLINE1, "$samtoolsBin view $in|head -1|" ) or die $!;
 	my $firstLine = <BAMLINE1>;
 	my @headers = split( ":", ( split( "\t", $firstLine ) )[0] );
@@ -297,7 +313,7 @@ sub getbammetric {
 		my $insert     = $line[8];
 		my $insertflag = 0;
 		if ( $insert =~ /^\d+$/
-			and (  $flag & $flag_read_mapped_proper_pair ) )
+			and ( $flag & $flag_read_mapped_proper_pair ) )
 		{
 			$insertflag = 1;
 		}
@@ -492,11 +508,12 @@ sub getbammetric {
 		my $exonRatio2 = $ontargetD10num / $totalExonLength;
 		my $exonRatio3 = $ontargetD30num / $totalExonLength;
 
-		my @returnValue=($in,                        $instrument,
-			$runNumber,                 $flowcell,
-			$lane,                      $total,
-			$ontarget,                  $offtarget,
-			$ummapped,                  $offtargetintron,
+		my @returnValue = (
+			$label,     $instrument,
+			$runNumber, $flowcell,
+			$lane,     $ummapped, $total,
+			$ontarget, $offtarget,
+			$offtargetintron,
 			$offtargetintergenic,       $offtargetmito,
 			$totalMQ,                   $ontargetMQ,
 			$offtargetMQ,               $offtargetintronMQ,
@@ -508,15 +525,17 @@ sub getbammetric {
 			$offtargetdepth,            $offtargetintrondepth,
 			$offtargetintergenicdepth,  $offtargetmitodepth,
 			$exonRatio1,                $exonRatio2,
-			$exonRatio3);
-		return (\@returnValue);
+			$exonRatio3
+		);
+		return ( \@returnValue );
 	}
 	else {
-		my @returnValue=($in,                        $instrument,
+		my @returnValue = (
+			$label,                     $instrument,
 			$runNumber,                 $flowcell,
-			$lane,                      $total,
-			$ontarget,                  $offtarget,
-			$ummapped,                  $offtargetintron,
+			$lane,                      $ummapped,
+			$total,                     $ontarget,
+			$offtarget,                 $offtargetintron,
 			$offtargetintergenic,       $offtargetmito,
 			$totalMQ,                   $ontargetMQ,
 			$offtargetMQ,               $offtargetintronMQ,
@@ -525,15 +544,16 @@ sub getbammetric {
 			$offtargetinsert,           $offtargetintroninsert,
 			$offtargetintergenicinsert, $offtargetmitoinsert
 		);
-		return (\@returnValue);
+		return ( \@returnValue );
 	}
 }
 
-
 sub bamProcess {
-	my ($threadNum, $fileListRef,$regionDatabaseRef,
-						$inBedSign,      $isdepth,   $samtoolsBin,
-						$caculateMethod, $totalExonLength,$logRef)= @_;
+	my (
+		$threadNum,      $fileListRef,     $regionDatabaseRef,
+		$inBedSign,      $isdepth,         $samtoolsBin,
+		$caculateMethod, $totalExonLength, $logRef
+	) = @_;
 	pInfo( "Thread $threadNum stared", $logRef );
 	while (1) {
 		my $file;
@@ -547,9 +567,10 @@ sub bamProcess {
 		$file = ${$fileListRef}[$current_temp];
 
 		pInfo( "Thread $threadNum processing $file", $logRef );
-		my ( $metric ) =&getbammetric($file, $regionDatabaseRef,
-                                                $inBedSign,      $isdepth,   $samtoolsBin,
-                                                $caculateMethod, $totalExonLength);
+		my ($metric) =
+		  &getbammetric( $file, $regionDatabaseRef, $inBedSign, $isdepth,
+			$samtoolsBin, $caculateMethod, $totalExonLength );
+
 		#return result here
 		{
 			lock @resultOut;
@@ -643,13 +664,13 @@ sub loadgtf {
 #	print $logFile "[", scalar(localtime), "] $s\n";
 #}
 sub pInfo {
-	my $s       = $_[0];
+	my $s = $_[0];
 	print "[", scalar(localtime), "] $s\n";
-	
+
 	lock $_[1];
 	{
-		lock @{$_[1]};
-		push @{$_[1]}, "[".scalar(localtime)."] $s\n";
+		lock @{ $_[1] };
+		push @{ $_[1] }, "[" . scalar(localtime) . "] $s\n";
 	}
 }
 
