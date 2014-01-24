@@ -60,8 +60,8 @@ h2 {
 </div>
 
 <div><h2 id="M100">Command</h2>
-<p>The report was generated at Fri Aug  9 10:56:01 2013. Here is your command for generating this report, keep it in order to reproduce the result.</p>
-<pre>perl /home/zhaos/source/perl_cqs/software_QC/RC2/qc3.pl -m b -rp -i sample_bam_list.txt -t 12 -r /data/cqs/guoy1/reference/annotation/hg19/hg19_protein_coding.bed -g /data/cqs/guoy1/reference/annotation/hg19/Homo_sapiens.GRCh37.63_protein_coding_chr1-22-X-Y-M.gtf -o ../sample_report/sample_bam_result_mean -d</pre>
+<p>The report was generated at Tue Jan 21 15:10:14 2014. Here is your command for generating this report, keep it in order to reproduce the result.</p>
+<pre>perl /home/zhaos/source/perl_cqs/software_QC/RC2/qc3.pl -m b -i 11bam.list -t 11 -r /data/cqs/guoy1/reference/annotation/hg19/hg19_protein_coding.bed -g /data/cqs/guoy1/reference/annotation/hg19/Homo_sapiens.GRCh37.63_protein_coding_chr1-22-X-Y-M.gtf -o brca11Sample_bam_result -d</pre>
 </div>
 
 <div><h2 id="M150">Result Table</h2>
@@ -86,20 +86,20 @@ On-target percent: Percent of target positions that were sequenced
       <td align="center">Run</td>
       <td align="center">Flowcell</td>
       <td align="center">Lane</td>
-      <td align="center">Total Reads</td>
+      <td align="center">Unmapped</td>
+      <td align="center">Total Mapped</td>
       <td align="center">On-target</td>
       <td align="center">Off-target</td>
-      <td align="center">Unmapped</td>
       <td align="center">Off-target-intron</td>
       <td align="center">Off-target-intergenic</td>
       <td align="center">Off-target-mito</td>
-      <td align="center">Total Reads(Mean MQ)</td>
+      <td align="center">Total Mapped(Mean MQ)</td>
       <td align="center">On-target(Mean MQ)</td>
       <td align="center">Off-target(Mean MQ)</td>
       <td align="center">Off-target-intron(Mean MQ)</td>
       <td align="center">Off-target-intergenic(Mean MQ)</td>
       <td align="center">Off-target-mito(Mean MQ)</td>
-      <td align="center">Total Reads(Mean InsertSize)</td>
+      <td align="center">Total Mapped(Mean InsertSize)</td>
       <td align="center">On-target(Mean InsertSize)</td>
       <td align="center">Off-target(Mean InsertSize)</td>
       <td align="center">Off-target-intron(Mean InsertSize)</td>
@@ -121,1198 +121,438 @@ On-target percent: Percent of target positions that were sequenced
                   
                   
                  
-      <td align="center">sample-10.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
-      <td align="center">3</td>
-      <td align="center">71682873</td>
-      <td align="center">41442593</td>
-      <td align="center">30240280</td>
-      <td align="center">1794431</td>
-      <td align="center">24668450</td>
-      <td align="center">5424617</td>
-      <td align="center">13702</td>
-      <td align="center">57.96</td>
-      <td align="center">58.39</td>
-      <td align="center">57.37</td>
-      <td align="center">58.13</td>
-      <td align="center">53.84</td>
-      <td align="center">53.04</td>
-      <td align="center">201.13</td>
-      <td align="center">198.24</td>
-      <td align="center">204.34</td>
-      <td align="center">205.50</td>
-      <td align="center">198.51</td>
-      <td align="center">197.81</td>
-      <td align="center">16.19</td>
-      <td align="center">59.73</td>
-      <td align="center">7.91</td>
-      <td align="center">11.56</td>
-      <td align="center">3.28</td>
-      <td align="center">188.24</td>
-      <td align="center">0.60</td>
-      <td align="center">0.47</td>
-      <td align="center">0.35</td>
-   </tr>
- 
-                 
-                    <tr class="even">
-                  
-                  
-                 
-      <td align="center">sample-11.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
-      <td align="center">3</td>
-      <td align="center">181416862</td>
-      <td align="center">102164995</td>
-      <td align="center">79251867</td>
-      <td align="center">5988952</td>
-      <td align="center">60533616</td>
-      <td align="center">18344222</td>
-      <td align="center">44087</td>
-      <td align="center">57.53</td>
-      <td align="center">58.27</td>
-      <td align="center">56.58</td>
-      <td align="center">57.81</td>
-      <td align="center">52.47</td>
-      <td align="center">51.61</td>
-      <td align="center">180.01</td>
-      <td align="center">177.55</td>
-      <td align="center">182.68</td>
-      <td align="center">184.19</td>
-      <td align="center">177.18</td>
-      <td align="center">177.66</td>
-      <td align="center">14.97</td>
-      <td align="center">122.45</td>
-      <td align="center">6.85</td>
-      <td align="center">10.99</td>
-      <td align="center">3.08</td>
-      <td align="center">605.78</td>
-      <td align="center">0.73</td>
-      <td align="center">0.52</td>
-      <td align="center">0.46</td>
-   </tr>
- 
-                 
-                    <tr class="odd">
-                  
-                  
-                 
-      <td align="center">sample-12.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
-      <td align="center">3</td>
-      <td align="center">146884326</td>
-      <td align="center">83236299</td>
-      <td align="center">63648027</td>
-      <td align="center">4733132</td>
-      <td align="center">49979947</td>
-      <td align="center">13359414</td>
-      <td align="center">22018</td>
-      <td align="center">57.66</td>
-      <td align="center">58.30</td>
-      <td align="center">56.83</td>
-      <td align="center">57.86</td>
-      <td align="center">52.94</td>
-      <td align="center">51.79</td>
-      <td align="center">181.86</td>
-      <td align="center">178.92</td>
-      <td align="center">185.08</td>
-      <td align="center">186.49</td>
-      <td align="center">179.29</td>
-      <td align="center">180.87</td>
-      <td align="center">14.83</td>
-      <td align="center">103.59</td>
-      <td align="center">6.82</td>
-      <td align="center">10.87</td>
-      <td align="center">2.87</td>
-      <td align="center">302.98</td>
-      <td align="center">0.70</td>
-      <td align="center">0.51</td>
-      <td align="center">0.44</td>
-   </tr>
- 
-                 
-                    <tr class="even">
-                  
-                  
-                 
-      <td align="center">sample-13.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
-      <td align="center">5</td>
-      <td align="center">118249042</td>
-      <td align="center">66491279</td>
-      <td align="center">51757763</td>
-      <td align="center">6778838</td>
-      <td align="center">40918432</td>
-      <td align="center">10593182</td>
-      <td align="center">50517</td>
-      <td align="center">53.97</td>
-      <td align="center">54.52</td>
-      <td align="center">53.26</td>
-      <td align="center">54.16</td>
-      <td align="center">49.75</td>
-      <td align="center">48.45</td>
-      <td align="center">191.21</td>
-      <td align="center">187.60</td>
-      <td align="center">195.07</td>
-      <td align="center">196.58</td>
-      <td align="center">188.62</td>
-      <td align="center">189.25</td>
-      <td align="center">14.34</td>
-      <td align="center">84.46</td>
-      <td align="center">6.82</td>
-      <td align="center">10.73</td>
-      <td align="center">2.84</td>
-      <td align="center">686.41</td>
-      <td align="center">0.67</td>
-      <td align="center">0.50</td>
-      <td align="center">0.41</td>
-   </tr>
- 
-                 
-                    <tr class="odd">
-                  
-                  
-                 
-      <td align="center">sample-14.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
-      <td align="center">5</td>
-      <td align="center">135788425</td>
-      <td align="center">79038155</td>
-      <td align="center">56750270</td>
-      <td align="center">7576681</td>
-      <td align="center">45334686</td>
-      <td align="center">11121044</td>
-      <td align="center">30829</td>
-      <td align="center">54.13</td>
-      <td align="center">54.58</td>
-      <td align="center">53.50</td>
-      <td align="center">54.33</td>
-      <td align="center">50.10</td>
-      <td align="center">49.11</td>
-      <td align="center">177.11</td>
-      <td align="center">175.29</td>
-      <td align="center">179.20</td>
-      <td align="center">179.98</td>
-      <td align="center">175.76</td>
-      <td align="center">174.16</td>
-      <td align="center">16.26</td>
-      <td align="center">102.71</td>
-      <td align="center">7.30</td>
-      <td align="center">11.74</td>
-      <td align="center">2.90</td>
-      <td align="center">418.01</td>
-      <td align="center">0.66</td>
-      <td align="center">0.50</td>
-      <td align="center">0.43</td>
-   </tr>
- 
-                 
-                    <tr class="even">
-                  
-                  
-                 
-      <td align="center">sample-15.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
-      <td align="center">5</td>
-      <td align="center">114568220</td>
-      <td align="center">63958074</td>
-      <td align="center">50610146</td>
-      <td align="center">7123520</td>
-      <td align="center">38751495</td>
-      <td align="center">11625953</td>
-      <td align="center">39187</td>
-      <td align="center">53.79</td>
-      <td align="center">54.43</td>
-      <td align="center">52.97</td>
-      <td align="center">54.02</td>
-      <td align="center">49.46</td>
-      <td align="center">48.38</td>
-      <td align="center">183.62</td>
-      <td align="center">181.08</td>
-      <td align="center">186.32</td>
-      <td align="center">187.73</td>
-      <td align="center">181.13</td>
-      <td align="center">181.40</td>
-      <td align="center">12.13</td>
-      <td align="center">79.75</td>
-      <td align="center">5.73</td>
-      <td align="center">8.91</td>
-      <td align="center">2.63</td>
-      <td align="center">532.15</td>
-      <td align="center">0.69</td>
-      <td align="center">0.50</td>
-      <td align="center">0.43</td>
-   </tr>
- 
-                 
-                    <tr class="odd">
-                  
-                  
-                 
-      <td align="center">sample-16.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
-      <td align="center">5</td>
-      <td align="center">119111859</td>
-      <td align="center">67954652</td>
-      <td align="center">51157207</td>
-      <td align="center">7223909</td>
-      <td align="center">40302974</td>
-      <td align="center">10602873</td>
-      <td align="center">38787</td>
-      <td align="center">53.95</td>
-      <td align="center">54.49</td>
-      <td align="center">53.23</td>
-      <td align="center">54.14</td>
-      <td align="center">49.73</td>
-      <td align="center">47.93</td>
-      <td align="center">180.32</td>
-      <td align="center">178.08</td>
-      <td align="center">182.83</td>
-      <td align="center">183.91</td>
-      <td align="center">178.33</td>
-      <td align="center">178.36</td>
-      <td align="center">13.93</td>
-      <td align="center">86.40</td>
-      <td align="center">6.44</td>
-      <td align="center">10.07</td>
-      <td align="center">2.74</td>
-      <td align="center">526.76</td>
-      <td align="center">0.67</td>
-      <td align="center">0.50</td>
-      <td align="center">0.42</td>
-   </tr>
- 
-                 
-                    <tr class="even">
-                  
-                  
-                 
-      <td align="center">sample-19.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
-      <td align="center">6</td>
-      <td align="center">90728075</td>
-      <td align="center">53106241</td>
-      <td align="center">37621834</td>
-      <td align="center">2218141</td>
-      <td align="center">30283935</td>
-      <td align="center">7134660</td>
-      <td align="center">11090</td>
-      <td align="center">57.77</td>
-      <td align="center">58.26</td>
-      <td align="center">57.07</td>
-      <td align="center">57.97</td>
-      <td align="center">53.20</td>
-      <td align="center">53.42</td>
-      <td align="center">178.24</td>
-      <td align="center">175.83</td>
-      <td align="center">181.05</td>
-      <td align="center">181.95</td>
-      <td align="center">176.92</td>
-      <td align="center">177.52</td>
-      <td align="center">14.91</td>
-      <td align="center">73.85</td>
-      <td align="center">6.81</td>
-      <td align="center">10.53</td>
-      <td align="center">2.76</td>
-      <td align="center">153.30</td>
-      <td align="center">0.63</td>
-      <td align="center">0.49</td>
-      <td align="center">0.40</td>
-   </tr>
- 
-                 
-                    <tr class="odd">
-                  
-                  
-                 
-      <td align="center">sample-1.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
+      <td align="center">TCGA-A7-A0D9-01A</td>
+      <td align="center">HWUSI-EAS1612_105608784</td>
       <td align="center">1</td>
-      <td align="center">97510719</td>
-      <td align="center">55533751</td>
-      <td align="center">41976968</td>
-      <td align="center">2222775</td>
-      <td align="center">33929649</td>
-      <td align="center">7852771</td>
-      <td align="center">16406</td>
-      <td align="center">58.24</td>
-      <td align="center">58.73</td>
-      <td align="center">57.58</td>
-      <td align="center">58.43</td>
-      <td align="center">53.89</td>
-      <td align="center">53.05</td>
-      <td align="center">209.30</td>
-      <td align="center">205.85</td>
-      <td align="center">213.02</td>
-      <td align="center">214.55</td>
-      <td align="center">205.73</td>
-      <td align="center">207.50</td>
-      <td align="center">17.81</td>
-      <td align="center">77.68</td>
-      <td align="center">8.62</td>
-      <td align="center">12.95</td>
-      <td align="center">3.56</td>
-      <td align="center">228.56</td>
-      <td align="center">0.63</td>
-      <td align="center">0.50</td>
-      <td align="center">0.40</td>
-   </tr>
- 
-                 
-                    <tr class="even">
-                  
-                  
-                 
-      <td align="center">sample-20.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
-      <td align="center">6</td>
-      <td align="center">123102217</td>
-      <td align="center">70691275</td>
-      <td align="center">52410942</td>
-      <td align="center">3193435</td>
-      <td align="center">42001451</td>
-      <td align="center">10135970</td>
-      <td align="center">13901</td>
-      <td align="center">57.71</td>
-      <td align="center">58.22</td>
-      <td align="center">57.02</td>
-      <td align="center">57.90</td>
-      <td align="center">53.32</td>
-      <td align="center">53.02</td>
-      <td align="center">185.85</td>
-      <td align="center">182.67</td>
-      <td align="center">189.40</td>
-      <td align="center">190.62</td>
-      <td align="center">183.98</td>
-      <td align="center">185.49</td>
-      <td align="center">15.73</td>
-      <td align="center">93.00</td>
-      <td align="center">7.22</td>
-      <td align="center">11.45</td>
-      <td align="center">2.88</td>
-      <td align="center">192.87</td>
-      <td align="center">0.67</td>
-      <td align="center">0.51</td>
-      <td align="center">0.44</td>
-   </tr>
- 
-                 
-                    <tr class="odd">
-                  
-                  
-                 
-      <td align="center">sample-21.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
-      <td align="center">6</td>
-      <td align="center">145134039</td>
-      <td align="center">83999704</td>
-      <td align="center">61134335</td>
-      <td align="center">4140643</td>
-      <td align="center">49374920</td>
-      <td align="center">11440323</td>
-      <td align="center">9939</td>
-      <td align="center">57.70</td>
-      <td align="center">58.21</td>
-      <td align="center">56.99</td>
-      <td align="center">57.90</td>
-      <td align="center">53.01</td>
-      <td align="center">52.84</td>
-      <td align="center">183.23</td>
-      <td align="center">180.08</td>
-      <td align="center">186.81</td>
-      <td align="center">187.88</td>
-      <td align="center">181.78</td>
-      <td align="center">183.10</td>
-      <td align="center">18.19</td>
-      <td align="center">109.98</td>
-      <td align="center">8.24</td>
-      <td align="center">13.15</td>
-      <td align="center">3.18</td>
-      <td align="center">137.03</td>
-      <td align="center">0.67</td>
-      <td align="center">0.51</td>
-      <td align="center">0.45</td>
-   </tr>
- 
-                 
-                    <tr class="even">
-                  
-                  
-                 
-      <td align="center">sample-22.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
-      <td align="center">6</td>
-      <td align="center">115142941</td>
-      <td align="center">66789284</td>
-      <td align="center">48353657</td>
-      <td align="center">3163369</td>
-      <td align="center">38765782</td>
-      <td align="center">9334968</td>
-      <td align="center">16190</td>
-      <td align="center">57.77</td>
-      <td align="center">58.27</td>
-      <td align="center">57.08</td>
-      <td align="center">57.99</td>
-      <td align="center">53.28</td>
-      <td align="center">52.43</td>
-      <td align="center">179.77</td>
-      <td align="center">177.23</td>
-      <td align="center">182.68</td>
-      <td align="center">183.67</td>
-      <td align="center">178.26</td>
-      <td align="center">177.12</td>
-      <td align="center">15.89</td>
-      <td align="center">89.78</td>
-      <td align="center">7.23</td>
-      <td align="center">11.36</td>
-      <td align="center">2.91</td>
-      <td align="center">224.20</td>
-      <td align="center">0.65</td>
-      <td align="center">0.50</td>
-      <td align="center">0.42</td>
-   </tr>
- 
-                 
-                    <tr class="odd">
-                  
-                  
-                 
-      <td align="center">sample-2.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
-      <td align="center">1</td>
-      <td align="center">119700679</td>
-      <td align="center">68131922</td>
-      <td align="center">51568757</td>
-      <td align="center">2726733</td>
-      <td align="center">42191691</td>
-      <td align="center">9135709</td>
-      <td align="center">57378</td>
-      <td align="center">58.30</td>
-      <td align="center">58.73</td>
-      <td align="center">57.72</td>
-      <td align="center">58.47</td>
-      <td align="center">54.23</td>
-      <td align="center">53.03</td>
-      <td align="center">209.75</td>
-      <td align="center">206.00</td>
-      <td align="center">213.79</td>
-      <td align="center">215.21</td>
-      <td align="center">206.63</td>
-      <td align="center">206.81</td>
-      <td align="center">20.97</td>
-      <td align="center">93.98</td>
-      <td align="center">10.11</td>
-      <td align="center">15.28</td>
-      <td align="center">3.97</td>
-      <td align="center">786.22</td>
-      <td align="center">0.64</td>
-      <td align="center">0.51</td>
-      <td align="center">0.42</td>
-   </tr>
- 
-                 
-                    <tr class="even">
-                  
-                  
-                 
-      <td align="center">sample-37.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
-      <td align="center">7</td>
-      <td align="center">27099</td>
-      <td align="center">13745</td>
-      <td align="center">13354</td>
-      <td align="center">1607</td>
-      <td align="center">10334</td>
-      <td align="center">2972</td>
-      <td align="center">6</td>
-      <td align="center">56.81</td>
-      <td align="center">57.76</td>
-      <td align="center">55.84</td>
-      <td align="center">56.98</td>
-      <td align="center">51.82</td>
-      <td align="center">52.17</td>
-      <td align="center">238.34</td>
-      <td align="center">237.20</td>
-      <td align="center">239.33</td>
-      <td align="center">240.30</td>
-      <td align="center">235.49</td>
-      <td align="center">270.67</td>
-      <td align="center">1.05</td>
-      <td align="center">1.06</td>
-      <td align="center">1.04</td>
-      <td align="center">1.04</td>
-      <td align="center">1.03</td>
-      <td align="center">1.24</td>
-      <td align="center">0.01</td>
-      <td align="center">0.00</td>
-      <td align="center">0</td>
-   </tr>
- 
-                 
-                    <tr class="odd">
-                  
-                  
-                 
-      <td align="center">sample-38.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
-      <td align="center">7</td>
-      <td align="center">123977836</td>
-      <td align="center">62877907</td>
-      <td align="center">61099929</td>
-      <td align="center">4974504</td>
-      <td align="center">49270682</td>
-      <td align="center">11611686</td>
-      <td align="center">22052</td>
-      <td align="center">57.08</td>
-      <td align="center">57.78</td>
-      <td align="center">56.36</td>
-      <td align="center">57.40</td>
-      <td align="center">51.93</td>
-      <td align="center">51.46</td>
-      <td align="center">243.94</td>
-      <td align="center">241.34</td>
-      <td align="center">246.17</td>
-      <td align="center">247.33</td>
-      <td align="center">240.69</td>
-      <td align="center">247.76</td>
-      <td align="center">12.85</td>
-      <td align="center">80.60</td>
-      <td align="center">6.81</td>
-      <td align="center">11.15</td>
-      <td align="center">2.57</td>
-      <td align="center">303.99</td>
-      <td align="center">0.68</td>
-      <td align="center">0.51</td>
-      <td align="center">0.44</td>
-   </tr>
- 
-                 
-                    <tr class="even">
-                  
-                  
-                 
-      <td align="center">sample-39.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
-      <td align="center">7</td>
-      <td align="center">104572229</td>
-      <td align="center">52701211</td>
-      <td align="center">51871018</td>
-      <td align="center">3786143</td>
-      <td align="center">39020951</td>
-      <td align="center">12669786</td>
-      <td align="center">23783</td>
-      <td align="center">57.30</td>
-      <td align="center">58.29</td>
-      <td align="center">56.29</td>
-      <td align="center">57.69</td>
-      <td align="center">51.95</td>
-      <td align="center">51.08</td>
-      <td align="center">228.05</td>
-      <td align="center">227.26</td>
-      <td align="center">228.72</td>
-      <td align="center">229.78</td>
-      <td align="center">225.05</td>
-      <td align="center">226.07</td>
-      <td align="center">8.87</td>
-      <td align="center">65.59</td>
-      <td align="center">4.66</td>
-      <td align="center">7.41</td>
-      <td align="center">2.18</td>
-      <td align="center">329.92</td>
-      <td align="center">0.70</td>
-      <td align="center">0.49</td>
-      <td align="center">0.40</td>
-   </tr>
- 
-                 
-                    <tr class="odd">
-                  
-                  
-                 
-      <td align="center">sample-3.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
-      <td align="center">1</td>
-      <td align="center">108151919</td>
-      <td align="center">61850325</td>
-      <td align="center">46301594</td>
-      <td align="center">2579185</td>
-      <td align="center">37268764</td>
-      <td align="center">8809587</td>
-      <td align="center">17200</td>
-      <td align="center">58.19</td>
-      <td align="center">58.70</td>
-      <td align="center">57.51</td>
-      <td align="center">58.41</td>
-      <td align="center">53.67</td>
-      <td align="center">53.04</td>
-      <td align="center">197.27</td>
-      <td align="center">194.76</td>
-      <td align="center">200.01</td>
-      <td align="center">201.19</td>
-      <td align="center">194.48</td>
-      <td align="center">193.88</td>
-      <td align="center">20.04</td>
-      <td align="center">87.69</td>
-      <td align="center">9.62</td>
-      <td align="center">14.50</td>
-      <td align="center">4.01</td>
-      <td align="center">238.89</td>
-      <td align="center">0.62</td>
-      <td align="center">0.50</td>
-      <td align="center">0.41</td>
-   </tr>
- 
-                 
-                    <tr class="even">
-                  
-                  
-                 
-      <td align="center">sample-40.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
-      <td align="center">7</td>
-      <td align="center">129916334</td>
-      <td align="center">65116473</td>
-      <td align="center">64799861</td>
-      <td align="center">4944094</td>
-      <td align="center">50995068</td>
-      <td align="center">13582908</td>
-      <td align="center">33205</td>
-      <td align="center">57.23</td>
-      <td align="center">58.12</td>
-      <td align="center">56.33</td>
-      <td align="center">57.55</td>
-      <td align="center">51.72</td>
-      <td align="center">51.26</td>
-      <td align="center">239.88</td>
-      <td align="center">238.18</td>
-      <td align="center">241.32</td>
-      <td align="center">242.29</td>
-      <td align="center">237.26</td>
-      <td align="center">240.16</td>
-      <td align="center">12.20</td>
-      <td align="center">82.60</td>
-      <td align="center">6.51</td>
-      <td align="center">10.60</td>
-      <td align="center">2.66</td>
-      <td align="center">459.12</td>
-      <td align="center">0.68</td>
-      <td align="center">0.51</td>
-      <td align="center">0.43</td>
-   </tr>
- 
-                 
-                    <tr class="odd">
-                  
-                  
-                 
-      <td align="center">sample-41.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
-      <td align="center">8</td>
-      <td align="center">118618902</td>
-      <td align="center">61438895</td>
-      <td align="center">57180007</td>
-      <td align="center">16676652</td>
-      <td align="center">41875092</td>
-      <td align="center">15084485</td>
-      <td align="center">58791</td>
-      <td align="center">53.18</td>
-      <td align="center">54.62</td>
-      <td align="center">51.63</td>
-      <td align="center">53.42</td>
-      <td align="center">46.61</td>
-      <td align="center">48.19</td>
-      <td align="center">185.18</td>
-      <td align="center">185.13</td>
-      <td align="center">185.23</td>
-      <td align="center">186.38</td>
-      <td align="center">181.49</td>
-      <td align="center">184.75</td>
-      <td align="center">8.75</td>
-      <td align="center">74.41</td>
-      <td align="center">4.42</td>
-      <td align="center">7.00</td>
-      <td align="center">2.19</td>
-      <td align="center">791.34</td>
-      <td align="center">0.70</td>
-      <td align="center">0.48</td>
-      <td align="center">0.40</td>
-   </tr>
- 
-                 
-                    <tr class="even">
-                  
-                  
-                 
-      <td align="center">sample-42.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
-      <td align="center">8</td>
-      <td align="center">96525477</td>
-      <td align="center">51737549</td>
-      <td align="center">44787928</td>
-      <td align="center">12107515</td>
-      <td align="center">34097973</td>
-      <td align="center">10508592</td>
-      <td align="center">26535</td>
-      <td align="center">54.20</td>
-      <td align="center">55.18</td>
-      <td align="center">53.07</td>
-      <td align="center">54.41</td>
-      <td align="center">48.70</td>
-      <td align="center">48.48</td>
-      <td align="center">193.03</td>
-      <td align="center">193.01</td>
-      <td align="center">193.04</td>
-      <td align="center">193.69</td>
-      <td align="center">190.62</td>
-      <td align="center">191.82</td>
-      <td align="center">10.20</td>
-      <td align="center">68.70</td>
-      <td align="center">5.06</td>
-      <td align="center">8.09</td>
-      <td align="center">2.29</td>
-      <td align="center">354.91</td>
-      <td align="center">0.64</td>
-      <td align="center">0.47</td>
-      <td align="center">0.37</td>
-   </tr>
- 
-                 
-                    <tr class="odd">
-                  
-                  
-                 
-      <td align="center">sample-43.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
-      <td align="center">8</td>
-      <td align="center">158287554</td>
-      <td align="center">86357187</td>
-      <td align="center">71930367</td>
-      <td align="center">23299606</td>
-      <td align="center">57697947</td>
-      <td align="center">13926299</td>
-      <td align="center">120659</td>
-      <td align="center">53.89</td>
-      <td align="center">54.70</td>
-      <td align="center">52.91</td>
-      <td align="center">54.15</td>
-      <td align="center">47.72</td>
-      <td align="center">49.67</td>
-      <td align="center">204.51</td>
-      <td align="center">202.32</td>
-      <td align="center">206.71</td>
-      <td align="center">207.73</td>
-      <td align="center">201.90</td>
-      <td align="center">194.66</td>
-      <td align="center">21.82</td>
-      <td align="center">125.69</td>
-      <td align="center">10.81</td>
-      <td align="center">17.84</td>
-      <td align="center">4.09</td>
-      <td align="center">1267.68</td>
-      <td align="center">0.58</td>
-      <td align="center">0.44</td>
-      <td align="center">0.37</td>
-   </tr>
- 
-                 
-                    <tr class="even">
-                  
-                  
-                 
-      <td align="center">sample-44.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
-      <td align="center">8</td>
-      <td align="center">114035904</td>
-      <td align="center">62485046</td>
-      <td align="center">51550858</td>
-      <td align="center">15415298</td>
-      <td align="center">38979079</td>
-      <td align="center">12350403</td>
-      <td align="center">28918</td>
-      <td align="center">54.32</td>
-      <td align="center">55.23</td>
-      <td align="center">53.21</td>
-      <td align="center">54.55</td>
-      <td align="center">48.96</td>
-      <td align="center">48.57</td>
-      <td align="center">189.37</td>
-      <td align="center">189.16</td>
-      <td align="center">189.59</td>
-      <td align="center">190.16</td>
-      <td align="center">187.55</td>
-      <td align="center">187.10</td>
-      <td align="center">10.60</td>
-      <td align="center">77.94</td>
-      <td align="center">5.10</td>
-      <td align="center">8.11</td>
-      <td align="center">2.35</td>
-      <td align="center">385.64</td>
-      <td align="center">0.68</td>
-      <td align="center">0.49</td>
-      <td align="center">0.41</td>
-   </tr>
- 
-                 
-                    <tr class="odd">
-                  
-                  
-                 
-      <td align="center">sample-45.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">157</td>
-      <td align="center">C0UMFACXX</td>
-      <td align="center">1</td>
-      <td align="center">133590870</td>
-      <td align="center">71901131</td>
-      <td align="center">61689739</td>
-      <td align="center">5623836</td>
-      <td align="center">48710231</td>
-      <td align="center">12710236</td>
-      <td align="center">21564</td>
-      <td align="center">56.52</td>
-      <td align="center">57.49</td>
-      <td align="center">55.38</td>
-      <td align="center">56.78</td>
-      <td align="center">49.96</td>
-      <td align="center">51.68</td>
-      <td align="center">196.33</td>
-      <td align="center">194.53</td>
-      <td align="center">198.10</td>
-      <td align="center">199.31</td>
-      <td align="center">192.73</td>
-      <td align="center">201.75</td>
-      <td align="center">13.44</td>
-      <td align="center">93.75</td>
-      <td align="center">6.60</td>
-      <td align="center">10.75</td>
-      <td align="center">2.66</td>
-      <td align="center">296.70</td>
-      <td align="center">0.67</td>
-      <td align="center">0.50</td>
-      <td align="center">0.43</td>
-   </tr>
- 
-                 
-                    <tr class="even">
-                  
-                  
-                 
-      <td align="center">sample-46.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">157</td>
-      <td align="center">C0UMFACXX</td>
-      <td align="center">1</td>
-      <td align="center">114435351</td>
-      <td align="center">57167528</td>
-      <td align="center">57267823</td>
-      <td align="center">10459769</td>
-      <td align="center">41084157</td>
-      <td align="center">15974440</td>
-      <td align="center">23037</td>
-      <td align="center">51.05</td>
-      <td align="center">53.75</td>
-      <td align="center">48.35</td>
-      <td align="center">51.24</td>
-      <td align="center">40.84</td>
-      <td align="center">48.36</td>
-      <td align="center">188.49</td>
-      <td align="center">187.40</td>
-      <td align="center">189.48</td>
-      <td align="center">192.22</td>
-      <td align="center">180.27</td>
-      <td align="center">188.93</td>
-      <td align="center">9.72</td>
-      <td align="center">73.73</td>
-      <td align="center">5.10</td>
-      <td align="center">7.79</td>
-      <td align="center">2.70</td>
-      <td align="center">313.44</td>
-      <td align="center">0.67</td>
-      <td align="center">0.48</td>
-      <td align="center">0.39</td>
-   </tr>
- 
-                 
-                    <tr class="odd">
-                  
-                  
-                 
-      <td align="center">sample-4.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
-      <td align="center">1</td>
-      <td align="center">94336977</td>
-      <td align="center">55031598</td>
-      <td align="center">39305379</td>
-      <td align="center">2137231</td>
-      <td align="center">31611918</td>
-      <td align="center">7487413</td>
-      <td align="center">6023</td>
-      <td align="center">58.29</td>
-      <td align="center">58.77</td>
-      <td align="center">57.63</td>
-      <td align="center">58.49</td>
-      <td align="center">53.98</td>
-      <td align="center">52.73</td>
-      <td align="center">187.64</td>
-      <td align="center">185.48</td>
-      <td align="center">190.12</td>
-      <td align="center">191.21</td>
-      <td align="center">185.05</td>
-      <td align="center">187.64</td>
-      <td align="center">19.27</td>
-      <td align="center">80.13</td>
-      <td align="center">9.07</td>
-      <td align="center">13.59</td>
-      <td align="center">3.82</td>
-      <td align="center">83.94</td>
-      <td align="center">0.61</td>
-      <td align="center">0.48</td>
-      <td align="center">0.39</td>
-   </tr>
- 
-                 
-                    <tr class="even">
-                  
-                  
-                 
-      <td align="center">sample-5.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
-      <td align="center">2</td>
-      <td align="center">121158667</td>
-      <td align="center">68997655</td>
-      <td align="center">52161012</td>
-      <td align="center">2436261</td>
-      <td align="center">42298611</td>
-      <td align="center">9614231</td>
-      <td align="center">14484</td>
-      <td align="center">58.32</td>
-      <td align="center">58.81</td>
-      <td align="center">57.67</td>
-      <td align="center">58.52</td>
-      <td align="center">53.92</td>
-      <td align="center">53.40</td>
-      <td align="center">205.59</td>
-      <td align="center">201.74</td>
-      <td align="center">209.74</td>
-      <td align="center">211.20</td>
-      <td align="center">202.66</td>
-      <td align="center">209.09</td>
-      <td align="center">21.05</td>
-      <td align="center">95.33</td>
-      <td align="center">10.12</td>
-      <td align="center">15.34</td>
-      <td align="center">4.08</td>
-      <td align="center">202.80</td>
-      <td align="center">0.64</td>
-      <td align="center">0.51</td>
-      <td align="center">0.43</td>
-   </tr>
- 
-                 
-                    <tr class="odd">
-                  
-                  
-                 
-      <td align="center">sample-6.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
-      <td align="center">2</td>
-      <td align="center">68863799</td>
-      <td align="center">39916903</td>
-      <td align="center">28946896</td>
-      <td align="center">1169513</td>
-      <td align="center">23446336</td>
-      <td align="center">5357612</td>
-      <td align="center">14714</td>
-      <td align="center">58.42</td>
-      <td align="center">58.87</td>
-      <td align="center">57.79</td>
-      <td align="center">58.62</td>
-      <td align="center">54.14</td>
-      <td align="center">53.61</td>
-      <td align="center">194.02</td>
-      <td align="center">191.29</td>
-      <td align="center">197.09</td>
-      <td align="center">198.25</td>
-      <td align="center">191.47</td>
-      <td align="center">192.79</td>
-      <td align="center">15.92</td>
-      <td align="center">58.86</td>
-      <td align="center">7.73</td>
-      <td align="center">11.26</td>
-      <td align="center">3.29</td>
-      <td align="center">205.15</td>
-      <td align="center">0.60</td>
-      <td align="center">0.47</td>
-      <td align="center">0.35</td>
-   </tr>
- 
-                 
-                    <tr class="even">
-                  
-                  
-                 
-      <td align="center">sample-7.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
-      <td align="center">2</td>
-      <td align="center">164013818</td>
-      <td align="center">94059545</td>
-      <td align="center">69954273</td>
-      <td align="center">3430310</td>
-      <td align="center">56437682</td>
-      <td align="center">13170705</td>
-      <td align="center">28418</td>
-      <td align="center">58.38</td>
-      <td align="center">58.86</td>
-      <td align="center">57.73</td>
-      <td align="center">58.56</td>
-      <td align="center">54.12</td>
-      <td align="center">53.15</td>
-      <td align="center">194.04</td>
-      <td align="center">191.19</td>
-      <td align="center">197.16</td>
-      <td align="center">198.41</td>
-      <td align="center">191.25</td>
-      <td align="center">194.92</td>
-      <td align="center">27.74</td>
-      <td align="center">131.42</td>
-      <td align="center">13.12</td>
-      <td align="center">20.17</td>
-      <td align="center">5.30</td>
-      <td align="center">396.56</td>
-      <td align="center">0.63</td>
-      <td align="center">0.52</td>
-      <td align="center">0.45</td>
-   </tr>
- 
-                 
-                    <tr class="odd">
-                  
-                  
-                 
-      <td align="center">sample-8.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
-      <td align="center">2</td>
-      <td align="center">77994114</td>
-      <td align="center">44399958</td>
-      <td align="center">33594156</td>
-      <td align="center">1654878</td>
-      <td align="center">27438940</td>
-      <td align="center">5997108</td>
-      <td align="center">9327</td>
-      <td align="center">58.37</td>
-      <td align="center">58.83</td>
-      <td align="center">57.76</td>
-      <td align="center">58.53</td>
-      <td align="center">54.22</td>
-      <td align="center">53.59</td>
-      <td align="center">208.33</td>
-      <td align="center">204.34</td>
-      <td align="center">212.61</td>
-      <td align="center">214.07</td>
-      <td align="center">205.27</td>
-      <td align="center">208.63</td>
-      <td align="center">17.39</td>
-      <td align="center">63.60</td>
-      <td align="center">8.66</td>
-      <td align="center">12.48</td>
-      <td align="center">3.63</td>
-      <td align="center">129.80</td>
-      <td align="center">0.62</td>
-      <td align="center">0.49</td>
-      <td align="center">0.37</td>
-   </tr>
- 
-                 
-                    <tr class="even">
-                  
-                  
-                 
-      <td align="center">sample-9.bam</td>
-      <td align="center">HWI-ST829</td>
-      <td align="center">156</td>
-      <td align="center">D12DCACXX</td>
-      <td align="center">3</td>
-      <td align="center">80112672</td>
-      <td align="center">46101213</td>
-      <td align="center">34011459</td>
-      <td align="center">2110496</td>
-      <td align="center">27934656</td>
-      <td align="center">5916259</td>
-      <td align="center">7648</td>
-      <td align="center">57.92</td>
-      <td align="center">58.34</td>
-      <td align="center">57.36</td>
-      <td align="center">58.10</td>
-      <td align="center">53.84</td>
-      <td align="center">52.35</td>
-      <td align="center">208.08</td>
-      <td align="center">204.88</td>
-      <td align="center">211.60</td>
-      <td align="center">212.72</td>
-      <td align="center">205.85</td>
-      <td align="center">208.26</td>
-      <td align="center">20.35</td>
-      <td align="center">67.64</td>
+      <td align="center">111</td>
+      <td align="center">13801</td>
+      <td align="center">1092664</td>
+      <td align="center">136951242</td>
+      <td align="center">53105492</td>
+      <td align="center">83845750</td>
+      <td align="center">63331421</td>
+      <td align="center">20282631</td>
+      <td align="center">48089</td>
+      <td align="center">53.55</td>
+      <td align="center">54.60</td>
+      <td align="center">52.89</td>
+      <td align="center">54.28</td>
+      <td align="center">48.53</td>
+      <td align="center">49.77</td>
+      <td align="center">333.50</td>
+      <td align="center">322.36</td>
+      <td align="center">338.63</td>
+      <td align="center">341.27</td>
+      <td align="center">329.35</td>
+      <td align="center">326.43</td>
       <td align="center">10.23</td>
-      <td align="center">14.67</td>
-      <td align="center">4.24</td>
-      <td align="center">105.11</td>
-      <td align="center">0.59</td>
-      <td align="center">0.48</td>
+      <td align="center">72.80</td>
+      <td align="center">6.44</td>
+      <td align="center">10.19</td>
+      <td align="center">3.07</td>
+      <td align="center">229.98</td>
+      <td align="center">0.69</td>
+      <td align="center">0.44</td>
+      <td align="center">0.34</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">TCGA-BH-A0B3-01A</td>
+      <td align="center">HWUSI-EAS711_105804534</td>
+      <td align="center">5</td>
+      <td align="center">107</td>
+      <td align="center">4470</td>
+      <td align="center">927210</td>
+      <td align="center">158525580</td>
+      <td align="center">66250292</td>
+      <td align="center">92275288</td>
+      <td align="center">67567160</td>
+      <td align="center">24423486</td>
+      <td align="center">6020</td>
+      <td align="center">52.82</td>
+      <td align="center">53.98</td>
+      <td align="center">51.99</td>
+      <td align="center">53.21</td>
+      <td align="center">48.58</td>
+      <td align="center">50.21</td>
+      <td align="center">279.85</td>
+      <td align="center">275.73</td>
+      <td align="center">281.97</td>
+      <td align="center">284.28</td>
+      <td align="center">274.55</td>
+      <td align="center">272.90</td>
+      <td align="center">10.51</td>
+      <td align="center">93.49</td>
+      <td align="center">6.23</td>
+      <td align="center">9.93</td>
+      <td align="center">3.14</td>
+      <td align="center">30.80</td>
+      <td align="center">0.72</td>
+      <td align="center">0.45</td>
+      <td align="center">0.37</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">TCGA-BH-A0B8-01A</td>
+      <td align="center">HWUSI-EAS1625_105908207</td>
+      <td align="center">6</td>
+      <td align="center">74</td>
+      <td align="center">16985</td>
+      <td align="center">1655205</td>
+      <td align="center">214026196</td>
+      <td align="center">84816005</td>
+      <td align="center">129210191</td>
+      <td align="center">94025915</td>
+      <td align="center">34801284</td>
+      <td align="center">45565</td>
+      <td align="center">52.96</td>
+      <td align="center">54.08</td>
+      <td align="center">52.23</td>
+      <td align="center">53.53</td>
+      <td align="center">48.67</td>
+      <td align="center">48.86</td>
+      <td align="center">279.71</td>
+      <td align="center">275.75</td>
+      <td align="center">281.60</td>
+      <td align="center">283.83</td>
+      <td align="center">274.57</td>
+      <td align="center">272.52</td>
+      <td align="center">10.71</td>
+      <td align="center">108.55</td>
+      <td align="center">6.54</td>
+      <td align="center">10.59</td>
+      <td align="center">3.28</td>
+      <td align="center">228.03</td>
+      <td align="center">0.79</td>
+      <td align="center">0.46</td>
+      <td align="center">0.39</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">TCGA-BH-A0BJ-01A</td>
+      <td align="center">HWUSI-EAS574_105716864</td>
+      <td align="center">7</td>
+      <td align="center">8</td>
+      <td align="center">1677</td>
+      <td align="center">915877</td>
+      <td align="center">141994854</td>
+      <td align="center">53254242</td>
+      <td align="center">88740612</td>
+      <td align="center">62797925</td>
+      <td align="center">25703621</td>
+      <td align="center">19304</td>
+      <td align="center">52.81</td>
+      <td align="center">53.90</td>
+      <td align="center">52.15</td>
+      <td align="center">53.31</td>
+      <td align="center">49.31</td>
+      <td align="center">49.27</td>
+      <td align="center">298.28</td>
+      <td align="center">289.12</td>
+      <td align="center">302.36</td>
+      <td align="center">305.24</td>
+      <td align="center">294.32</td>
+      <td align="center">298.76</td>
+      <td align="center">7.98</td>
+      <td align="center">70.69</td>
+      <td align="center">5.05</td>
+      <td align="center">7.85</td>
+      <td align="center">2.76</td>
+      <td align="center">92.67</td>
+      <td align="center">0.73</td>
+      <td align="center">0.44</td>
+      <td align="center">0.35</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">TCGA-BH-A0BM-01A</td>
+      <td align="center">HWUSI-EAS404_105730715</td>
+      <td align="center">4</td>
+      <td align="center">19</td>
+      <td align="center">2838</td>
+      <td align="center">1175882</td>
+      <td align="center">117336275</td>
+      <td align="center">43684678</td>
+      <td align="center">73651597</td>
+      <td align="center">52968988</td>
+      <td align="center">20480976</td>
+      <td align="center">48401</td>
+      <td align="center">51.59</td>
+      <td align="center">52.89</td>
+      <td align="center">50.81</td>
+      <td align="center">52.04</td>
+      <td align="center">47.62</td>
+      <td align="center">48.51</td>
+      <td align="center">313.66</td>
+      <td align="center">301.17</td>
+      <td align="center">319.18</td>
+      <td align="center">321.74</td>
+      <td align="center">311.62</td>
+      <td align="center">311.60</td>
+      <td align="center">7.42</td>
+      <td align="center">55.47</td>
+      <td align="center">4.76</td>
+      <td align="center">7.37</td>
+      <td align="center">2.54</td>
+      <td align="center">208.79</td>
+      <td align="center">0.69</td>
+      <td align="center">0.41</td>
+      <td align="center">0.31</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">TCGA-BH-A0C0-01A</td>
+      <td align="center">ILLUMINA-63A70C_105583654</td>
+      <td align="center">7</td>
+      <td align="center">19</td>
+      <td align="center">12853</td>
+      <td align="center">980429</td>
+      <td align="center">141416749</td>
+      <td align="center">58978073</td>
+      <td align="center">82438676</td>
+      <td align="center">62147851</td>
+      <td align="center">20021515</td>
+      <td align="center">13346</td>
+      <td align="center">53.51</td>
+      <td align="center">54.61</td>
+      <td align="center">52.72</td>
+      <td align="center">54.30</td>
+      <td align="center">47.76</td>
+      <td align="center">50.50</td>
+      <td align="center">287.35</td>
+      <td align="center">280.21</td>
+      <td align="center">290.98</td>
+      <td align="center">292.79</td>
+      <td align="center">284.62</td>
+      <td align="center">287.20</td>
+      <td align="center">11.12</td>
+      <td align="center">83.64</td>
+      <td align="center">6.65</td>
+      <td align="center">10.60</td>
+      <td align="center">3.15</td>
+      <td align="center">62.89</td>
+      <td align="center">0.67</td>
+      <td align="center">0.44</td>
+      <td align="center">0.35</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">TCGA-BH-A0DK-01A</td>
+      <td align="center">HWUSI-EAS712_105700244</td>
+      <td align="center">7</td>
+      <td align="center">76</td>
+      <td align="center">2277</td>
+      <td align="center">1586375</td>
+      <td align="center">175303522</td>
+      <td align="center">62392340</td>
+      <td align="center">112911182</td>
+      <td align="center">73230693</td>
+      <td align="center">39389787</td>
+      <td align="center">58810</td>
+      <td align="center">53.67</td>
+      <td align="center">54.46</td>
+      <td align="center">53.23</td>
+      <td align="center">54.20</td>
+      <td align="center">51.41</td>
+      <td align="center">50.69</td>
+      <td align="center">260.50</td>
+      <td align="center">258.20</td>
+      <td align="center">261.44</td>
+      <td align="center">265.19</td>
+      <td align="center">253.44</td>
+      <td align="center">258.33</td>
+      <td align="center">7.53</td>
+      <td align="center">79.76</td>
+      <td align="center">4.89</td>
+      <td align="center">7.26</td>
+      <td align="center">3.10</td>
+      <td align="center">296.84</td>
+      <td align="center">0.80</td>
+      <td align="center">0.44</td>
+      <td align="center">0.36</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">TCGA-BH-A0DP-01A</td>
+      <td align="center">HWI-EAS97_105698468</td>
+      <td align="center">8</td>
+      <td align="center">106</td>
+      <td align="center">14846</td>
+      <td align="center">1711226</td>
+      <td align="center">165772051</td>
+      <td align="center">68630299</td>
+      <td align="center">97141752</td>
+      <td align="center">74314402</td>
+      <td align="center">22515772</td>
+      <td align="center">26655</td>
+      <td align="center">52.25</td>
+      <td align="center">53.66</td>
+      <td align="center">51.26</td>
+      <td align="center">52.78</td>
+      <td align="center">46.18</td>
+      <td align="center">48.81</td>
+      <td align="center">296.03</td>
+      <td align="center">285.12</td>
+      <td align="center">301.66</td>
+      <td align="center">304.14</td>
+      <td align="center">292.29</td>
+      <td align="center">297.74</td>
+      <td align="center">10.86</td>
+      <td align="center">83.46</td>
+      <td align="center">6.52</td>
+      <td align="center">10.47</td>
+      <td align="center">2.98</td>
+      <td align="center">107.73</td>
+      <td align="center">0.68</td>
+      <td align="center">0.44</td>
+      <td align="center">0.36</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">TCGA-BH-A0DP-10A</td>
+      <td align="center">HWI-EAS97_105698468</td>
+      <td align="center">5</td>
+      <td align="center">115</td>
+      <td align="center">13657</td>
+      <td align="center">1695734</td>
+      <td align="center">155553618</td>
+      <td align="center">60223582</td>
+      <td align="center">95330036</td>
+      <td align="center">70117124</td>
+      <td align="center">24940259</td>
+      <td align="center">8593</td>
+      <td align="center">53.23</td>
+      <td align="center">54.34</td>
+      <td align="center">52.52</td>
+      <td align="center">53.88</td>
+      <td align="center">48.69</td>
+      <td align="center">49.77</td>
+      <td align="center">300.44</td>
+      <td align="center">288.80</td>
+      <td align="center">305.85</td>
+      <td align="center">310.75</td>
+      <td align="center">289.91</td>
+      <td align="center">303.13</td>
+      <td align="center">8.75</td>
+      <td align="center">82.70</td>
+      <td align="center">5.40</td>
+      <td align="center">8.76</td>
+      <td align="center">2.68</td>
+      <td align="center">43.75</td>
+      <td align="center">0.74</td>
+      <td align="center">0.45</td>
+      <td align="center">0.37</td>
+   </tr>
+ 
+                 
+                    <tr class="even">
+                  
+                  
+                 
+      <td align="center">TCGA-BH-A0E0-01A</td>
+      <td align="center">HWUSI-EAS677_105571333</td>
+      <td align="center">1</td>
+      <td align="center">21</td>
+      <td align="center">10367</td>
+      <td align="center">845443</td>
+      <td align="center">129638688</td>
+      <td align="center">51246357</td>
+      <td align="center">78392331</td>
+      <td align="center">58816272</td>
+      <td align="center">19338835</td>
+      <td align="center">8836</td>
+      <td align="center">52.36</td>
+      <td align="center">53.70</td>
+      <td align="center">51.49</td>
+      <td align="center">52.67</td>
+      <td align="center">47.88</td>
+      <td align="center">49.28</td>
+      <td align="center">306.47</td>
+      <td align="center">293.72</td>
+      <td align="center">312.56</td>
+      <td align="center">316.19</td>
+      <td align="center">299.81</td>
+      <td align="center">303.72</td>
+      <td align="center">9.58</td>
+      <td align="center">72.02</td>
+      <td align="center">5.89</td>
+      <td align="center">9.36</td>
+      <td align="center">2.86</td>
+      <td align="center">41.47</td>
+      <td align="center">0.68</td>
+      <td align="center">0.43</td>
+      <td align="center">0.33</td>
+   </tr>
+ 
+                 
+                    <tr class="odd">
+                  
+                  
+                 
+      <td align="center">TCGA-BH-A0H7-01A</td>
+      <td align="center">HWUSI-EAS577_105608028</td>
+      <td align="center">6</td>
+      <td align="center">23</td>
+      <td align="center">4729</td>
+      <td align="center">910416</td>
+      <td align="center">155198044</td>
+      <td align="center">58114684</td>
+      <td align="center">97083360</td>
+      <td align="center">69091228</td>
+      <td align="center">27722581</td>
+      <td align="center">34733</td>
+      <td align="center">53.68</td>
+      <td align="center">54.69</td>
+      <td align="center">53.08</td>
+      <td align="center">54.32</td>
+      <td align="center">49.97</td>
+      <td align="center">49.30</td>
+      <td align="center">287.57</td>
+      <td align="center">279.86</td>
+      <td align="center">290.96</td>
+      <td align="center">295.94</td>
+      <td align="center">276.61</td>
+      <td align="center">287.64</td>
+      <td align="center">8.04</td>
+      <td align="center">78.37</td>
+      <td align="center">5.08</td>
+      <td align="center">8.04</td>
+      <td align="center">2.71</td>
+      <td align="center">179.60</td>
+      <td align="center">0.77</td>
+      <td align="center">0.45</td>
       <td align="center">0.36</td>
    </tr>
 
@@ -1329,13 +569,13 @@ On-target percent: Percent of target positions that were sequenced
 <div><h2 id="M300">Batch effect</h2>
 <p>The results were separated into different groups by their Instrument, RunNumber, Flowcell and Lane. Then boxplot plots were used to visualize their distribution. Kruskal-Wallis rank sum test and Fligner-Killeen test were performed to see if the distributions and variances in each of the groups are the same</p>
 
-<p class="centeredImage"><img src="./bamFigure//batch_Total Reads.png"></p>
+<p class="centeredImage"><img src="./bamFigure//batch_Unmapped.png"></p>
+
+<p class="centeredImage"><img src="./bamFigure//batch_Total Mapped.png"></p>
 
 <p class="centeredImage"><img src="./bamFigure//batch_On-target.png"></p>
 
 <p class="centeredImage"><img src="./bamFigure//batch_Off-target.png"></p>
-
-<p class="centeredImage"><img src="./bamFigure//batch_Unmapped.png"></p>
 
 <p class="centeredImage"><img src="./bamFigure//batch_Off-target-intron.png"></p>
 
@@ -1343,7 +583,7 @@ On-target percent: Percent of target positions that were sequenced
 
 <p class="centeredImage"><img src="./bamFigure//batch_Off-target-mito.png"></p>
 
-<p class="centeredImage"><img src="./bamFigure//batch_Total Reads(Mean MQ).png"></p>
+<p class="centeredImage"><img src="./bamFigure//batch_Total Mapped(Mean MQ).png"></p>
 
 <p class="centeredImage"><img src="./bamFigure//batch_On-target(Mean MQ).png"></p>
 
@@ -1355,7 +595,7 @@ On-target percent: Percent of target positions that were sequenced
 
 <p class="centeredImage"><img src="./bamFigure//batch_Off-target-mito(Mean MQ).png"></p>
 
-<p class="centeredImage"><img src="./bamFigure//batch_Total Reads(Mean InsertSize).png"></p>
+<p class="centeredImage"><img src="./bamFigure//batch_Total Mapped(Mean InsertSize).png"></p>
 
 <p class="centeredImage"><img src="./bamFigure//batch_On-target(Mean InsertSize).png"></p>
 

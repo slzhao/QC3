@@ -18,7 +18,7 @@ my @result2 : shared;
 my @result3 : shared;
 my @result4 : shared;
 
-my $logRef=\@main::log;
+my $logRef = \@main::log;
 
 1;
 
@@ -27,12 +27,13 @@ sub fastqSummary {
 	# each line is a file name in $filelist
 	my ( $filelist, $config ) = @_;
 	my $resultDir  = $config->{'resultDir'};
-	my $singleEnd    = $config->{'singleEnd'};
+	my $singleEnd  = $config->{'singleEnd'};
 	my $RBin       = $config->{'RBin'};
 	my $maxThreads = $config->{'maxThreads'};
-#	$logFile    = $config->{'log'};
-	my $rePlot     = $config->{'rePlot'};
-	my $showHelp     = $config->{'showHelp'};
+
+	#	$logFile    = $config->{'log'};
+	my $rePlot   = $config->{'rePlot'};
+	my $showHelp = $config->{'showHelp'};
 
 	my $usage =
 "Program: qc3.pl (a quality control tool for DNA sequencing data in raw data, alignment, and variant calling stages)
@@ -63,16 +64,17 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 
 	$| = 1;
 	if ($rePlot) {    #re plot by R only, comment below codes
-
+		pInfo( "Parameter -rp was used. The program will use the result files in output directory to re-generate the report", $logRef );
 	}
 	else {
+
 		#test R, comment below code
-		
-		open( IN,           $filelist )                 or die $!;
-		my @fileList;   #get file list
+
+		open( IN, $filelist ) or die $!;
+		my @fileList;    #get file list
 		while ( my $f = <IN> ) {
 			$f =~ s/\r|\n//g;
-			my @fileLable=( split /\t/, $f );
+			my @fileLable = ( split /\t/, $f );
 			if ( !-e $fileLable[0] ) {
 				pInfo( "$fileLable[0] doesn't exist", $logRef );
 				next;
@@ -80,26 +82,28 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 			push @fileList, $f;
 		}
 		close IN;
-		
-		my @threads; #open threads and get results
+
+		my @threads;     #open threads and get results
 		$current = 0;
 		foreach my $x ( 1 .. $maxThreads ) {
-			push @threads, threads->new( \&fastqProcess, $x, \@fileList,$logRef );
+			push @threads,
+			  threads->new( \&fastqProcess, $x, \@fileList, $logRef );
 		}
-		
+
 		foreach my $thread (@threads) {
 			my $threadNum = $thread->join;
 			pInfo( "Thread $threadNum finished", $logRef );
 		}
-#		while (my $thread=shift @threads) {
-#			if ($thread->is_joinable()) {
-#				my $threadNum = $thread->join;
-#				pInfo( "Thread $threadNum finished", $logFile );
-#			} else {
-#				push @threads,$thread;
-#			}
-#		}
-		
+
+		#		while (my $thread=shift @threads) {
+		#			if ($thread->is_joinable()) {
+		#				my $threadNum = $thread->join;
+		#				pInfo( "Thread $threadNum finished", $logFile );
+		#			} else {
+		#				push @threads,$thread;
+		#			}
+		#		}
+
 		#write results to file
 		open OUT, ">$outputFile" or die $!;
 		print OUT join "\t",
@@ -138,6 +142,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 		close INFORMATION2;
 		close INFORMATION3;
 		close INFORMATION4;
+
 		#test R, end comment
 	}
 
@@ -152,7 +157,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 }
 
 sub fastqProcess {
-	my ($threadNum, $fileListRef,$logRef)= @_;
+	my ( $threadNum, $fileListRef, $logRef ) = @_;
 	pInfo( "Thread $threadNum stared", $logRef );
 	while (1) {
 		my $file;
@@ -166,7 +171,7 @@ sub fastqProcess {
 		$file = ${$fileListRef}[$current_temp];
 
 		pInfo( "Thread $threadNum processing $file", $logRef );
-		my ( $metric, $info1, $info2, $info3, $info4 ) =&getmetric($file);
+		my ( $metric, $info1, $info2, $info3, $info4 ) = &getmetric($file);
 		{
 			lock @resultOut;
 			$resultOut[$current_temp] = join "\t", ( @{$metric} );
@@ -190,15 +195,13 @@ sub fastqProcess {
 	}
 }
 
-
-
 sub getmetric {
-	my ($in)       = @_;
-	my @fileLable=( split /\t/, $in );
-	$in=$fileLable[0];
-	my $label=$in;
-	if (defined $fileLable[1]) {
-		$label=$fileLable[1];
+	my ($in) = @_;
+	my @fileLable = ( split /\t/, $in );
+	$in = $fileLable[0];
+	my $label = $in;
+	if ( defined $fileLable[1] ) {
+		$label = $fileLable[1];
 	}
 	my @r1         = ($label);    #return values
 	my @r2         = ($label);    #return values
@@ -258,12 +261,20 @@ sub getmetric {
 			if ( $line1 =~
 /@(.*?):(.*?):(.*?):(.*?):(.*?):(.*?):(.*?)\s+(.*?):(.*?):(.*?):(.*?)/
 			  )
-			{
+			{ #casava 1.8 format
 				( $instrument, $run, $flowcell, $lane ) = ( $1, $2, $3, $4 );
 				$first = 0;
+			} #not casava 1.8 format, but Illumina format
+			elsif ( $line1 =~ /@(.*?):(.*?):(.*?):(.*?):(.*?)/ ) {
+				pInfo( "$in was Not casava 1.8 format, Can't find information for run ID and flowcell ID, use None instead", $logRef );
+				( $instrument, $lane, $run, $flowcell ) = ( $1, $2, $3, $4 );
+				$run      = 'None';
+				$flowcell = 'None';
+				$first    = 0;
 			}
 			else {
-				print STDERR "Not in casava 1.8 format\n";
+				die
+"Sequence identifiers were Not Illumina format, Can't find information for instrument, run, flowcell and lane";
 			}
 		}
 		my @tmpscores = map( ord, ( split //, $line4 ) );
@@ -290,6 +301,9 @@ sub getmetric {
 		<IIN>;
 		my $line4 = <IIN>;
 		$failed = ( split /:/, $line1 )[7];
+		if (! defined $failed) {
+			$failed="N"; #in case Not casava 1.8 format
+		}
 
 		$totalreads++;
 
@@ -336,13 +350,9 @@ sub getmetric {
 				$nucSumBaseN[$key]{ substr $line2, $key, 1 }++;
 			}
 		}
-
-		#        }else{
-		#            print STDERR "Not in casava 1.8 format\n";
-		#        }
 	}
 	close IIN;
-	
+
 	#print to information file
 	foreach my $key ( 0 .. ( $readlen - 1 ) ) {
 		push @r2, $scoreSumBase[$key] / $totalreads - $offset;
@@ -353,7 +363,7 @@ sub getmetric {
 		  $nucSumBase[$key]{"C"} +
 		  $nucSumBase[$key]{"G"};    #percenty for each nuc, what about U?
 		foreach my $nuc ( "A", "T", "C", "G" ) {
-			push @r3, &myDivide($nucSumBase[$key]{$nuc},$totalNuc);
+			push @r3, &myDivide( $nucSumBase[$key]{$nuc}, $totalNuc );
 		}
 		$totalNuc =
 		  $nucSumBaseN[$key]{"A"} +
@@ -361,7 +371,7 @@ sub getmetric {
 		  $nucSumBaseN[$key]{"C"} +
 		  $nucSumBaseN[$key]{"G"};    #percenty for each nuc, what about U?
 		foreach my $nuc ( "A", "T", "C", "G" ) {
-			push @r5, &myDivide($nucSumBaseN[$key]{$nuc},$totalNuc);
+			push @r5, &myDivide( $nucSumBaseN[$key]{$nuc}, $totalNuc );
 		}
 	}
 
@@ -372,31 +382,29 @@ sub getmetric {
 	  );
 
 	#add bq
-	my $tempY=0;
-	my $tempN=0;
-	if ($totalreadsy==0) {
-		$tempY='NA';
-	} else {
-		$tempY=&myDivide($bqy,$totalreadsy)-$offset;
+	my $tempY = 0;
+	my $tempN = 0;
+	if ( $totalreadsy == 0 ) {
+		$tempY = 'NA';
 	}
-	if ($totalreadsn==0) {
-		$tempN='NA';
-	} else {
-		$tempN=&myDivide($bqn,$totalreadsn)-$offset;
+	else {
+		$tempY = &myDivide( $bqy, $totalreadsy ) - $offset;
 	}
-	push @r1,
-	  (
-		&myDivide($bq,$totalreads)-$offset,
-		$tempY,
-		$tempN,
-	  );
+	if ( $totalreadsn == 0 ) {
+		$tempN = 'NA';
+	}
+	else {
+		$tempN = &myDivide( $bqn, $totalreadsn ) - $offset;
+	}
+	push @r1, ( &myDivide( $bq, $totalreads ) - $offset, $tempY, $tempN, );
 
 	#add gc
 	push @r1,
-	  ( 
-	  &myDivide($gc,$totalnuclear),
-	  &myDivide($gcy,$totalnucleary),
-	  &myDivide($gcn,$totalnuclearn));
+	  (
+		&myDivide( $gc,  $totalnuclear ),
+		&myDivide( $gcy, $totalnucleary ),
+		&myDivide( $gcn, $totalnuclearn )
+	  );
 
 	return ( \@r1, \@r2, \@r3, \@r4, \@r5 );
 }
@@ -431,13 +439,13 @@ sub guessoffset {
 }
 
 sub pInfo {
-	my $s       = $_[0];
+	my $s = $_[0];
 	print "[", scalar(localtime), "] $s\n";
-	
+
 	lock $_[1];
 	{
-		lock @{$_[1]};
-		push @{$_[1]}, "[".scalar(localtime)."] $s\n";
+		lock @{ $_[1] };
+		push @{ $_[1] }, "[" . scalar(localtime) . "] $s\n";
 	}
 }
 

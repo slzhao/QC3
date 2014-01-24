@@ -14,7 +14,7 @@ use source::fastqSummary;
 use source::bamSummary;
 use source::vcfSummary;
 
-our $version="1.15";
+our $version="1.20";
 
 my $qc3ConfigFile=dirname($0) ."/config.txt";
 my %config;
@@ -98,12 +98,12 @@ my $detectR=`which $config{"RBin"}`;
 if ($detectR eq '') {
 	die "Can't find R. Please install R or modify the RBin in config.txt.\n$usageModule";
 }
-if ( !defined $module) {
+if ( !defined $module or ($module ne 'f' and $module ne 'b' and $module ne 'v')) {
 	die ("Module (-m) is required and must be f (fastq), b (bam), and v (vcf)\n$usageModule");
 } elsif (!defined $filelist or !defined $resultDir) {
-	die ("Input file (-i) and Output directory (-o) must be provided\n$usageModule");
+	die ("Input file (-i) and Output directory (-o) must be provided\nYou can use '$commandline -h' to see help information for the module\n$usageModule");
 } elsif (!(-s $filelist)) {
-	die ("Input file (-i) didn't exist or size equal 0\n$usageModule");
+	die ("Input file (-i) didn't exist or size equal 0\nYou can use '$commandline -h' to see help information for the module\n$usageModule");
 }
 
 if ( !defined $isdepth )    { $isdepth              = 0; }
@@ -219,6 +219,8 @@ elsif ( $module eq "v" ) {
 	 		$table4 =
 	  &file2table("$resultDir/vcfAnnovarResult/$vcfFileName.pass.avinput.annovar.countTable.txt",'',1);
 	 }
+	my $table5 =
+	  &file2table("$resultDir/vcfResult/$vcfFileName.sexCheck.txt",'',1);
 	my $figureList1 =
 	  &dir2list( $resultDir, "/vcfFigure/", "scoreCompare", "FIGURE2" );
 	my $figureList2 =
@@ -229,6 +231,7 @@ elsif ( $module eq "v" ) {
 	${$reportHash}{'MAKETABLE2'} = $table2;
 	${$reportHash}{'MAKETABLE3'} = $table3;
 	${$reportHash}{'MAKETABLE4'} = $table4;
+	${$reportHash}{'MAKETABLE5'} = $table5;
 	${$reportHash}{'FILTERFILE'}   = $vcfCfgFile;
 	${$reportHash}{'FILTERFILECONTENT'}   = $cfgFileContent;
 	${$reportHash}{'FIG'}    = "./vcfFigure/$vcfFileName.Method$method.txt.png";

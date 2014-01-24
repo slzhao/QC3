@@ -15,12 +15,16 @@ dir.create(figureDir, showWarnings = FALSE)
 oldwd<-getwd()
 setwd(figureDir)
 file.remove(list.files("."))
-if (ncol(allResult)>=29) {
+if (ncol(allResult)>=35) {
+	colList<-list(5:11,c(12:14,NA,15:17),c(18:20,NA,21:23),c(24:26,NA,27:29),c(30:32,NA,33:35))
+} else if (ncol(allResult)>=29) {
 	colList<-list(5:11,c(12:14,NA,15:17),c(18:20,NA,21:23),c(24:26,NA,27:29))
 } else {
 	colList<-list(5:11,c(12:14,NA,15:17),c(18:20,NA,21:23))
 }
-if (ncol(allResult)>29) {
+if (ncol(allResult)>=35) {
+	colBox<-5:35
+} else if (ncol(allResult)>=29) {
 	colBox<-5:29
 } else {
 	colBox<-5:ncol(allResult)

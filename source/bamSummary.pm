@@ -81,7 +81,10 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 
 	$| = 1;
 	if ($rePlot) {    #re plot by R only, comment below codes
-
+		pInfo(
+"Parameter -rp was used. The program will use the result files in output directory to re-generate the report",
+			$logRef
+		);
 	}
 	else {
 		if ( $isdepth == 1 ) {
@@ -171,51 +174,6 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 		open( IN,  $filelist )      or die $!;
 		open( OUT, ">$outputFile" ) or die $!;
 
-		print OUT join "\t",
-		  (
-			"Sample",
-			"Instrument",
-			"Run",
-			"Flowcell",
-			"Lane",
-			"Unmapped",
-			"Total Mapped",
-			"On-target",
-			"Off-target",
-			"Off-target-intron",
-			"Off-target-intergenic",
-			"Off-target-mito",
-			"Total Mapped($methodText MQ)",
-			"On-target($methodText MQ)",
-			"Off-target($methodText MQ)",
-			"Off-target-intron($methodText MQ)",
-			"Off-target-intergenic($methodText MQ)",
-			"Off-target-mito($methodText MQ)",
-			"Total Mapped($methodText InsertSize)",
-			"On-target($methodText InsertSize)",
-			"Off-target($methodText InsertSize)",
-			"Off-target-intron($methodText InsertSize)",
-			"Off-target-intergenic($methodText InsertSize)",
-			"Off-target-mito($methodText InsertSize)"
-		  );
-		if ($isdepth) {
-			print OUT "\t";
-			print OUT join "\t",
-			  (
-				"Total Reads($methodText Depth)",
-				"On-target($methodText Depth)",
-				"Off-target($methodText Depth)",
-				"Off-target-intron($methodText Depth)",
-				"Off-target-intergenic($methodText Depth)",
-				"Off-target-mito($methodText Depth)",
-				"On-target percent (Depth larger than 0)",
-				"On-target percent (Depth larger than 10)",
-				"On-target percent (Depth larger than 30)\n"
-			  );
-		}
-		else {
-			print OUT "\n";
-		}
 		my @fileList;    #get file list
 		while ( my $f = <IN> ) {
 			$f =~ s/\r|\n//g;
@@ -243,6 +201,62 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 		foreach my $thread (@threads) {
 			my $threadNum = $thread->join;
 			pInfo( "Thread $threadNum finished", $logRef );
+		}
+		print OUT join "\t",
+		  (
+			"Sample",
+			"Instrument",
+			"Run",
+			"Flowcell",
+			"Lane",
+			"Unmapped",
+			"Total Mapped",
+			"On-target",
+			"Off-target",
+			"Off-target-intron",
+			"Off-target-intergenic",
+			"Off-target-mito",
+			"Total Mapped($methodText MQ)",
+			"On-target($methodText MQ)",
+			"Off-target($methodText MQ)",
+			"Off-target-intron($methodText MQ)",
+			"Off-target-intergenic($methodText MQ)",
+			"Off-target-mito($methodText MQ)",
+			"Total Mapped($methodText InsertSize)",
+			"On-target($methodText InsertSize)",
+			"Off-target($methodText InsertSize)",
+			"Off-target-intron($methodText InsertSize)",
+			"Off-target-intergenic($methodText InsertSize)",
+			"Off-target-mito($methodText InsertSize)"
+		  );
+		  
+		my $colNumber=$resultOut[0]=~y/\t//;
+		if (($isdepth and $colNumber>32) or (!$isdepth and $colNumber>23)) { #result with AS
+			print OUT "\t";
+			print OUT join "\t",("Total Mapped($methodText AS)",
+			"On-target($methodText AS)",
+			"Off-target($methodText AS)",
+			"Off-target-intron($methodText AS)",
+			"Off-target-intergenic($methodText AS)",
+			"Off-target-mito($methodText AS)")
+		}
+		if ($isdepth) {
+			print OUT "\t";
+			print OUT join "\t",
+			  (
+				"Total Reads($methodText Depth)",
+				"On-target($methodText Depth)",
+				"Off-target($methodText Depth)",
+				"Off-target-intron($methodText Depth)",
+				"Off-target-intergenic($methodText Depth)",
+				"Off-target-mito($methodText Depth)",
+				"On-target percent (Depth larger than 0)",
+				"On-target percent (Depth larger than 10)",
+				"On-target percent (Depth larger than 30)\n"
+			  );
+		}
+		else {
+			print OUT "\n";
 		}
 		foreach my $result (@resultOut) {
 			print OUT "$result\n";
@@ -275,12 +289,18 @@ sub getbammetric {
 		$offtargetMQflag,           $offtargetInsertflag,
 		$offtargetintronMQflag,     $offtargetintronInsertflag,
 		$offtargetintergenicMQflag, $offtargetintergenicInsertflag,
-		$offtargetmitoMQflag,       $offtargetmitoInsertflag
-	) = ( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
+		$offtargetmitoMQflag,       $offtargetmitoInsertflag,
+		$totalASflag,               $ontargetASflag,
+		$offtargetASflag,           $offtargetintronASflag,
+		$offtargetintergenicASflag, $offtargetmitoASflag
+	) = ( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 	my (
 		$totalMQ,                   $ontargetMQ,
 		$offtargetMQ,               $offtargetintronMQ,
 		$offtargetintergenicMQ,     $offtargetmitoMQ,
+		$totalAS,                   $ontargetAS,
+		$offtargetAS,               $offtargetintronAS,
+		$offtargetintergenicAS,     $offtargetmitoAS,
 		$totalinsert,               $ontargetinsert,
 		$offtargetinsert,           $offtargetintroninsert,
 		$offtargetintergenicinsert, $offtargetmitoinsert
@@ -318,7 +338,21 @@ sub getbammetric {
 			$insertflag = 1;
 		}
 		my $chr = $line[2];
+		$chr =~ s/^chr//i;
 		my $pos = $line[3];
+
+		my $AS     = $line[11];
+		my $ASflag = 0;
+		if ( $AS =~ /AS:i:([-]*\d+)/ ) {
+			$AS     = $1;
+			$ASflag = 1;
+		}
+
+		if (   !exists( $regionDatabaseRef->{$chr} )
+			or !defined vec( $regionDatabaseRef->{$chr}, $pos, 2 ) )
+		{
+			next;
+		}
 
 		if ( $flag & $flag_read_unmapped ) {
 
@@ -330,6 +364,10 @@ sub getbammetric {
 			if ($MQflag) {
 				&storeData( $MQ, $totalMQ, $caculateMethod );
 				$totalMQflag++;
+			}
+			if ($ASflag) {
+				&storeData( $AS, $totalAS, $caculateMethod );
+				$totalASflag++;
 			}
 			if ($insertflag) {
 				&storeData( $insert, $totalinsert, $caculateMethod );
@@ -343,6 +381,10 @@ sub getbammetric {
 					&storeData( $MQ, $ontargetMQ, $caculateMethod );
 					$ontargetMQflag++;
 				}
+				if ($ASflag) {
+					&storeData( $AS, $ontargetAS, $caculateMethod );
+					$ontargetASflag++;
+				}
 				if ($insertflag) {
 					&storeData( $insert, $ontargetinsert, $caculateMethod );
 					$ontargetInsertflag++;
@@ -355,6 +397,10 @@ sub getbammetric {
 					&storeData( $MQ, $offtargetMQ, $caculateMethod );
 					$offtargetMQflag++;
 				}
+				if ($ASflag) {
+					&storeData( $AS, $offtargetAS, $caculateMethod );
+					$offtargetASflag++;
+				}
 				if ($insertflag) {
 					&storeData( $insert, $offtargetinsert, $caculateMethod );
 					$offtargetInsertflag++;
@@ -366,6 +412,10 @@ sub getbammetric {
 					if ($MQflag) {
 						&storeData( $MQ, $offtargetintronMQ, $caculateMethod );
 						$offtargetintronMQflag++;
+					}
+					if ($ASflag) {
+						&storeData( $AS, $offtargetintronAS, $caculateMethod );
+						$offtargetintronASflag++;
 					}
 					if ($insertflag) {
 						&storeData( $insert, $offtargetintroninsert,
@@ -381,6 +431,11 @@ sub getbammetric {
 							$caculateMethod );
 						$offtargetintergenicMQflag++;
 					}
+					if ($ASflag) {
+						&storeData( $AS, $offtargetintergenicAS,
+							$caculateMethod );
+						$offtargetintergenicASflag++;
+					}
 					if ($insertflag) {
 						&storeData( $insert, $offtargetintergenicinsert,
 							$caculateMethod );
@@ -392,6 +447,10 @@ sub getbammetric {
 					if ($MQflag) {
 						&storeData( $MQ, $offtargetmitoMQ, $caculateMethod );
 						$offtargetmitoMQflag++;
+					}
+					if ($ASflag) {
+						&storeData( $AS, $offtargetmitoAS, $caculateMethod );
+						$offtargetmitoASflag++;
 					}
 					if ($insertflag) {
 						&storeData( $insert, $offtargetmitoinsert,
@@ -405,21 +464,29 @@ sub getbammetric {
 	close BAM;
 
 	$totalMQ = findMedianMean( $totalMQ, $totalMQflag, $caculateMethod );
+	$totalAS = findMedianMean( $totalAS, $totalASflag, $caculateMethod );
 	$totalinsert =
 	  findMedianMean( $totalinsert, $totalInsertflag, $caculateMethod );
 
 	$ontargetMQ =
 	  findMedianMean( $ontargetMQ, $ontargetMQflag, $caculateMethod );
+	$ontargetAS =
+	  findMedianMean( $ontargetAS, $ontargetASflag, $caculateMethod );
 	$ontargetinsert =
 	  findMedianMean( $ontargetinsert, $ontargetInsertflag, $caculateMethod );
 
 	$offtargetMQ =
 	  findMedianMean( $offtargetMQ, $offtargetMQflag, $caculateMethod );
+	$offtargetAS =
+	  findMedianMean( $offtargetAS, $offtargetASflag, $caculateMethod );
 	$offtargetinsert =
 	  findMedianMean( $offtargetinsert, $offtargetInsertflag, $caculateMethod );
 
 	$offtargetintronMQ =
 	  findMedianMean( $offtargetintronMQ, $offtargetintronMQflag,
+		$caculateMethod );
+	$offtargetintronAS =
+	  findMedianMean( $offtargetintronAS, $offtargetintronASflag,
 		$caculateMethod );
 	$offtargetintroninsert =
 	  findMedianMean( $offtargetintroninsert, $offtargetintronInsertflag,
@@ -428,6 +495,9 @@ sub getbammetric {
 	$offtargetintergenicMQ =
 	  findMedianMean( $offtargetintergenicMQ, $offtargetintergenicMQflag,
 		$caculateMethod );
+	$offtargetintergenicAS =
+	  findMedianMean( $offtargetintergenicAS, $offtargetintergenicASflag,
+		$caculateMethod );
 	$offtargetintergenicinsert =
 	  findMedianMean( $offtargetintergenicinsert,
 		$offtargetintergenicInsertflag,
@@ -435,6 +505,8 @@ sub getbammetric {
 
 	$offtargetmitoMQ =
 	  findMedianMean( $offtargetmitoMQ, $offtargetmitoMQflag, $caculateMethod );
+	$offtargetmitoAS =
+	  findMedianMean( $offtargetmitoAS, $offtargetmitoASflag, $caculateMethod );
 	$offtargetmitoinsert =
 	  findMedianMean( $offtargetmitoinsert, $offtargetmitoInsertflag,
 		$caculateMethod );
@@ -460,6 +532,12 @@ sub getbammetric {
 			if ( !$depth ) { next; }
 			$totalnum++;
 			&storeData( $depth, $totaldepth, $caculateMethod );
+
+			if (   !exists( $regionDatabaseRef->{$chr} )
+				or !defined vec( $regionDatabaseRef->{$chr}, $pos, 2 ) )
+			{
+				next;
+			}
 
 			if ( vec( $regionDatabaseRef->{$chr}, $pos, 2 ) == $inBedSign ) {
 				$ontargetnum++;
@@ -509,24 +587,29 @@ sub getbammetric {
 		my $exonRatio3 = $ontargetD30num / $totalExonLength;
 
 		my @returnValue = (
-			$label,     $instrument,
-			$runNumber, $flowcell,
-			$lane,     $ummapped, $total,
-			$ontarget, $offtarget,
-			$offtargetintron,
+			$label,                     $instrument,
+			$runNumber,                 $flowcell,
+			$lane,                      $ummapped,
+			$total,                     $ontarget,
+			$offtarget,                 $offtargetintron,
 			$offtargetintergenic,       $offtargetmito,
 			$totalMQ,                   $ontargetMQ,
 			$offtargetMQ,               $offtargetintronMQ,
 			$offtargetintergenicMQ,     $offtargetmitoMQ,
 			$totalinsert,               $ontargetinsert,
 			$offtargetinsert,           $offtargetintroninsert,
-			$offtargetintergenicinsert, $offtargetmitoinsert,
-			$totaldepth,                $ontargetdepth,
+			$offtargetintergenicinsert, $offtargetmitoinsert
+		);
+		if ($totalAS ne "NA") {
+			@returnValue=(@returnValue,$totalAS,                   $ontargetAS,
+			$offtargetAS,               $offtargetintronAS,
+			$offtargetintergenicAS,     $offtargetmitoAS);
+		}
+		@returnValue=(@returnValue,			$totaldepth,                $ontargetdepth,
 			$offtargetdepth,            $offtargetintrondepth,
 			$offtargetintergenicdepth,  $offtargetmitodepth,
 			$exonRatio1,                $exonRatio2,
-			$exonRatio3
-		);
+			$exonRatio3);
 		return ( \@returnValue );
 	}
 	else {
@@ -544,6 +627,11 @@ sub getbammetric {
 			$offtargetinsert,           $offtargetintroninsert,
 			$offtargetintergenicinsert, $offtargetmitoinsert
 		);
+		if ($totalAS ne "NA") {
+			@returnValue=(@returnValue,$totalAS,                   $ontargetAS,
+			$offtargetAS,               $offtargetintronAS,
+			$offtargetintergenicAS,     $offtargetmitoAS);
+		}
 		return ( \@returnValue );
 	}
 }
@@ -586,6 +674,7 @@ sub initializeDatabase {
 		chomp;
 		if (/^\@SQ\tSN:(\w+)\tLN:(\d+)/) {
 			my $chr = $1;
+			$chr =~ s/^chr//i;
 			$databaseRef->{$chr} = "";
 			my $chrLength = $2;
 			vec( $databaseRef->{$chr}, $chrLength, 2 ) = 0;
@@ -599,6 +688,7 @@ sub loadbed {
 	while (<IIN>) {
 		s/\r|\n//g;
 		my ( $chr, $start, $end ) = split "\t";
+		$chr =~ s/^chr//i;
 		if ( exists $ref->{$chr} ) {
 			foreach ( my $i = $start + 1 ; $i <= $end ; $i++ ) {
 				vec( $ref->{$chr}, $i * 2, 1 ) = 1;    #10 in bed
@@ -613,9 +703,13 @@ sub loadgtf {
 	open( IIN, $in ) or die $!;
 	my %transcripts;
 	while (<IIN>) {
+		if (/^#/) {
+			next;
+		}
 		s/\r|\n//g;
 		my ( $chr, $feature, $start, $end, $attributes ) =
 		  ( split( /\t/, $_ ) )[ ( 0, 2, 3, 4, 8 ) ];
+		$chr =~ s/^chr//i;
 
 		if ( $feature eq "exon" ) {
 			if ( exists $ref->{$chr} ) {

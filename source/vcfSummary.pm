@@ -97,6 +97,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 	my %changes;
 	my %cfgFilter;
 	my %snpCount;
+	my %genderCount;
 
 	open CFG, "<$vcfCfgFile" or die "Can't read $vcfCfgFile\n$!";
 	pInfo( "VariantFiltration based on $vcfCfgFile", $logRef );
@@ -116,7 +117,10 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 	my $annovarResultDir = "$resultDir/vcfAnnovarResult/";
 
 	if ($rePlot) {    #re plot by R only, comment below codes
-
+		pInfo(
+"Parameter -rp was used. The program will use the result files in output directory to re-generate the report",
+			$logRef
+		);
 	}
 	else {
 
@@ -137,6 +141,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 		open RESULT5, ">$resultDir/vcfResult/$filename.snpCount.txt" or die $!;
 		open RESULT6, ">$annovarResultDir$filename.pass"
 		  or die $!;    #new vcf for annovar
+		open RESULT7, ">$resultDir/vcfResult/$filename.sexCheck.txt" or die $!;
 
 		while (<READ>) {    #read title and ID list
 			chomp;
@@ -175,14 +180,14 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 			}
 			my @lines = ( split /\t/, $_ );
 
-			my @line4S=($lines[4]);
-			my @line7S=($lines[7]);
+			my @line4S       = ( $lines[4] );
+			my @line7S       = ( $lines[7] );
 			my $line47Length = 1;
 			if ( $lines[4] =~ /,/ ) {    #such as A,C
 				@line4S = split( /,/, $lines[4] );
 				$line47Length = scalar @line4S;
 				foreach my $x ( 0 .. ( $line47Length - 1 ) ) {
-					$line7S[$x] ="";
+					$line7S[$x] = "";
 				}
 				my @temp1 = split( /;/, $lines[7] );
 				foreach my $temp (@temp1) {
@@ -197,7 +202,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 					}
 					else {
 						foreach my $x ( 0 .. ( $line47Length - 1 ) ) {
-							$line7S[$x] = $line7S[$x] . $temp. ';';
+							$line7S[$x] = $line7S[$x] . $temp . ';';
 						}
 					}
 				}
@@ -214,7 +219,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 				else {
 					$done_filter = 0;
 					print RESULT2 "$lines[0]\t$lines[1]\t$lines[3]\t$lines[4]";
-					print RESULT6 join("\t",@lines )."\n";
+					print RESULT6 join( "\t", @lines ) . "\n";
 				}
 				print RESULT1 "$lines[0]\t$lines[1]\t$lines[3]\t$lines[4]";
 
@@ -252,9 +257,9 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 
 				for ( my $x = 9 ; $x < ( 9 + $sampleSize ) ; $x++ ) {
 					if ( $lines[$x] eq './.' ) { next; }
-					$lines[$x]=~/(\d)\/(\d)/;
-					my $allele1=$1;
-					my $allele2=$2;
+					$lines[$x] =~ /(\d)\/(\d)/;
+					my $allele1 = $1;
+					my $allele2 = $2;
 					if ( $allele1 ne $allele2 ) {
 						if (   ( $lines[3] . $lines[4] eq "AG" )
 							or ( $lines[3] . $lines[4] eq "GA" )
@@ -277,18 +282,31 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 						$Sample2NumberAll{ $titles[$x] }{"01Number"}++;
 						if ( $done_filter == 0 ) {
 							$Sample2NumberFilter{ $titles[$x] }{"01Number"}++;
+							if ( $lines[0] =~ /[xX]/ ) {
+								$genderCount{ $lines[0] }{"Heterozygous SNP"}
+								  { $titles[$x] }++;
+							}
 						}
 					}
 					elsif ( ( $allele1 eq $allele2 )
-						and ( $allele2 + $allele2 ) > 0 )
+						and ($allele1 > 0) )
 					{
 						$Sample2NumberAll{ $titles[$x] }{"11Number"}++;
 						if ( $done_filter == 0 ) {
 							$Sample2NumberFilter{ $titles[$x] }{"11Number"}++;
+							if ( $lines[0] =~ /[xX]/ ) {
+								$genderCount{ $lines[0] }{"Non-reference Homozygous SNP"}
+								  { $titles[$x] }++;
+							}
 						}
 					}
 
 					if ( $done_filter == 0 ) {    #this line was kept
+						    #store X Y counts for sex check
+						if ( $lines[0] =~ /[yY]/ ) {
+							$genderCount{ $lines[0] }{"Total Reads"}{ $titles[$x] } +=
+							  $allele1 + $allele2;
+						}
 						if ( ( $allele2 + $allele2 ) > 0 )
 						{    #count SNP for each sample in each chromosome
 							$snpCount{ $lines[0] }{ $titles[$x] }++;
@@ -346,21 +364,10 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 
 			printf RESULT3
 "$sample\t$TTRatioAll\t$Ratio0111All\t$TTRatioFilter\t$Ratio0111Filter\n";
-
-			#			printf RESULT3 (
-			#				"%s\t%.3f\t%.3f\t%.3f\t%.3f\n",
-			#				$sample, $TTRatioAll, $Ratio0111All, $TTRatioFilter,
-			#				$Ratio0111Filter
-			#			);
 		}
 
 		print RESULT4
 "FileTitle\tSampleA\tSampleB\tCountB2A\tCountA\tHeterozygous Consistency (CountB2A:CountA)\tCountA2B\tCountB\tHeterozygous Consistency (CountA2B:CountB)\tOverall Consistent Genotypes\tOverall Overlapped Genotypes\tOverall Consistency\n";
-
-		#		foreach my $change ( sort keys %changes ) {
-		#			print RESULT4 "\t$change";
-		#		}
-		#		print RESULT4 "\n";
 
 		my $fileName = basename($VCF);
 		foreach my $sample1 ( sort keys %selected2 ) {
@@ -375,33 +382,9 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 					$total2{$sample1}{$sample2}
 				);
 
-				#				printf RESULT4 (
-				#					"%s\t%s\t%s\t%d\t%d\t%.3f\t%d\t%d\t%.3f\t%d\t%d\t%.3f",
-				#					$fileName,
-				#					$sample1,
-				#					$sample2,
-				#					$selected{$sample1}{$sample2},
-				#					$total{$sample1}{$sample2},
-				#					$ratio1,
-				#					$selected{$sample2}{$sample1},
-				#					$total{$sample2}{$sample1},
-				#					$ratio2,
-				#					$selected2{$sample1}{$sample2},
-				#					$total2{$sample1}{$sample2},
-				#					$ratio3
-				#				);
 				print RESULT4
 "$fileName\t$sample1\t$sample2\t$selected{$sample1}{$sample2}\t$total{$sample1}{$sample2}\t$ratio1\t$selected{$sample2}{$sample1}\t$total{$sample2}{$sample1}\t$ratio2\t$selected2{$sample1}{$sample2}\t$total2{$sample1}{$sample2}\t$ratio3";
 
-			  #				foreach my $change ( sort keys %changes ) {
-			  #					if ( exists( $changNumber{$sample1}{$sample2}{$change} ) ) {
-			  #						print RESULT4
-			  #						  "\t$changNumber{$sample1}{$sample2}{$change}";
-			  #					}
-			  #					else {
-			  #						print RESULT4 "\t0";
-			  #					}
-			  #				}
 				print RESULT4 "\n";
 			}
 		}
@@ -426,8 +409,31 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 			print RESULT5 "\n";
 		}
 
-		#do annovar
+		#export information for sex check
+		#		$genderCount{ "chro" }{"11Number"}{ "sample" }++;
+		$temp = ( sort keys %snpCount )[0];
+		print RESULT7 "Chromosome";
+		foreach my $sample ( sort keys %{ $snpCount{$temp} } ) {
+			print RESULT7 "\t$sample";
+		}
+		print RESULT7 "\n";
+		foreach my $chrom ( sort keys %genderCount ) {
+			foreach my $type ( sort keys %{ $genderCount{$chrom} } ) {
+				print RESULT7 "$chrom: $type";
+				foreach my $sample ( sort keys %{ $snpCount{$temp} } ) {
+					if ( exists $genderCount{$chrom}{$type}{$sample} ) {
+						print RESULT7 "\t$genderCount{$chrom}{$type}{$sample}";
+					}
+					else {
+						print RESULT7 "\t0";
+					}
+				}
+				print RESULT7 "\n";
+			}
+		}
+		close(RESULT7);
 
+		#do annovar
 		if ($doAnnovar) {
 			pInfo( "do ANNOVAR annotation", $logRef );
 			system(
@@ -527,9 +533,19 @@ sub caculate_ratio {
 		elsif ( $method == 2 ) {
 			if (
 				$lines1[0] eq $lines2[0]
-				and (  ( $lines1[1] eq $lines2[1] )
-#				 or ( $lines1[3] * $lines2[3] > 0 ) )
-					or (( $lines1[2+$lines1[1]] * $lines2[2+$lines1[1]]) > 0  and ( $lines1[2+$lines2[1]] * $lines2[2+$lines2[1]]) > 0 ))
+				and (
+					( $lines1[1] eq $lines2[1] )
+
+					#				 or ( $lines1[3] * $lines2[3] > 0 ) )
+					or (
+						(
+							$lines1[ 2 + $lines1[1] ] *
+							$lines2[ 2 + $lines1[1] ]
+						) > 0
+						and ( $lines1[ 2 + $lines2[1] ] *
+							$lines2[ 2 + $lines2[1] ] ) > 0
+					)
+				)
 			  )
 			{
 				$fenzi = 1;
