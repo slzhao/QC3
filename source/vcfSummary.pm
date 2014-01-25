@@ -289,13 +289,14 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 						}
 					}
 					elsif ( ( $allele1 eq $allele2 )
-						and ($allele1 > 0) )
+						and ( $allele1 > 0 ) )
 					{
 						$Sample2NumberAll{ $titles[$x] }{"11Number"}++;
 						if ( $done_filter == 0 ) {
 							$Sample2NumberFilter{ $titles[$x] }{"11Number"}++;
 							if ( $lines[0] =~ /[xX]/ ) {
-								$genderCount{ $lines[0] }{"Non-reference Homozygous SNP"}
+								$genderCount{ $lines[0] }
+								  {"Non-reference Homozygous SNP"}
 								  { $titles[$x] }++;
 							}
 						}
@@ -304,8 +305,8 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 					if ( $done_filter == 0 ) {    #this line was kept
 						    #store X Y counts for sex check
 						if ( $lines[0] =~ /[yY]/ ) {
-							$genderCount{ $lines[0] }{"Total Reads"}{ $titles[$x] } +=
-							  $allele1 + $allele2;
+							$genderCount{ $lines[0] }{"Total Reads"}
+							  { $titles[$x] } += $allele1 + $allele2;
 						}
 						if ( ( $allele2 + $allele2 ) > 0 )
 						{    #count SNP for each sample in each chromosome

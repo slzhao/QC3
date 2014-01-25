@@ -229,16 +229,21 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 			"Off-target-intergenic($methodText InsertSize)",
 			"Off-target-mito($methodText InsertSize)"
 		  );
-		  
-		my $colNumber=$resultOut[0]=~y/\t//;
-		if (($isdepth and $colNumber>32) or (!$isdepth and $colNumber>23)) { #result with AS
+
+		my $colNumber = $resultOut[0] =~ y/\t//;
+		if (   ( $isdepth and $colNumber > 32 )
+			or ( !$isdepth and $colNumber > 23 ) )
+		{    #result with AS
 			print OUT "\t";
-			print OUT join "\t",("Total Mapped($methodText AS)",
-			"On-target($methodText AS)",
-			"Off-target($methodText AS)",
-			"Off-target-intron($methodText AS)",
-			"Off-target-intergenic($methodText AS)",
-			"Off-target-mito($methodText AS)")
+			print OUT join "\t",
+			  (
+				"Total Mapped($methodText AS)",
+				"On-target($methodText AS)",
+				"Off-target($methodText AS)",
+				"Off-target-intron($methodText AS)",
+				"Off-target-intergenic($methodText AS)",
+				"Off-target-mito($methodText AS)"
+			  );
 		}
 		if ($isdepth) {
 			print OUT "\t";
@@ -600,16 +605,20 @@ sub getbammetric {
 			$offtargetinsert,           $offtargetintroninsert,
 			$offtargetintergenicinsert, $offtargetmitoinsert
 		);
-		if ($totalAS ne "NA") {
-			@returnValue=(@returnValue,$totalAS,                   $ontargetAS,
-			$offtargetAS,               $offtargetintronAS,
-			$offtargetintergenicAS,     $offtargetmitoAS);
+
+		if ( $totalAS ne "NA" ) {
+			@returnValue = (
+				@returnValue, $totalAS, $ontargetAS, $offtargetAS,
+				$offtargetintronAS, $offtargetintergenicAS, $offtargetmitoAS
+			);
 		}
-		@returnValue=(@returnValue,			$totaldepth,                $ontargetdepth,
-			$offtargetdepth,            $offtargetintrondepth,
-			$offtargetintergenicdepth,  $offtargetmitodepth,
-			$exonRatio1,                $exonRatio2,
-			$exonRatio3);
+		@returnValue = (
+			@returnValue,          $totaldepth,
+			$ontargetdepth,        $offtargetdepth,
+			$offtargetintrondepth, $offtargetintergenicdepth,
+			$offtargetmitodepth,   $exonRatio1,
+			$exonRatio2,           $exonRatio3
+		);
 		return ( \@returnValue );
 	}
 	else {
@@ -627,10 +636,11 @@ sub getbammetric {
 			$offtargetinsert,           $offtargetintroninsert,
 			$offtargetintergenicinsert, $offtargetmitoinsert
 		);
-		if ($totalAS ne "NA") {
-			@returnValue=(@returnValue,$totalAS,                   $ontargetAS,
-			$offtargetAS,               $offtargetintronAS,
-			$offtargetintergenicAS,     $offtargetmitoAS);
+		if ( $totalAS ne "NA" ) {
+			@returnValue = (
+				@returnValue, $totalAS, $ontargetAS, $offtargetAS,
+				$offtargetintronAS, $offtargetintergenicAS, $offtargetmitoAS
+			);
 		}
 		return ( \@returnValue );
 	}

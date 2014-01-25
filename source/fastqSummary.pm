@@ -64,7 +64,10 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 
 	$| = 1;
 	if ($rePlot) {    #re plot by R only, comment below codes
-		pInfo( "Parameter -rp was used. The program will use the result files in output directory to re-generate the report", $logRef );
+		pInfo(
+"Parameter -rp was used. The program will use the result files in output directory to re-generate the report",
+			$logRef
+		);
 	}
 	else {
 
@@ -261,12 +264,15 @@ sub getmetric {
 			if ( $line1 =~
 /@(.*?):(.*?):(.*?):(.*?):(.*?):(.*?):(.*?)\s+(.*?):(.*?):(.*?):(.*?)/
 			  )
-			{ #casava 1.8 format
+			{    #casava 1.8 format
 				( $instrument, $run, $flowcell, $lane ) = ( $1, $2, $3, $4 );
 				$first = 0;
-			} #not casava 1.8 format, but Illumina format
+			}    #not casava 1.8 format, but Illumina format
 			elsif ( $line1 =~ /@(.*?):(.*?):(.*?):(.*?):(.*?)/ ) {
-				pInfo( "$in was Not casava 1.8 format, Can't find information for run ID and flowcell ID, use None instead", $logRef );
+				pInfo(
+"$in was Not casava 1.8 format, Can't find information for run ID and flowcell ID, use None instead",
+					$logRef
+				);
 				( $instrument, $lane, $run, $flowcell ) = ( $1, $2, $3, $4 );
 				$run      = 'None';
 				$flowcell = 'None';
@@ -301,8 +307,8 @@ sub getmetric {
 		<IIN>;
 		my $line4 = <IIN>;
 		$failed = ( split /:/, $line1 )[7];
-		if (! defined $failed) {
-			$failed="N"; #in case Not casava 1.8 format
+		if ( !defined $failed ) {
+			$failed = "N";    #in case Not casava 1.8 format
 		}
 
 		$totalreads++;

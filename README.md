@@ -20,7 +20,7 @@ Table of Content
  * [fastq QC](#fqc)
  * [bam QC](#bqc)
  * [vcf QC](#vqc)
-* [A short example](#sExample)
+* [A simple example](#sExample)
  * [Download example data](#ded)
  * [fastq QC example](#fqcE)
  * [bam QC example](#bqcE)
@@ -33,7 +33,6 @@ Table of Content
  * [Introduction for fastq QC result](#ifr)
  * [Introduction for bam QC result](#ibr)
  * [Introduction for vcf QC result](#ivr)
-* [Contacts](#Contacts)
 
 <a name="Introduction"/>
 # Introduction #
@@ -421,9 +420,3 @@ The "Statistics for sex check" section displayed the Heterozygous and Non-refere
 The "Score" section visualized the position and score of SNPs before and after filter.
 
 The "Annovar annotation" section displayed the counts of SNPs with different functions, such as synonymous/nonsynonymous SNV, and whether they were in snp137 database.
-
-<a name="Contacts"/>
-# Contacts #
-Shilin Zhao:	shilin.zhao@vanderbilt.edu
-
-Yan Guo:	    yan.guo@vanderbilt.edu
