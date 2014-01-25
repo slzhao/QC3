@@ -342,7 +342,7 @@ These 11 bam files including 10 primary solid tumor samples and 1 blood derived 
 
 <a name="TfqcE"/>
 ## fastq QC ##
-The fastq files were generated based on the 11 bam files. The results were generated with follwoing codes:
+The fastq files were first generated based on the 11 bam files. Then fastq QC results were generated with following codes:
  
 	#assume qc3.pl in qc3Dir, fastq files in fastqDir and listed in 11fastq.list file
 	cd fastqDir
@@ -352,32 +352,24 @@ The fastq QC results can be visited [Here](http://htmlpreview.github.io/?https:/
 
 <a name="TbqcE"/>
 ## bam QC
+The results were generated with following codes:
 
-	#assume qc3.pl in qc3Dir, examples in exampleDir
-	cd exampleDir
-	cd bam
+	#assume qc3.pl in qc3Dir, bam files in bamDir and listed in 11bam.list file
+	cd bamDir
+	perl qc3Dir/qc3.pl -m b -t 11 -i 11bam.list -r hg19BedFile -g hg19GtfFile -o 11BRCA_bam_result
 
-	#a simple example, with only bed file
-	perl qc3Dir/qc3.pl -m b -i example_bam_list.txt -r ../bamQcDatabase/hg19_protein_coding.bed.Part -o example_bam_result1
-	
-	#a simple example, with only gtf file
-	perl qc3Dir/qc3.pl -m b -i example_bam_list.txt -g ../bamQcDatabase/Homo_sapiens.GRCh37.63_protein_coding_chr1-22-X-Y-M.gtf.Part -o example_bam_result2
-	
-	#a example with both bed and gtf file, and will calculate the depth
-	perl qc3Dir/qc3.pl -m b -i example_bam_list.txt -r ../bamQcDatabase/hg19_protein_coding.bed.Part -g ../bamQcDatabase/Homo_sapiens.GRCh37.63_protein_coding_chr1-22-X-Y-M.gtf.Part -o example_bam_result3
+The bam QC results can be visited [Here](http://htmlpreview.github.io/?https://github.com/slzhao/QC3/blob/master/reportExample/bam/bamReport.html)
 
 <a name="TvqcE"/>
 ## vcf QC
-	
-	#assume qc3.pl in qc3Dir, examples in exampleDir
-	cd exampleDir
-	cd vcf
-
-	#a simple example, will not perform ANNOVAR annotation
-	perl qc3Dir/qc3.pl -m v -i CV-7261.vcf.top40000.txt -o example_vcf_result1
-	
+The vcf file was first generated based on the 11 bam files by GATK. Then vcf QC results were generated with following codes:
+ 	
+	#assume qc3.pl in qc3Dir, vcf files in vcfDir
+	cd vcfDir	
 	#assume ANNOVAR database in annovarDatabase, will perform ANNOVAR annotation
-	perl qc3Dir/qc3.pl -m v -i CV-7261.vcf.top40000.txt -s 2 -a annovarDatabase -o example_vcf_result2
+	perl qc3Dir/qc3.pl -m v -i vcfFile -a annovarDatabase -o 11BRCA_vcf_result
+
+The vcf QC results can be visited [Here](http://htmlpreview.github.io/?https://github.com/slzhao/QC3/blob/master/reportExample/vcf/vcfReport.html)
 
 <a name="Results"/>
 # Results #
@@ -414,7 +406,7 @@ The "Batch effect" section indicated the statistics of reads, on-target and off-
 
 An example report could be accessed at [Here](http://htmlpreview.github.io/?https://github.com/slzhao/QC3/blob/master/reportExample/vcf/vcfReport.html)
 
-vcf QC report was constituted by six sections. 
+vcf QC report was constituted by seven sections. 
 
 The "Filter" section displayed the arguments for the filter of vcf files.
 
@@ -423,6 +415,8 @@ The "Statistics" section displayed the Transitions:Transversions ratio and Heter
 The "Consistency" section visualized the consistency in all sample to sample pairs.
 
 The "SNP count" section displayed the SNP count of each sample in different chromesomes.
+
+The "Statistics for sex check" section displayed the Heterozygous and Non-reference Homozygous SNP counts in chromosome X, and total reads in chromosome Y, which can be used for sex check.
 
 The "Score" section visualized the position and score of SNPs before and after filter.
 
