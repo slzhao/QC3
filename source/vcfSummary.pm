@@ -146,7 +146,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 		while (<READ>) {    #read title and ID list
 			chomp;
 			s/\r//g;
-			if (/^##INFO=<ID=(\w+),/) {    #all IDs
+			if (/^##INFO=<ID=(\w+),Number=1/) {    #all IDs
 				$IDList{$1} = "";
 			}
 			elsif (/^##/) {
@@ -179,6 +179,12 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 				next;
 			}
 			my @lines = ( split /\t/, $_ );
+			if (   length( $lines[3] ) != length( $lines[4] )
+				or $lines[3] eq '.'
+				or $lines[4] eq '.' )
+			{               #insertion or deletion
+				next;
+			}
 
 			my @line4S       = ( $lines[4] );
 			my @line7S       = ( $lines[7] );
@@ -505,6 +511,9 @@ sub caculate_ratio {
 	#deepth <10
 	my $sum1 = 0;
 	my $sum2 = 0;
+	if ( $lines1[3] eq '.' or $lines2[3] eq '.' ) {
+		return( 0, 0, 0, 0, 0, 0 );
+	}
 	if ( $lines1[0] eq $lines1[1] ) {
 		$sum1 = $lines1[ 2 + $lines1[0] ];
 	}

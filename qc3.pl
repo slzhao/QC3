@@ -14,7 +14,7 @@ use source::fastqSummary;
 use source::bamSummary;
 use source::vcfSummary;
 
-our $version = "1.20";
+our $version = "1.22";
 
 my $qc3ConfigFile = dirname($0) . "/config.txt";
 my %config;
@@ -33,7 +33,8 @@ Options:
 	-t	threads            Optional. Threads used in analysis. The default value is 4. This parameter only valid for fastq and bam QC. Only one thread will be used in vcf QC.
 	
 	-h	help               Optional. Show this information.
-	
+
+To see help information for each module, please use -m parameter to specify module.
 For more information, please refer to the readme file in QC3 directory. Or visit the QC3 website at https://github.com/slzhao/QC3
 
 ";
@@ -180,7 +181,9 @@ if ( $module eq "f" ) {
 	${$reportHash}{'FIGUREBASESCOREYNLEGEND'} =
 	  "./fastqFigure/fastqScoreYN.png.legend.png";
 	${$reportHash}{'FIGUREBASENUCYN'} = "./fastqFigure/nucPercentyYN.png";
-	${$reportHash}{'FIGURELOOP1'}     = $figureList1;
+	if ( defined($figureList1) ) {
+		${$reportHash}{'FIGURELOOP1'} = $figureList1;
+	};
 	${$reportHash}{'MAKETABLE1'}      = $table1;
 	$template =
 	  &build_template( dirname($0) . "/template/report_tmpl_fastq.tmpl",
@@ -206,7 +209,9 @@ elsif ( $module eq "b" ) {
 	${$reportHash}{'FIGURELOOP1'} = $figureList1;
 	my $figureList2 =
 	  &dir2list( $resultDir, "/bamFigure/", "^batch_", "FIGUREBATCH" );
-	${$reportHash}{'FIGURELOOP2'} = $figureList2;
+	if ( defined($figureList2) ) {
+		${$reportHash}{'FIGURELOOP2'} = $figureList2;
+	};
 	my $table1 = &file2table( "$resultDir/bamResult/bamSummary.txt", '', 1 );
 	${$reportHash}{'MAKETABLE1'} = $table1;
 
