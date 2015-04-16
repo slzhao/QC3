@@ -262,7 +262,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 				}
 
 				for ( my $x = 9 ; $x < ( 9 + $sampleSize ) ; $x++ ) {
-					if ( $lines[$x] eq './.' ) { next; }
+					if ( $lines[$x] eq './.' or $lines[$x]=~/^\.\/\./ ) { next; }
 					$lines[$x] =~ /(\d)\/(\d)/;
 					my $allele1 = $1;
 					my $allele2 = $2;
@@ -324,7 +324,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 							$y++
 						  )
 						{
-							if ( $lines[$y] eq './.' ) { next; }
+							if ( $lines[$y] eq './.' or $lines[$y]=~/^\.\/\./ ) { next; }
 							else {
 								my @result =
 								  &caculate_ratio( $lines[$x], $lines[$y],

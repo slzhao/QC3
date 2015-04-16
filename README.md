@@ -3,6 +3,8 @@ Table of Content
 * [Introduction](#Introduction)
 * [Download](#download)
 * [Change log](#Change)
+ * [Release Version 1.24](#R124)
+ * [Release Version 1.23](#R123)
  * [Release Version 1.22](#R122)
  * [Release Version 1.21](#R121)
  * [Release Version 1.20](#R120)
@@ -60,6 +62,18 @@ Or you can also download the zip file of QC3 from [github](https://github.com/sl
 
 <a name="Change"/>
 # Change log #
+
+<a name="R124">
+## Release version 1.24 on April 15, 2015
+Release version 1.24
+ * More robust for different formats of vcf files;
+
+<a name="R123">
+## Release version 1.23 on October 20, 2014
+Release version 1.23
+ * A table with counts for different SNPs was added in vcf QC;
+ * The SNPs on X, Y chromosome and Mitochondrion can be selected to keep or not;
+ * More robust for different formats of vcf files;
 
 <a name="R122">
 ## Release version 1.22 on July 30, 2014

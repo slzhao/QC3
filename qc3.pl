@@ -14,7 +14,7 @@ use source::fastqSummary;
 use source::bamSummary;
 use source::vcfSummary;
 
-our $version = "1.22";
+our $version = "1.24";
 
 my $qc3ConfigFile = dirname($0) . "/config.txt";
 my %config;
@@ -46,7 +46,7 @@ my $commandline = "perl $0 "
 my (
 	$module,           $filelist, $resultDir,  $singleEnd,
 	$targetregionfile, $gtffile,  $isdepth,    $caculateMethod,
-	$vcfCfgFile,       $method,   $maxThreads, $annovarDb,
+	$vcfCfgFile,       $method,   $maxThreads, $annovarDb,$xym,
 	$rePlot,           $showHelp
 ) = ();
 our @log : shared;
@@ -66,6 +66,7 @@ GetOptions(
 	"c:s" => \$vcfCfgFile,
 	"s=i" => \$method,
 	"a=s" => \$annovarDb,
+	"xym"    => \$xym,
 
 	"rp" => \$rePlot,
 	"h"  => \$showHelp,
@@ -116,6 +117,7 @@ elsif ( !( -s $filelist ) ) {
 }
 
 if ( !defined $isdepth ) { $isdepth = 0; }
+if ( !defined $xym ) { $xym = 0; }
 if ( !defined $method )  { $method  = 1; }
 if ( !( defined $vcfCfgFile ) or $vcfCfgFile eq '' ) {
 	$vcfCfgFile = dirname($0) . '/GATK.cfg';
@@ -225,6 +227,7 @@ elsif ( $module eq "v" ) {
 	$config{'vcfCfgFile'} = $vcfCfgFile;
 	$config{'method'}     = $method;
 	$config{'annovarDb'}  = $annovarDb;
+	$config{'xym'}          = $xym;
 	my $rResult = &vcfSummary( $filelist, \%config );
 	if ( $rResult != 0 ) {
 		pInfo(
@@ -256,6 +259,8 @@ elsif ( $module eq "v" ) {
 	}
 	my $table5 =
 	  &file2table( "$resultDir/vcfResult/$vcfFileName.sexCheck.txt", '', 1 );
+	my $table6 =
+	  &file2table( "$resultDir/vcfResult/$vcfFileName.snpNucCount.txt", '', 1 );
 	my $figureList1 =
 	  &dir2list( $resultDir, "/vcfFigure/", "scoreCompare", "FIGURE2" );
 	my $figureList2 =
@@ -267,6 +272,7 @@ elsif ( $module eq "v" ) {
 	${$reportHash}{'MAKETABLE3'}        = $table3;
 	${$reportHash}{'MAKETABLE4'}        = $table4;
 	${$reportHash}{'MAKETABLE5'}        = $table5;
+	${$reportHash}{'MAKETABLE6'}        = $table6;
 	${$reportHash}{'FILTERFILE'}        = $vcfCfgFile;
 	${$reportHash}{'FILTERFILECONTENT'} = $cfgFileContent;
 	${$reportHash}{'FIG'} = "./vcfFigure/$vcfFileName.Method$method.txt.png";
