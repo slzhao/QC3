@@ -3,6 +3,7 @@ Table of Content
 * [Introduction](#Introduction)
 * [Download](#download)
 * [Change log](#Change)
+ * [Release Version 1.25](#R125)
  * [Release Version 1.24](#R124)
  * [Release Version 1.23](#R123)
  * [Release Version 1.22](#R122)
@@ -62,6 +63,11 @@ Or you can also download the zip file of QC3 from [github](https://github.com/sl
 
 <a name="Change"/>
 # Change log #
+
+<a name="R125">
+## Release version 1.25 on April 16, 2015
+Release version 1.25
+ * More robust for different formats of vcf files;
 
 <a name="R124">
 ## Release version 1.24 on April 15, 2015

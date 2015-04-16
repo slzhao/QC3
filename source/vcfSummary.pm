@@ -262,7 +262,8 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 				}
 
 				for ( my $x = 9 ; $x < ( 9 + $sampleSize ) ; $x++ ) {
-					if ( $lines[$x] eq './.' or $lines[$x]=~/^\.\/\./ ) { next; }
+					#if ( $lines[$x] eq './.' or $lines[$x]=~/^\.\/\./ ) { next; }
+					if ( $lines[$x]=~/^\./ ) { next; }
 					$lines[$x] =~ /(\d)\/(\d)/;
 					my $allele1 = $1;
 					my $allele2 = $2;
@@ -324,7 +325,8 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 							$y++
 						  )
 						{
-							if ( $lines[$y] eq './.' or $lines[$y]=~/^\.\/\./ ) { next; }
+#							if ( $lines[$y] eq './.' or $lines[$y]=~/^\.\/\./ ) { next; }
+							if ( $lines[$y]=~/^\./ ) { next; }
 							else {
 								my @result =
 								  &caculate_ratio( $lines[$x], $lines[$y],
@@ -511,7 +513,8 @@ sub caculate_ratio {
 	#deepth <10
 	my $sum1 = 0;
 	my $sum2 = 0;
-	if ( $lines1[3] eq '.' or $lines2[3] eq '.' ) {
+#	if ( $lines1[3] eq '.' or $lines2[3] eq '.' ) {
+	if ( $lines1[2] eq '.' or $lines2[2] eq '.' or $lines1[3] eq '.' or $lines2[3] eq '.' ) {
 		return( 0, 0, 0, 0, 0, 0 );
 	}
 	if ( $lines1[0] eq $lines1[1] ) {
