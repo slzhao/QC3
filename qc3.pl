@@ -14,7 +14,7 @@ use source::fastqSummary;
 use source::bamSummary;
 use source::vcfSummary;
 
-our $version = "1.25";
+our $version = "1.31";
 
 my $qc3ConfigFile = dirname($0) . "/config.txt";
 my %config;
@@ -46,7 +46,7 @@ my $commandline = "perl $0 "
 my (
 	$module,           $filelist, $resultDir,  $singleEnd,
 	$targetregionfile, $gtffile,  $isdepth,    $caculateMethod,
-	$vcfCfgFile,       $method,   $maxThreads, $annovarDb,$xym,
+	$vcfCfgFile,       $method,   $maxThreads, $annovarDb,$usePASS,$xym,
 	$rePlot,           $showHelp
 ) = ();
 our @log : shared;
@@ -66,6 +66,7 @@ GetOptions(
 	"c:s" => \$vcfCfgFile,
 	"s=i" => \$method,
 	"a=s" => \$annovarDb,
+	"up"    => \$usePASS,
 	"xym"    => \$xym,
 
 	"rp" => \$rePlot,
@@ -117,6 +118,7 @@ elsif ( !( -s $filelist ) ) {
 }
 
 if ( !defined $isdepth ) { $isdepth = 0; }
+if ( !defined $usePASS ) { $usePASS = 0; }
 if ( !defined $xym ) { $xym = 0; }
 if ( !defined $method )  { $method  = 1; }
 if ( !( defined $vcfCfgFile ) or $vcfCfgFile eq '' ) {
@@ -227,6 +229,7 @@ elsif ( $module eq "v" ) {
 	$config{'vcfCfgFile'} = $vcfCfgFile;
 	$config{'method'}     = $method;
 	$config{'annovarDb'}  = $annovarDb;
+	$config{'usePASS'}  =$usePASS;
 	$config{'xym'}          = $xym;
 	my $rResult = &vcfSummary( $filelist, \%config );
 	if ( $rResult != 0 ) {

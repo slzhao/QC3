@@ -22,6 +22,7 @@ sub vcfSummary {
 	my $vcfCfgFile = $config->{'vcfCfgFile'};
 	my $method     = $config->{'method'};
 	my $resultDir  = $config->{'resultDir'};
+	my $usePASS    = $config->{'usePASS'};
 
 	#	my $logFile   = $config->{'log'};
 	my $rePlot = $config->{'rePlot'};
@@ -47,6 +48,7 @@ Options:
 	-o	output directory        Required. Output directory for QC result. If the directory doesn't exist, it would be created.
 	-s	method                  Optional. Method used in consistence calculation, should be 1 or 2.
 	-c	config file             Optional. A file indicating the filter arguments for vcf files. If not specified, the default file 'GATK.cfg' in QC3 directory with GATK best practices recommended arguments will be used.
+	-up	use PASS only           Optional. Only use PASS variants in vcf. QC3 will use all variants in vcf file except LowQual by default.
 	-a	annotation directory	Optional. Directory of annovar database.
 
 	-h	                        Optional. Show this information.
@@ -82,6 +84,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 		);
 	}
 
+	my %formatPos;
 	my %IDList;
 	my $done_filter;
 	my @titles;
@@ -98,6 +101,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 	my %cfgFilter;
 	my %snpCount;
 	my %genderCount;
+	my %snpNucCount;
 
 	open CFG, "<$vcfCfgFile" or die "Can't read $vcfCfgFile\n$!";
 	pInfo( "VariantFiltration based on $vcfCfgFile", $logRef );
@@ -142,6 +146,8 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 		open RESULT6, ">$annovarResultDir$filename.pass"
 		  or die $!;    #new vcf for annovar
 		open RESULT7, ">$resultDir/vcfResult/$filename.sexCheck.txt" or die $!;
+		open RESULT8, ">$resultDir/vcfResult/$filename.snpNucCount.txt"
+		  or die $!;
 
 		while (<READ>) {    #read title and ID list
 			chomp;
@@ -149,17 +155,44 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 			if (/^##INFO=<ID=(\w+),Number=1/) {    #all IDs
 				$IDList{$1} = "";
 			}
+
+  #			elsif (/^##FORMAT=<ID=(\w+),Number=[1G\.]/) { #all formats, find GT and AD
+  #				print "$1\n";
+  #				$formatPos{$1} = (scalar keys %formatPos);
+  #			}
 			elsif (/^##/) {
 				next;
 			}
-			elsif (/^#/) {                 #title
+			elsif (/^#/) {                         #title
 				@titles = ( split /\t/, $_ );
 				$sampleSize = scalar(@titles) - 9;
 				pInfo( "The VCF file has $sampleSize samples", $logRef );
+			}
+			else {
+				my @formats = ( split /:/, ( split /\t/, $_ )[8] );
+				foreach my $format (@formats) {
+					$formatPos{$format} = ( scalar keys %formatPos );
+				}
 				last;
 			}
 		}
 		close(READ);
+		if ( !exists( $formatPos{"GT"} ) or !exists( $formatPos{"AD"} ) ) {
+			die "Can't find GT or AD in vcf file!\n";
+		}
+		if ( exists( $formatPos{"RD"} ) ) {
+			pInfo(
+"Find both RD and AD in VCF file, will use RD as ref and AD as alt",
+				$logRef
+			);
+			if ( $method == 2 ) {
+				$method = 1;
+				pInfo(
+"Method will be changed to 1 as this vcf file did NOT contain reads for all genetypes",
+					$logRef
+				);
+			}
+		}
 
 		print RESULT1 "CHROM\tPOS\tREF\tALT";
 		print RESULT2 "CHROM\tPOS\tREF\tALT";
@@ -186,164 +219,131 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 				next;
 			}
 
-			my @line4S       = ( $lines[4] );
-			my @line7S       = ( $lines[7] );
-			my $line47Length = 1;
-			if ( $lines[4] =~ /,/ ) {    #such as A,C
-				@line4S = split( /,/, $lines[4] );
-				$line47Length = scalar @line4S;
-				foreach my $x ( 0 .. ( $line47Length - 1 ) ) {
-					$line7S[$x] = "";
+			my $REF  = $lines[3];
+			my @ALTs = split( /,|\//, $lines[4] );
+			my @SNPs = ( $REF, @ALTs );
+			if (   ( $usePASS == 1 and $lines[6] ne "PASS" )
+				or ( $usePASS != 1 and $lines[6] eq "LowQual" )
+				or &filter( $lines[7], \%cfgFilter ) == 0 )
+			{
+				$done_filter = 1;
+			}
+			else {
+				$done_filter = 0;
+				print RESULT2 "$lines[0]\t$lines[1]\t$lines[3]\t$lines[4]";
+				print RESULT6 join( "\t", @lines ) . "\n";
+			}
+			print RESULT1 "$lines[0]\t$lines[1]\t$lines[3]\t$lines[4]";
+
+			my @ID1 = ( split /;/, $lines[7] );
+			my %IDNumber;
+			foreach my $ID (@ID1) {
+				my @ID2 = ( split /=|,/, $ID );
+				$IDNumber{ $ID2[0] } = $ID2[1];
+			}
+			if ( $done_filter == 0 ) {
+				foreach my $ID ( sort keys %IDList ) {
+					if ( defined $IDNumber{$ID} ) {
+						print RESULT1 "\t$IDNumber{$ID}";
+						print RESULT2 "\t$IDNumber{$ID}";
+					}
+					else {
+						print RESULT1 "\t";
+						print RESULT2 "\t";
+					}
 				}
-				my @temp1 = split( /;/, $lines[7] );
-				foreach my $temp (@temp1) {
-					if ( $temp =~ /=/ && $temp =~ /,/ ) {
-						my @temp2 = split( /=|,/, $temp );
-						foreach my $x ( 0 .. ( $line47Length - 1 ) ) {
-							$line7S[$x] =
-							    $line7S[$x]
-							  . $temp2[0] . '='
-							  . $temp2[ $x + 1 ] . ';';
+				print RESULT1 "\n";
+				print RESULT2 "\n";
+			}
+			else {
+				foreach my $ID ( sort keys %IDList ) {
+					if ( defined $IDNumber{$ID} ) {
+						print RESULT1 "\t$IDNumber{$ID}";
+					}
+					else {
+						print RESULT1 "\t";
+					}
+				}
+				print RESULT1 "\n";
+			}
+
+			for ( my $x = 9 ; $x < ( 9 + $sampleSize ) ; $x++ ) {
+				if ( !(defined $lines[$x]) or $lines[$x] =~ /^\./ ) { next; }
+				$lines[$x] =~ /^(\d)\/(\d)/;
+				my $allele1 = $1;
+				my $allele2 = $2;
+				if ( $allele1 ne $allele2 ) {
+					if (   ( $SNPs[$allele1] . $SNPs[$allele2] eq "AG" )
+						or ( $SNPs[$allele1] . $SNPs[$allele2] eq "GA" )
+						or ( $SNPs[$allele1] . $SNPs[$allele2] eq "CT" )
+						or ( $SNPs[$allele1] . $SNPs[$allele2] eq "TC" ) )
+					{
+						$Sample2NumberAll{ $titles[$x] }{"Transitions"}++;
+						if ( $done_filter == 0 ) {
+							$Sample2NumberFilter{ $titles[$x] }
+							  {"Transitions"}++;
 						}
 					}
 					else {
-						foreach my $x ( 0 .. ( $line47Length - 1 ) ) {
-							$line7S[$x] = $line7S[$x] . $temp . ';';
+						$Sample2NumberAll{ $titles[$x] }{"Transversions"}++;
+						if ( $done_filter == 0 ) {
+							$Sample2NumberFilter{ $titles[$x] }
+							  {"Transversions"}++;
+						}
+					}
+					$Sample2NumberAll{ $titles[$x] }{"01Number"}++;
+					if ( $done_filter == 0 ) {
+						$Sample2NumberFilter{ $titles[$x] }{"01Number"}++;
+						if ( $lines[0] =~ /[xX]/ ) {
+							$genderCount{ $lines[0] }{"Heterozygous SNP"}
+							  { $titles[$x] }++;
 						}
 					}
 				}
-			}
-			foreach my $x ( 0 .. ( $line47Length - 1 ) ) {
-				$lines[4] = $line4S[$x];
-				$lines[7] = $line7S[$x];
-
-				if (   $lines[6] eq "LowQual"
-					or &filter( $lines[7], \%cfgFilter ) == 0 )
+				elsif ( ( $allele1 eq $allele2 )
+					and ( $allele1 > 0 ) )
 				{
-					$done_filter = 1;
-				}
-				else {
-					$done_filter = 0;
-					print RESULT2 "$lines[0]\t$lines[1]\t$lines[3]\t$lines[4]";
-					print RESULT6 join( "\t", @lines ) . "\n";
-				}
-				print RESULT1 "$lines[0]\t$lines[1]\t$lines[3]\t$lines[4]";
-
-				my @ID1 = ( split /;/, $lines[7] );
-				my %IDNumber;
-				foreach my $ID (@ID1) {
-					my @ID2 = ( split /=/, $ID );
-					$IDNumber{ $ID2[0] } = $ID2[1];
-				}
-				if ( $done_filter == 0 ) {
-					foreach my $ID ( sort keys %IDList ) {
-						if ( defined $IDNumber{$ID} ) {
-							print RESULT1 "\t$IDNumber{$ID}";
-							print RESULT2 "\t$IDNumber{$ID}";
-						}
-						else {
-							print RESULT1 "\t";
-							print RESULT2 "\t";
+					$Sample2NumberAll{ $titles[$x] }{"11Number"}++;
+					if ( $done_filter == 0 ) {
+						$Sample2NumberFilter{ $titles[$x] }{"11Number"}++;
+						if ( $lines[0] =~ /[xX]/ ) {
+							$genderCount{ $lines[0] }
+							  {"Non-reference Homozygous SNP"}{ $titles[$x] }++;
 						}
 					}
-					print RESULT1 "\n";
-					print RESULT2 "\n";
-				}
-				else {
-					foreach my $ID ( sort keys %IDList ) {
-						if ( defined $IDNumber{$ID} ) {
-							print RESULT1 "\t$IDNumber{$ID}";
-						}
-						else {
-							print RESULT1 "\t";
-						}
-					}
-					print RESULT1 "\n";
 				}
 
-				for ( my $x = 9 ; $x < ( 9 + $sampleSize ) ; $x++ ) {
-					#if ( $lines[$x] eq './.' or $lines[$x]=~/^\.\/\./ ) { next; }
-					if ( $lines[$x]=~/^\./ ) { next; }
-					$lines[$x] =~ /(\d)\/(\d)/;
-					my $allele1 = $1;
-					my $allele2 = $2;
-					if ( $allele1 ne $allele2 ) {
-						if (   ( $lines[3] . $lines[4] eq "AG" )
-							or ( $lines[3] . $lines[4] eq "GA" )
-							or ( $lines[3] . $lines[4] eq "CT" )
-							or ( $lines[3] . $lines[4] eq "TC" ) )
-						{
-							$Sample2NumberAll{ $titles[$x] }{"Transitions"}++;
-							if ( $done_filter == 0 ) {
-								$Sample2NumberFilter{ $titles[$x] }
-								  {"Transitions"}++;
-							}
-						}
-						else {
-							$Sample2NumberAll{ $titles[$x] }{"Transversions"}++;
-							if ( $done_filter == 0 ) {
-								$Sample2NumberFilter{ $titles[$x] }
-								  {"Transversions"}++;
-							}
-						}
-						$Sample2NumberAll{ $titles[$x] }{"01Number"}++;
-						if ( $done_filter == 0 ) {
-							$Sample2NumberFilter{ $titles[$x] }{"01Number"}++;
-							if ( $lines[0] =~ /[xX]/ ) {
-								$genderCount{ $lines[0] }{"Heterozygous SNP"}
-								  { $titles[$x] }++;
-							}
-						}
+				if ( $done_filter == 0 ) {    #this line was kept
+					                          #store X Y counts for sex check
+					if ( $lines[0] =~ /[yY]/ ) {
+						$genderCount{ $lines[0] }{"Total Reads"}
+						  { $titles[$x] } += $allele1 + $allele2;
 					}
-					elsif ( ( $allele1 eq $allele2 )
-						and ( $allele1 > 0 ) )
+					if ( ( $allele1 + $allele2 ) > 0 )
+					{    #count SNP for each sample in each chromosome
+						$snpCount{ $lines[0] }{ $titles[$x] }++;
+					}
+					if ( ( $allele1 + $allele2 ) > 0 )
+					{    #count SNP NUC for each sample
+						$snpNucCount{ $SNPs[$allele2] }{ $titles[$x] }++;
+					}
+					for ( my $y = ( $x + 1 ) ; $y < ( 9 + $sampleSize ) ; $y++ )
 					{
-						$Sample2NumberAll{ $titles[$x] }{"11Number"}++;
-						if ( $done_filter == 0 ) {
-							$Sample2NumberFilter{ $titles[$x] }{"11Number"}++;
-							if ( $lines[0] =~ /[xX]/ ) {
-								$genderCount{ $lines[0] }
-								  {"Non-reference Homozygous SNP"}
-								  { $titles[$x] }++;
-							}
-						}
-					}
-
-					if ( $done_filter == 0 ) {    #this line was kept
-						    #store X Y counts for sex check
-						if ( $lines[0] =~ /[yY]/ ) {
-							$genderCount{ $lines[0] }{"Total Reads"}
-							  { $titles[$x] } += $allele1 + $allele2;
-						}
-						if ( ( $allele2 + $allele2 ) > 0 )
-						{    #count SNP for each sample in each chromosome
-							$snpCount{ $lines[0] }{ $titles[$x] }++;
-						}
-						for (
-							my $y = ( $x + 1 ) ;
-							$y < ( 9 + $sampleSize ) ;
-							$y++
-						  )
-						{
-#							if ( $lines[$y] eq './.' or $lines[$y]=~/^\.\/\./ ) { next; }
-							if ( $lines[$y]=~/^\./ ) { next; }
-							else {
-								my @result =
-								  &caculate_ratio( $lines[$x], $lines[$y],
-									$method );
-								$selected{ $titles[$x] }{ $titles[$y] } +=
-								  $result[0];
-								$total{ $titles[$x] }{ $titles[$y] } +=
-								  $result[1];
-								$selected{ $titles[$y] }{ $titles[$x] } +=
-								  $result[2];
-								$total{ $titles[$y] }{ $titles[$x] } +=
-								  $result[3];
-								$selected2{ $titles[$x] }{ $titles[$y] } +=
-								  $result[4];
-								$total2{ $titles[$x] }{ $titles[$y] } +=
-								  $result[5];
-							}
+						if ( !(defined $lines[$y]) or $lines[$y] =~ /^\./ ) { next; }
+						else {
+							my @result = &caculate_ratio(
+								$lines[$x], $lines[$y],
+								$method,    \%formatPos
+							);
+							$selected{ $titles[$x] }{ $titles[$y] } +=
+							  $result[0];
+							$total{ $titles[$x] }{ $titles[$y] } += $result[1];
+							$selected{ $titles[$y] }{ $titles[$x] } +=
+							  $result[2];
+							$total{ $titles[$y] }{ $titles[$x] } += $result[3];
+							$selected2{ $titles[$x] }{ $titles[$y] } +=
+							  $result[4];
+							$total2{ $titles[$x] }{ $titles[$y] } += $result[5];
 						}
 					}
 				}
@@ -442,6 +442,26 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 		}
 		close(RESULT7);
 
+		$temp = ( sort keys %snpCount )[0];
+		print RESULT8 "Chromosome";
+		foreach my $sample ( sort keys %{ $snpCount{$temp} } ) {
+			print RESULT8 "\t$sample";
+		}
+		print RESULT8 "\n";
+		foreach my $nuc ( sort keys %snpNucCount ) {
+			print RESULT8 "$nuc";
+			foreach my $sample ( sort keys %{ $snpCount{$temp} } ) {
+				if ( exists $snpNucCount{$nuc}{$sample} ) {
+					print RESULT8 "\t$snpNucCount{$nuc}{$sample}";
+				}
+				else {
+					print RESULT8 "\t0";
+				}
+			}
+			print RESULT8 "\n";
+		}
+		close(RESULT8);
+
 		#do annovar
 		if ($doAnnovar) {
 			pInfo( "do ANNOVAR annotation", $logRef );
@@ -485,21 +505,23 @@ sub filter {
 
 	#if keep this line:
 	foreach my $key ( sort keys %cfgFilter ) {
-		if ( exists( $filter{$key} )
-			and eval( $filter{$key} . $cfgFilter{$key} ) )
-		{
-
-			#			print "$filter{$key} $cfgFilter{$key}\n";
-			return (0);
+		if ( exists( $filter{$key} ) ) {
+			my @filterValues = ( split /,/, $filter{$key} );
+			foreach my $filterValue (@filterValues) {
+				if ( eval( $filterValue . $cfgFilter{$key} ) ) {
+					return (0);
+				}
+			}
 		}
 	}
 	return (1);
 }
 
 sub caculate_ratio {
-	my $sample1 = $_[0];
-	my $sample2 = $_[1];
-	my $method  = $_[2];
+	my $sample1   = $_[0];
+	my $sample2   = $_[1];
+	my $method    = $_[2];
+	my %formatPos = %{ $_[3] };
 
 	my (
 		$a2bSelected, $b2aSelected, $abSelected,
@@ -507,27 +529,51 @@ sub caculate_ratio {
 	) = ( 0, 0, 0, 0, 0, 0 );
 	my $fenzi = 0;
 
-	my @lines1 = ( split /;|:|,|\//, $sample1 );
-	my @lines2 = ( split /;|:|,|\//, $sample2 );
+	my @lines1 = ( split /:/, $sample1 );
+	my @lines2 = ( split /:/, $sample2 );
+	my $GTpos  = $formatPos{"GT"};
+	my ( $sample1GTRef, $sample1GTAlt ) = ( split /\//, $lines1[$GTpos] );
+	my ( $sample2GTRef, $sample2GTAlt ) = ( split /\//, $lines2[$GTpos] );
+
+	my $Sample1RDreads = 0;
+	my $Sample1ADreads = 0;
+	my $Sample2RDreads = 0;
+	my $Sample2ADreads = 0;
+	if ( exists( $formatPos{"RD"} ) ) {  #RD and AD reads as RDreads and ADreads
+		my $ADpos = $formatPos{"AD"};
+		my $RDpos = $formatPos{"RD"};
+		$Sample1RDreads = $lines1[$RDpos];
+		$Sample1ADreads = $lines1[$ADpos];
+		$Sample2RDreads = $lines2[$RDpos];
+		$Sample2ADreads = $lines2[$ADpos];
+	}
+	else {    #RD and AD reads as 0Reads,1Reads,2Reads
+		my $ADpos  = $formatPos{"AD"};
+		my @reads1 = ( split /,/, $lines1[$ADpos] );
+		my @reads2 = ( split /,/, $lines2[$ADpos] );
+		$Sample1RDreads = $reads1[$sample1GTRef];
+		$Sample1ADreads = $reads1[$sample1GTAlt];
+		$Sample2RDreads = $reads2[$sample2GTRef];
+		$Sample2ADreads = $reads2[$sample2GTAlt];
+	}
 
 	#deepth <10
 	my $sum1 = 0;
 	my $sum2 = 0;
-#	if ( $lines1[3] eq '.' or $lines2[3] eq '.' ) {
-	if ( $lines1[2] eq '.' or $lines2[2] eq '.' or $lines1[3] eq '.' or $lines2[3] eq '.' ) {
-		return( 0, 0, 0, 0, 0, 0 );
+	if ( $Sample1RDreads eq '.' or $Sample2RDreads eq '.' ) {
+		return ( 0, 0, 0, 0, 0, 0 );
 	}
-	if ( $lines1[0] eq $lines1[1] ) {
-		$sum1 = $lines1[ 2 + $lines1[0] ];
-	}
-	else {
-		$sum1 = $lines1[ 2 + $lines1[0] ] + $lines1[ 2 + $lines1[1] ];
-	}
-	if ( $lines2[0] eq $lines2[1] ) {
-		$sum2 = $lines2[ 2 + $lines2[0] ];
+	if ( $sample1GTRef eq $sample1GTAlt ) {
+		$sum1 = $Sample1RDreads;
 	}
 	else {
-		$sum2 = $lines2[ 2 + $lines2[0] ] + $lines2[ 2 + $lines2[1] ];
+		$sum1 = $Sample1RDreads + $Sample1ADreads;
+	}
+	if ( $sample2GTRef eq $sample2GTAlt ) {
+		$sum2 = $Sample2RDreads;
+	}
+	else {
+		$sum2 = $Sample2RDreads + $Sample2ADreads;
 	}
 	if ( $sum1 < 10 or $sum2 < 10 ) {
 		(
@@ -538,25 +584,31 @@ sub caculate_ratio {
 	else {
 		$abTotal = 1;
 		if ( $method == 1 ) {
-			if ( ( $lines1[0] eq $lines2[0] ) and ( $lines1[1] eq $lines2[1] ) )
+			if (    ( $sample1GTRef eq $sample2GTRef )
+				and ( $sample1GTAlt eq $sample2GTAlt ) )
 			{
 				$fenzi = 1;
 			}
 		}
 		elsif ( $method == 2 ) {
+			my $ADpos  = $formatPos{"AD"};
+			my @reads1 = ( split /,/, $lines1[$ADpos] );
+			my @reads2 = ( split /,/, $lines2[$ADpos] );
 			if (
-				$lines1[0] eq $lines2[0]
+				$sample1GTRef eq $sample2GTRef
 				and (
-					( $lines1[1] eq $lines2[1] )
-
-					#				 or ( $lines1[3] * $lines2[3] > 0 ) )
+					( $sample1GTAlt eq $sample2GTAlt )
 					or (
-						(
-							$lines1[ 2 + $lines1[1] ] *
-							$lines2[ 2 + $lines1[1] ]
-						) > 0
-						and ( $lines1[ 2 + $lines2[1] ] *
-							$lines2[ 2 + $lines2[1] ] ) > 0
+
+						#						(
+						#							$lines1[ 2 + $lines1[1] ] *
+						#							$lines2[ 2 + $lines1[1] ]
+						#						) > 0
+						#						and ( $lines1[ 2 + $lines2[1] ] *
+						#							$lines2[ 2 + $lines2[1] ] ) > 0
+						( $reads1[$sample1GTAlt] * $reads2[$sample1GTAlt] ) > 0
+						and ( $reads1[$sample2GTAlt] * $reads2[$sample2GTAlt] )
+						> 0
 					)
 				)
 			  )
@@ -570,7 +622,7 @@ sub caculate_ratio {
 		else { $abSelected = 0; }
 
 		#Samples A
-		if ( $lines1[0] ne $lines1[1] ) {
+		if ( $sample1GTRef ne $sample1GTAlt ) {
 			$a2bTotal = 1;
 			if ( $fenzi == 1 ) {
 				$a2bSelected = 1;
@@ -585,7 +637,7 @@ sub caculate_ratio {
 		}
 
 		#Samples B
-		if ( $lines2[0] ne $lines2[1] ) {
+		if ( $sample2GTRef ne $sample2GTAlt ) {
 			$b2aTotal = 1;
 			if ( $fenzi == 1 ) {
 				$b2aSelected = 1;

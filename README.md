@@ -3,6 +3,9 @@ Table of Content
 * [Introduction](#Introduction)
 * [Download](#download)
 * [Change log](#Change)
+ * [Release Version 1.31](#R131)
+ * [Release Version 1.30](#R130)
+ * [Release Version 1.26](#R126)
  * [Release Version 1.25](#R125)
  * [Release Version 1.24](#R124)
  * [Release Version 1.23](#R123)
@@ -63,6 +66,24 @@ Or you can also download the zip file of QC3 from [github](https://github.com/sl
 
 <a name="Change"/>
 # Change log #
+
+<a name="R131">
+## Release version 1.31 on May 01, 2015
+Release version 1.31
+ * Changes in methods of Vcf QC;
+ * More robust for different formats of vcf files;
+
+<a name="R130">
+## Release version 1.30 on April 26, 2015
+Release version 1.30
+ * Vcf QC supports more different formats of vcf files;
+ * Improvement of Vcf QC report;
+
+<a name="R126">
+## Release version 1.26 on April 23, 2015
+Release version 1.26
+ * More robust for different formats of vcf files;
+ * new parameter -up for Vcf QC, Only use PASS variants in vcf;
 
 <a name="R125">
 ## Release version 1.25 on April 16, 2015
