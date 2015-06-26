@@ -3,6 +3,7 @@ Table of Content
 * [Introduction](#Introduction)
 * [Download](#download)
 * [Change log](#Change)
+ * [Release Version 1.32](#R132)
  * [Release Version 1.31](#R131)
  * [Release Version 1.30](#R130)
  * [Release Version 1.26](#R126)
@@ -66,6 +67,11 @@ Or you can also download the zip file of QC3 from [github](https://github.com/sl
 
 <a name="Change"/>
 # Change log #
+
+<a name="R132">
+## Release version 1.32 on June 26, 2015
+Release version 1.32
+ * Fix bug in of Bam QC;
 
 <a name="R131">
 ## Release version 1.31 on May 01, 2015

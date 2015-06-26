@@ -652,7 +652,7 @@ sub bamProcess {
 		$inBedSign,      $isdepth,         $samtoolsBin,
 		$caculateMethod, $totalExonLength, $logRef
 	) = @_;
-	pInfo( "Thread $threadNum stared", $logRef );
+	pInfo( "Thread $threadNum started", $logRef );
 	while (1) {
 		my $file;
 		my $current_temp;
@@ -684,9 +684,9 @@ sub initializeDatabase {
 		chomp;
 		if (/^\@SQ\tSN:(\w+)\tLN:(\d+)/) {
 			my $chr = $1;
+			my $chrLength = $2;
 			$chr =~ s/^chr//i;
 			$databaseRef->{$chr} = "";
-			my $chrLength = $2;
 			vec( $databaseRef->{$chr}, $chrLength, 2 ) = 0;
 		}
 	}
