@@ -288,6 +288,9 @@ sub getbammetric {
 	my ( $total, $ontarget, $offtarget, $ummapped, $offtargetintron,
 		$offtargetintergenic, $offtargetmito )
 	  = ( 0, 0, 0, 0, 0, 0, 0 );
+	my ( $totalNorm, $ontargetNorm, $offtargetNorm, $ummappedNorm, $offtargetintronNorm,
+        $offtargetintergenicNorm, $offtargetmitoNorm )
+      = ( 0, 0, 0, 0, 0, 0, 0 );
 	my (
 		$totalMQflag,               $totalInsertflag,
 		$ontargetMQflag,            $ontargetInsertflag,
@@ -316,15 +319,33 @@ sub getbammetric {
 	if ( defined $fileLable[1] ) {
 		$label = $fileLable[1];
 	}
-	open( BAMLINE1, "$samtoolsBin view $in|head -1|" ) or die $!;
+	open( BAMLINE1, "$samtoolsBin view $in|" ) or die $!;
 	my $firstLine = <BAMLINE1>;
 	my @headers = split( ":", ( split( "\t", $firstLine ) )[0] );
 	my ( $instrument, $runNumber, $flowcell, $lane ) =
 	  ( $headers[0], $headers[1], $headers[2], $headers[3] );
-	close(BAMLINE1);
-	open( BAM, "$samtoolsBin view $in|" ) or die $!;
+	
 	my $flag_read_unmapped           = 0x0004;
 	my $flag_read_mapped_proper_pair = 0x0002;
+	
+	my $mutipleAlignInd=0;
+	while(<BAMLINE1>) {
+		my @line   = split "\t", $_;
+		my $flag   = $line[1];
+		if (!($flag & $flag_read_unmapped)) { #mapped
+			#find $mutipleAlignInd here
+			foreach my $i (11..(scalar(@line)-1)) {
+				if ($line[$i]=~/NH:i:\d+/ or $line[$i]=~/IH:i:\d+/) {
+					$mutipleAlignInd=$i;
+				}
+			}
+			last;
+		}
+	}
+	
+	close(BAMLINE1);
+	open( BAM, "$samtoolsBin view $in|" ) or die $!;
+
 
 	while (<BAM>) {
 		my @line   = split "\t", $_;
@@ -358,14 +379,23 @@ sub getbammetric {
 		{
 			next;
 		}
-
+		
+		my $mutipleAlignCount=1;
+		if ($mutipleAlignInd) {
+			#find the $mutipleAlignCount by $mutipleAlignInd
+			if ($line[$mutipleAlignInd]=~/\w\w:i:(\d+)/) {
+				$mutipleAlignCount=1/$1;
+			}
+		}
+		
 		if ( $flag & $flag_read_unmapped ) {
-
 			#read unmapped
 			$ummapped++;
+			$ummappedNorm+=$mutipleAlignCount;
 		}
 		else {
 			$total++;
+			$totalNorm+=$mutipleAlignCount;
 			if ($MQflag) {
 				&storeData( $MQ, $totalMQ, $caculateMethod );
 				$totalMQflag++;
@@ -381,7 +411,8 @@ sub getbammetric {
 
 			if ( vec( $regionDatabaseRef->{$chr}, $pos, 2 ) == $inBedSign )
 			{    #in bed file
-				$ontarget++;
+			    $ontarget++;
+				$ontargetNorm+=$mutipleAlignCount;
 				if ($MQflag) {
 					&storeData( $MQ, $ontargetMQ, $caculateMethod );
 					$ontargetMQflag++;
@@ -398,6 +429,7 @@ sub getbammetric {
 			}
 			else {
 				$offtarget++;
+				$offtargetNorm+=$mutipleAlignCount;
 				if ($MQflag) {
 					&storeData( $MQ, $offtargetMQ, $caculateMethod );
 					$offtargetMQflag++;
@@ -413,7 +445,8 @@ sub getbammetric {
 
 				if ( vec( $regionDatabaseRef->{$chr}, $pos, 2 ) == 3 )
 				{    #in intron
-					$offtargetintron++;
+				    $offtargetintron++;
+					$offtargetintronNorm+=$mutipleAlignCount;
 					if ($MQflag) {
 						&storeData( $MQ, $offtargetintronMQ, $caculateMethod );
 						$offtargetintronMQflag++;
@@ -430,7 +463,8 @@ sub getbammetric {
 				}
 				elsif ( !vec( $regionDatabaseRef->{$chr}, $pos, 2 ) )
 				{    #==0, then not in exon and intron, must be intergenic
-					$offtargetintergenic++;
+				    $offtargetintergenic++;
+					$offtargetintergenicNorm+=$mutipleAlignCount;
 					if ($MQflag) {
 						&storeData( $MQ, $offtargetintergenicMQ,
 							$caculateMethod );
@@ -448,7 +482,7 @@ sub getbammetric {
 					}
 				}
 				if ( $chr =~ /M/i ) {
-					$offtargetmito++;
+					$offtargetmito+=$mutipleAlignCount;
 					if ($MQflag) {
 						&storeData( $MQ, $offtargetmitoMQ, $caculateMethod );
 						$offtargetmitoMQflag++;
@@ -594,10 +628,10 @@ sub getbammetric {
 		my @returnValue = (
 			$label,                     $instrument,
 			$runNumber,                 $flowcell,
-			$lane,                      $ummapped,
-			$total,                     $ontarget,
-			$offtarget,                 $offtargetintron,
-			$offtargetintergenic,       $offtargetmito,
+			$lane,                      $ummappedNorm,
+			$totalNorm,                     $ontargetNorm,
+			$offtargetNorm,                 $offtargetintronNorm,
+			$offtargetintergenicNorm,       $offtargetmitoNorm,
 			$totalMQ,                   $ontargetMQ,
 			$offtargetMQ,               $offtargetintronMQ,
 			$offtargetintergenicMQ,     $offtargetmitoMQ,
@@ -625,10 +659,10 @@ sub getbammetric {
 		my @returnValue = (
 			$label,                     $instrument,
 			$runNumber,                 $flowcell,
-			$lane,                      $ummapped,
-			$total,                     $ontarget,
-			$offtarget,                 $offtargetintron,
-			$offtargetintergenic,       $offtargetmito,
+			$lane,                      $ummappedNorm,
+			$totalNorm,                     $ontargetNorm,
+			$offtargetNorm,                 $offtargetintronNorm,
+			$offtargetintergenicNorm,       $offtargetmitoNorm,
 			$totalMQ,                   $ontargetMQ,
 			$offtargetMQ,               $offtargetintronMQ,
 			$offtargetintergenicMQ,     $offtargetmitoMQ,

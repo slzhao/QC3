@@ -3,6 +3,7 @@ Table of Content
 * [Introduction](#Introduction)
 * [Download](#download)
 * [Change log](#Change)
+ * [Release Version 1.33](#R133)
  * [Release Version 1.32](#R132)
  * [Release Version 1.31](#R131)
  * [Release Version 1.30](#R130)
@@ -67,6 +68,11 @@ Or you can also download the zip file of QC3 from [github](https://github.com/sl
 
 <a name="Change"/>
 # Change log #
+
+<a name="R133">
+## Release version 1.33 on October 19, 2015
+Release version 1.33
+ * Bam QC supports bam files with more than one alignments for one query;
 
 <a name="R132">
 ## Release version 1.32 on June 26, 2015
