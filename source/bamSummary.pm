@@ -328,15 +328,19 @@ sub getbammetric {
 	my $flag_read_unmapped           = 0x0004;
 	my $flag_read_mapped_proper_pair = 0x0002;
 	
-	my $mutipleAlignInd=0;
+#	my $mutipleAlignInd=0;
+	my $mutipleAlignKey='';
 	while(<BAMLINE1>) {
 		my @line   = split "\t", $_;
 		my $flag   = $line[1];
 		if (!($flag & $flag_read_unmapped)) { #mapped
-			#find $mutipleAlignInd here
+			#find $mutipleAlignKey here
 			foreach my $i (11..(scalar(@line)-1)) {
-				if ($line[$i]=~/NH:i:\d+/ or $line[$i]=~/IH:i:\d+/) {
-					$mutipleAlignInd=$i;
+#				print $line[$i]."\n";
+				if ($line[$i]=~/(NH:i:)\d+/ or $line[$i]=~/(IH:i:)\d+/) {
+#					$mutipleAlignInd=$i;
+					$mutipleAlignKey=$1;
+#					print $mutipleAlignKey."\n";
 				}
 			}
 			last;
@@ -367,9 +371,10 @@ sub getbammetric {
 		$chr =~ s/^chr//i;
 		my $pos = $line[3];
 
-		my $AS     = $line[11];
+#		my $AS     = $line[11];
+		my $AS     = 0;
 		my $ASflag = 0;
-		if ( $AS =~ /AS:i:([-]*\d+)/ ) {
+		if (/\tAS:i:([-]*\d+)\t/ ) {
 			$AS     = $1;
 			$ASflag = 1;
 		}
@@ -381,20 +386,21 @@ sub getbammetric {
 		}
 		
 		my $mutipleAlignCount=1;
-		if ($mutipleAlignInd) {
+		if ($mutipleAlignKey ne "") {
 			#find the $mutipleAlignCount by $mutipleAlignInd
-			if ($line[$mutipleAlignInd]=~/\w\w:i:(\d+)/) {
+			if (/\t$mutipleAlignKey(\d+)\t/) {
 				$mutipleAlignCount=1/$1;
+				#print("Find:".$mutipleAlignInd.":".$mutipleAlignKey)
 			}
 		}
 		
 		if ( $flag & $flag_read_unmapped ) {
 			#read unmapped
-			$ummapped++;
+#			$ummapped++;
 			$ummappedNorm+=$mutipleAlignCount;
 		}
 		else {
-			$total++;
+#			$total++;
 			$totalNorm+=$mutipleAlignCount;
 			if ($MQflag) {
 				&storeData( $MQ, $totalMQ, $caculateMethod );
@@ -411,7 +417,7 @@ sub getbammetric {
 
 			if ( vec( $regionDatabaseRef->{$chr}, $pos, 2 ) == $inBedSign )
 			{    #in bed file
-			    $ontarget++;
+#			    $ontarget++;
 				$ontargetNorm+=$mutipleAlignCount;
 				if ($MQflag) {
 					&storeData( $MQ, $ontargetMQ, $caculateMethod );
@@ -428,7 +434,7 @@ sub getbammetric {
 
 			}
 			else {
-				$offtarget++;
+#				$offtarget++;
 				$offtargetNorm+=$mutipleAlignCount;
 				if ($MQflag) {
 					&storeData( $MQ, $offtargetMQ, $caculateMethod );
@@ -445,7 +451,7 @@ sub getbammetric {
 
 				if ( vec( $regionDatabaseRef->{$chr}, $pos, 2 ) == 3 )
 				{    #in intron
-				    $offtargetintron++;
+#				    $offtargetintron++;
 					$offtargetintronNorm+=$mutipleAlignCount;
 					if ($MQflag) {
 						&storeData( $MQ, $offtargetintronMQ, $caculateMethod );
@@ -463,7 +469,7 @@ sub getbammetric {
 				}
 				elsif ( !vec( $regionDatabaseRef->{$chr}, $pos, 2 ) )
 				{    #==0, then not in exon and intron, must be intergenic
-				    $offtargetintergenic++;
+#				    $offtargetintergenic++;
 					$offtargetintergenicNorm+=$mutipleAlignCount;
 					if ($MQflag) {
 						&storeData( $MQ, $offtargetintergenicMQ,
