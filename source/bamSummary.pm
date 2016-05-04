@@ -561,7 +561,7 @@ sub getbammetric {
 
 		# use samtools depth to get the depth file
 		#		pInfo("Getting depth of '$in'",$logFile);
-		open( DEPTH, "$samtoolsBin depth $in|" ) or die $!;
+		open( DEPTH, "$samtoolsBin depth -a $in|" ) or die $!;
 		my ( $totaldepth, $ontargetdepth, $offtargetdepth,
 			$offtargetintrondepth, $offtargetintergenicdepth,
 			$offtargetmitodepth );
