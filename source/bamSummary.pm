@@ -574,6 +574,7 @@ sub getbammetric {
 		while (<DEPTH>) {
 			s/\r|\n//g;
 			my ( $chr, $pos, $depth ) = split "\t";
+			$chr =~ s/^chr//i;
 			if ( !$depth ) { next; }
 			$totalnum++;
 			&storeData( $depth, $totaldepth, $caculateMethod );
