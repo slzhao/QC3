@@ -44,10 +44,11 @@ my $commandline = "perl $0 "
   . join( " ", @ARGV )
   ;    #Output you input command in the report to reproduce you result
 my (
-	$module,           $filelist, $resultDir,  $singleEnd,
-	$targetregionfile, $gtffile,  $isdepth,    $caculateMethod,
-	$vcfCfgFile,       $method,   $maxThreads, $annovarDb,$usePASS,$xym,
-	$rePlot,           $showHelp
+	$module,           $filelist,    $resultDir,  $singleEnd,
+	$targetregionfile, $gtffile,     $isdepth,    $nod,
+        $caculateMethod,   $vcfCfgFile,  $method,     $maxThreads,
+        $annovarDb,        $usePASS,     $xym,        $rePlot,
+        $showHelp
 ) = ();
 our @log : shared;
 
@@ -61,6 +62,7 @@ GetOptions(
 	"r=s"  => \$targetregionfile,
 	"g=s"  => \$gtffile,
 	"d"    => \$isdepth,
+	"nod"  => \$nod,
 	"cm=i" => \$caculateMethod,
 
 	"c:s" => \$vcfCfgFile,
@@ -116,8 +118,13 @@ elsif ( !( -s $filelist ) ) {
 "Input file (-i) didn't exist or size equal 0\nYou can use '$commandline -h' to see help information for the module\n$usageModule"
 	);
 }
-
+if ( !defined $targetregionfile and defined $nod ) {
+	die(
+"Target region file (-r) must be provided if option -nod used.\nYou can use '$commandline -h' to see help information for the module\n$usageModule"
+	);
+}
 if ( !defined $isdepth ) { $isdepth = 0; }
+if ( !defined $nod ) { $nod = 0; }
 if ( !defined $usePASS ) { $usePASS = 0; }
 if ( !defined $xym ) { $xym = 0; }
 if ( !defined $method )  { $method  = 1; }
@@ -199,6 +206,7 @@ elsif ( $module eq "b" ) {
 	$config{'targetregionfile'} = $targetregionfile;
 	$config{'gtffile'}          = $gtffile;
 	$config{'isdepth'}          = $isdepth;
+	$config{'nod'}              = $nod;
 	my $rResult = &bamSummary( $filelist, \%config );
 	if ( $rResult != 0 ) {
 		pInfo(
