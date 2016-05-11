@@ -319,6 +319,7 @@ Here is more details for each module:
 	-g  [database]	Optional. A gtf file. At least one targetregion file or gtf file should be provided.
 	-cm [int]	    Optional. Calculation method for data summary, should be 1 or 2. Method 1 means mean and method 2 means median. The default value is 1.
 	-d				Optional. The depth in on-/off-target regions will be calculated. QC3 will not calculate depth by default, because it may take a long time.
+	-nod            Optional. Do not compute the depth in off-target regions for saving time (no off-target depth) If set, the user must provide a bed file for target regions.
 
 **Please note: At least one targetregion file or gtf file should be provided for bam QC**. So the user can use (-r) or (-g) or (-r and -g) option for bam QC.
 

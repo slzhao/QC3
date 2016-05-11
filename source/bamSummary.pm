@@ -30,6 +30,7 @@ sub bamSummary {
 	my $gtffile          = $config->{'gtffile'};
 	my $resultDir        = $config->{'resultDir'};
 	my $isdepth          = $config->{'isdepth'};
+	my $nod              = $config->{'nod'};	
 	my $RBin             = $config->{'RBin'};
 	my $samtoolsBin      = $config->{'samtoolsBin'};
 
@@ -49,15 +50,16 @@ Usage:   perl qc3.pl -m b -i bamFileList -o outputDirectory [-t threads] [other 
 
 Options:
 
-	-i	input filelist      Required. A list file for bam files to be analyzed.
-	-o	output directory    Required. Output directory for QC result. If the directory doesn't exist, it would be created.
-	-t	threads             Optional. Threads used in analysis. The default value is 4.
-	-r	region file         Optional. A targetregion file. At least one targetregion file or gtf file should be provided.
-	-g	region file         Optional. A gtf file. At least one targetregion file or gtf file should be provided.
-	-cm	method	            Optional. Calculation method for data summary, should be 1 or 2. Method 1 means mean and method 2 means median. The default value is 1.
-	-d	                    Optional. The depth in on-/off-target regions will be calculated. QC3 will not calculate depth by default, because it may take a long time.
+	-i	input filelist        Required. A list file for bam files to be analyzed.
+	-o	output directory      Required. Output directory for QC result. If the directory doesn't exist, it would be created.
+	-t	threads               Optional. Threads used in analysis. The default value is 4.
+	-r	region file           Optional. A targetregion file. At least one targetregion file or gtf file should be provided.
+	-g	region file           Optional. A gtf file. At least one targetregion file or gtf file should be provided.
+	-cm	method	              Optional. Calculation method for data summary, should be 1 or 2. Method 1 means mean and method 2 means median. The default value is 1.
+	-d	                      Optional. The depth in on-/off-target regions will be calculated. QC3 will not calculate depth by default, because it may take a long time.
+	-nod	no off-target depth   Optional. The depth in off-target regions will not be calculated to save time.
 	
-	-h	                    Optional. Show this information.
+	-h	                      Optional. Show this information.
 		
 For more information, please refer to the readme file in QC3 directory. Or visit the QC3 website at https://github.com/slzhao/QC3
 
@@ -88,8 +90,10 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 	}
 	else {
 		if ( $isdepth == 1 ) {
+			my $off_on;
+			if ( $nod == 1 ) { $off_on = "on"} else { $off_on = "on-/off"; $nod = 0 }
 			pInfo(
-"Will calculate the depth in on-/off-target regions. It will take a long time. You can turn it off without -d in your command line",
+"Will calculate the depth in $off_on-target regions. It will take a long time. You can turn it off without -d in your command line",
 				$logRef
 			);
 		}
@@ -192,8 +196,8 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 			push @threads,
 			  threads->new(
 				\&bamProcess,     $x,              \@fileList,
-				\%regionDatabase, $inBedSign,      $isdepth,
-				$samtoolsBin,     $caculateMethod, $totalExonLength,
+				\%regionDatabase, $inBedSign,      $isdepth, 
+				$samtoolsBin,     $caculateMethod, $totalExonLength, $nod, $targetregionfile,
 				$logRef
 			  );
 		}
@@ -283,7 +287,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 
 sub getbammetric {
 	my ( $in, $regionDatabaseRef, $inBedSign, $isdepth, $samtoolsBin,
-		$caculateMethod, $totalExonLength )
+		$caculateMethod, $totalExonLength, $nod, $targetregionfile )
 	  = @_;
 	my ( $total, $ontarget, $offtarget, $ummapped, $offtargetintron,
 		$offtargetintergenic, $offtargetmito )
@@ -561,7 +565,10 @@ sub getbammetric {
 
 		# use samtools depth to get the depth file
 		#		pInfo("Getting depth of '$in'",$logFile);
-		open( DEPTH, "$samtoolsBin depth -a $in|" ) or die $!;
+		# add a variable to the samtools depth line for adapting it in case of  -nod option
+		my $nod_part;
+		if ($nod) { $nod_part = "-b $targetregionfile" } else { $nod_part = "" }
+		open( DEPTH, "$samtoolsBin depth $nod_part $in|" ) or die $!;
 		my ( $totaldepth, $ontargetdepth, $offtargetdepth,
 			$offtargetintrondepth, $offtargetintergenicdepth,
 			$offtargetmitodepth );
@@ -574,6 +581,7 @@ sub getbammetric {
 		while (<DEPTH>) {
 			s/\r|\n//g;
 			my ( $chr, $pos, $depth ) = split "\t";
+			$chr =~ s/^chr//i;
 			if ( !$depth ) { next; }
 			$totalnum++;
 			&storeData( $depth, $totaldepth, $caculateMethod );
@@ -690,7 +698,7 @@ sub bamProcess {
 	my (
 		$threadNum,      $fileListRef,     $regionDatabaseRef,
 		$inBedSign,      $isdepth,         $samtoolsBin,
-		$caculateMethod, $totalExonLength, $logRef
+		$caculateMethod, $totalExonLength, $nod, $targetregionfile, $logRef
 	) = @_;
 	pInfo( "Thread $threadNum started", $logRef );
 	while (1) {
@@ -707,7 +715,7 @@ sub bamProcess {
 		pInfo( "Thread $threadNum processing $file", $logRef );
 		my ($metric) =
 		  &getbammetric( $file, $regionDatabaseRef, $inBedSign, $isdepth,
-			$samtoolsBin, $caculateMethod, $totalExonLength );
+			$samtoolsBin, $caculateMethod, $totalExonLength, $nod, $targetregionfile );
 
 		#return result here
 		{
