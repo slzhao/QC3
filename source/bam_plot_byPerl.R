@@ -1,5 +1,5 @@
 # TODO: Add comment
-# 
+#
 # Author: zhaos
 ###############################################################################
 
@@ -29,5 +29,5 @@ if (ncol(allResult)>=35) {
 } else {
 	colBox<-5:ncol(allResult)
 }
-plot_dataFrame(allResult,colBox=colBox,colList=colList)
+plot_dataFrame(allResult,colBox=colBox,colList=colList,nobatch=commandArgs()[6])
 setwd(oldwd)

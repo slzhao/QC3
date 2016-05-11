@@ -30,7 +30,8 @@ sub bamSummary {
 	my $gtffile          = $config->{'gtffile'};
 	my $resultDir        = $config->{'resultDir'};
 	my $isdepth          = $config->{'isdepth'};
-	my $nod              = $config->{'nod'};	
+	my $nod              = $config->{'nod'};
+	my $no_batch         = $config->{'no_batch'};
 	my $RBin             = $config->{'RBin'};
 	my $samtoolsBin      = $config->{'samtoolsBin'};
 
@@ -57,10 +58,11 @@ Options:
 	-g	region file           Optional. A gtf file. At least one targetregion file or gtf file should be provided.
 	-cm	method	              Optional. Calculation method for data summary, should be 1 or 2. Method 1 means mean and method 2 means median. The default value is 1.
 	-d	                      Optional. The depth in on-/off-target regions will be calculated. QC3 will not calculate depth by default, because it may take a long time.
-	-nod	no off-target depth   Optional. The depth in off-target regions will not be calculated to save time.
-	
+	-nod	no off-target depth Optional. The depth in off-target regions will not be calculated to save time.
+	-no_batch                 Optional. The batch effect part of figures will not be plotted (considering BAM file not informative).
+
 	-h	                      Optional. Show this information.
-		
+
 For more information, please refer to the readme file in QC3 directory. Or visit the QC3 website at https://github.com/slzhao/QC3
 
 ";
@@ -196,9 +198,9 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 			push @threads,
 			  threads->new(
 				\&bamProcess,     $x,              \@fileList,
-				\%regionDatabase, $inBedSign,      $isdepth, 
+				\%regionDatabase, $inBedSign,      $isdepth,
 				$samtoolsBin,     $caculateMethod, $totalExonLength, $nod, $targetregionfile,
-				$logRef
+				$no_batch,        $logRef
 			  );
 		}
 
@@ -279,7 +281,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 	my $Rsource =
 	  dirname($0) . "/source/rFunctions.R " . dirname($0) . $rSourceLocation;
 	my $rResult = system(
-"cat $Rsource | $RBin --vanilla --slave --args $resultDir 1>$resultDir/bamResult/bamSummary.rLog 2>$resultDir/bamResult/bamSummary.rLog"
+"cat $Rsource | $RBin --vanilla --slave --args $resultDir $no_batch 1>$resultDir/bamResult/bamSummary.rLog 2>$resultDir/bamResult/bamSummary.rLog"
 	);
 	pInfo( "Finish bam summary!", $logRef );
 	return ($rResult);
@@ -328,10 +330,10 @@ sub getbammetric {
 	my @headers = split( ":", ( split( "\t", $firstLine ) )[0] );
 	my ( $instrument, $runNumber, $flowcell, $lane ) =
 	  ( $headers[0], $headers[1], $headers[2], $headers[3] );
-	
+
 	my $flag_read_unmapped           = 0x0004;
 	my $flag_read_mapped_proper_pair = 0x0002;
-	
+
 #	my $mutipleAlignInd=0;
 	my $mutipleAlignKey='';
 	while(<BAMLINE1>) {
@@ -350,7 +352,7 @@ sub getbammetric {
 			last;
 		}
 	}
-	
+
 	close(BAMLINE1);
 	open( BAM, "$samtoolsBin view $in|" ) or die $!;
 
@@ -388,7 +390,7 @@ sub getbammetric {
 		{
 			next;
 		}
-		
+
 		my $mutipleAlignCount=1;
 		if ($mutipleAlignKey ne "") {
 			#find the $mutipleAlignCount by $mutipleAlignInd
@@ -397,7 +399,7 @@ sub getbammetric {
 				#print("Find:".$mutipleAlignInd.":".$mutipleAlignKey)
 			}
 		}
-		
+
 		if ( $flag & $flag_read_unmapped ) {
 			#read unmapped
 #			$ummapped++;
@@ -568,7 +570,7 @@ sub getbammetric {
 		# add a variable to the samtools depth line for adapting it in case of  -nod option
 		my $nod_part;
 		if ($nod) { $nod_part = "-b $targetregionfile" } else { $nod_part = "" }
-		open( DEPTH, "$samtoolsBin depth $nod_part $in|" ) or die $!;
+		open( DEPTH, "$samtoolsBin depth -a $nod_part $in|" ) or die $!;
 		my ( $totaldepth, $ontargetdepth, $offtargetdepth,
 			$offtargetintrondepth, $offtargetintergenicdepth,
 			$offtargetmitodepth );
@@ -698,7 +700,7 @@ sub bamProcess {
 	my (
 		$threadNum,      $fileListRef,     $regionDatabaseRef,
 		$inBedSign,      $isdepth,         $samtoolsBin,
-		$caculateMethod, $totalExonLength, $nod, $targetregionfile, $logRef
+		$caculateMethod, $totalExonLength, $nod, $targetregionfile, $no_batch, $logRef
 	) = @_;
 	pInfo( "Thread $threadNum started", $logRef );
 	while (1) {

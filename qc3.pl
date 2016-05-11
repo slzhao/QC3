@@ -31,7 +31,6 @@ Options:
 	-i	input filelist     Required. Input file. In fastq QC or bam QC, it should be a file listing all analyzed files (supports .fastq, .fastq.gz, and .bam files). To analyze the pair-end fastq files in fastq QC, the two files for the same sample should be listed together in this file. In vcf QC, it should be a vcf file.
 	-o	output directory   Required. Output directory for QC result. If the directory doesn't exist, it would be created.
 	-t	threads            Optional. Threads used in analysis. The default value is 4. This parameter only valid for fastq and bam QC. Only one thread will be used in vcf QC.
-	
 	-h	help               Optional. Show this information.
 
 To see help information for each module, please use -m parameter to specify module.
@@ -48,7 +47,7 @@ my (
 	$targetregionfile, $gtffile,     $isdepth,    $nod,
         $caculateMethod,   $vcfCfgFile,  $method,     $maxThreads,
         $annovarDb,        $usePASS,     $xym,        $rePlot,
-        $showHelp
+        $no_batch,         $showHelp
 ) = ();
 our @log : shared;
 
@@ -63,6 +62,7 @@ GetOptions(
 	"g=s"  => \$gtffile,
 	"d"    => \$isdepth,
 	"nod"  => \$nod,
+	"no_batch"  => \$no_batch,
 	"cm=i" => \$caculateMethod,
 
 	"c:s" => \$vcfCfgFile,
@@ -125,6 +125,7 @@ if ( !defined $targetregionfile and defined $nod ) {
 }
 if ( !defined $isdepth ) { $isdepth = 0; }
 if ( !defined $nod ) { $nod = 0; }
+if ( !defined $no_batch ) { $no_batch = 0; }
 if ( !defined $usePASS ) { $usePASS = 0; }
 if ( !defined $xym ) { $xym = 0; }
 if ( !defined $method )  { $method  = 1; }
@@ -207,6 +208,7 @@ elsif ( $module eq "b" ) {
 	$config{'gtffile'}          = $gtffile;
 	$config{'isdepth'}          = $isdepth;
 	$config{'nod'}              = $nod;
+	$config{'no_batch'}         = $no_batch;
 	my $rResult = &bamSummary( $filelist, \%config );
 	if ( $rResult != 0 ) {
 		pInfo(
