@@ -568,7 +568,7 @@ sub getbammetric {
 		# add a variable to the samtools depth line for adapting it in case of  -nod option
 		my $nod_part;
 		if ($nod) { $nod_part = "-b $targetregionfile" } else { $nod_part = "" }
-		open( DEPTH, "$samtoolsBin depth $nod_part $in|" ) or die $!;
+		open( DEPTH, "$samtoolsBin depth -a $nod_part $in|" ) or die $!;
 		my ( $totaldepth, $ontargetdepth, $offtargetdepth,
 			$offtargetintrondepth, $offtargetintergenicdepth,
 			$offtargetmitodepth );
