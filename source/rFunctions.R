@@ -54,7 +54,7 @@ plot_dataFrame<-function(rawData,colBox=5:ncol(rawData),colList=NA,cex=1,dolog=F
 			winNrow=(length(colList)+1)/2
 		}
 		rawData<-as.matrix(rawData)
-		png(paste("summary_lines",nobatch,".png",sep=""),width=800,height=winNrow*400,res=res)
+		png(paste("summary_lines",".png",sep=""),width=800,height=winNrow*400,res=res)
 		par(mfrow=c(winNrow,2))
 		par(mar=c(7, 4, 2, 1), xpd=TRUE)
 		legendText<-colnames(rawData)[colList[[1]]]
