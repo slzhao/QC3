@@ -241,7 +241,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 
 		my $colNumber = $resultOut[0] =~ y/\t//;
 		if (   ( $isdepth and $colNumber > 32 )
-			or ( !$isdepth and $colNumber > 23 ) ) 
+			or ( !$isdepth and $colNumber > 23 ) )
 		{    #result with AS
 			print OUT "\t";
 			print OUT join "\t",
@@ -678,8 +678,12 @@ sub getbammetric {
 		return ( \@returnValue );
 	}
 	else {
+
+		my $SM="";
+		$SM=`samtools view -H $in | grep \@RG | head -1 | sed "s/.*SM:\\([^\\t]*\\).*/\\1/" | tr -d '[:space:]'`;
+
 		my @returnValue = (
-			$label,                     $instrument,
+			$label,                     $SM,	$instrument,
 			$runNumber,                 $flowcell,
 			$lane,                      $ummappedNorm,
 			$totalNorm,                     $ontargetNorm,
