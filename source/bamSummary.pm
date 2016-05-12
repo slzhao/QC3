@@ -240,8 +240,8 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 		  );
 
 		my $colNumber = $resultOut[0] =~ y/\t//;
-		if (   ( $isdepth and $colNumber > 32 ) #modify
-			or ( !$isdepth and $colNumber > 23 ) ) #modify
+		if (   ( $isdepth and $colNumber > 32 )
+			or ( !$isdepth and $colNumber > 23 ) ) 
 		{    #result with AS
 			print OUT "\t";
 			print OUT join "\t",
