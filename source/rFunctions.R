@@ -4,7 +4,7 @@
 ###############################################################################
 
 
-plot_dataFrame<-function(rawData,colBox=5:ncol(rawData),colList=NA,cex=1,dolog=F,res=150,nobatch=1) {
+plot_dataFrame<-function(rawData,colBox=5:ncol(rawData),colList=NA,cex=1,dolog=F,res=150,nobatch=1,useSM=0) {
 	row.names(rawData)<-gsub(".bam","",row.names(rawData))
 	temp<-strsplit(row.names(rawData),"/")
 	if (length(unique(sapply(temp,function(x) x[length(x)])))<nrow(rawData)) {
@@ -20,6 +20,7 @@ plot_dataFrame<-function(rawData,colBox=5:ncol(rawData),colList=NA,cex=1,dolog=F
 	} else {
 		row.names(rawData)<-sapply(temp,function(x) x[length(x)])
 	}
+  if (useSM==1) row.names(rawData)<-rawData[,"SM"]
 	cex.axis<-c(cex,cex,cex-0.3,cex)
 	if(nobatch!=1){
 		for (x in colBox) {

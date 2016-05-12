@@ -32,6 +32,7 @@ sub bamSummary {
 	my $isdepth          = $config->{'isdepth'};
 	my $nod              = $config->{'nod'};
 	my $no_batch         = $config->{'no_batch'};
+	my $use_SM           = $config->{'use_SM'};
 	my $RBin             = $config->{'RBin'};
 	my $samtoolsBin      = $config->{'samtoolsBin'};
 
@@ -60,6 +61,7 @@ Options:
 	-d	                      Optional. The depth in on-/off-target regions will be calculated. QC3 will not calculate depth by default, because it may take a long time.
 	-nod	no off-target depth Optional. The depth in off-target regions will not be calculated to save time.
 	-no_batch                 Optional. The batch effect part of figures will not be plotted (considering BAM file not informative).
+	-use_SM                   Optional. Extract SM field from bam file and use it as sample name.
 
 	-h	                      Optional. Show this information.
 
@@ -200,7 +202,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 				\&bamProcess,     $x,              \@fileList,
 				\%regionDatabase, $inBedSign,      $isdepth,
 				$samtoolsBin,     $caculateMethod, $totalExonLength, $nod, $targetregionfile,
-				$no_batch,        $logRef
+				$no_batch,        $use_SM,         $logRef
 			  );
 		}
 
@@ -211,6 +213,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 		print OUT join "\t",
 		  (
 			"Sample",
+			"SM",
 			"Instrument",
 			"Run",
 			"Flowcell",
@@ -237,8 +240,8 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 		  );
 
 		my $colNumber = $resultOut[0] =~ y/\t//;
-		if (   ( $isdepth and $colNumber > 32 )
-			or ( !$isdepth and $colNumber > 23 ) )
+		if (   ( $isdepth and $colNumber > 32 ) #modify
+			or ( !$isdepth and $colNumber > 23 ) ) #modify
 		{    #result with AS
 			print OUT "\t";
 			print OUT join "\t",
@@ -281,7 +284,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 	my $Rsource =
 	  dirname($0) . "/source/rFunctions.R " . dirname($0) . $rSourceLocation;
 	my $rResult = system(
-"cat $Rsource | $RBin --vanilla --slave --args $resultDir $no_batch 1>$resultDir/bamResult/bamSummary.rLog 2>$resultDir/bamResult/bamSummary.rLog"
+"cat $Rsource | $RBin --vanilla --slave --args $resultDir $no_batch $use_SM 1>$resultDir/bamResult/bamSummary.rLog 2>$resultDir/bamResult/bamSummary.rLog"
 	);
 	pInfo( "Finish bam summary!", $logRef );
 	return ($rResult);
@@ -289,7 +292,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 
 sub getbammetric {
 	my ( $in, $regionDatabaseRef, $inBedSign, $isdepth, $samtoolsBin,
-		$caculateMethod, $totalExonLength, $nod, $targetregionfile )
+		$caculateMethod, $totalExonLength, $nod, $targetregionfile, $use_SM )
 	  = @_;
 	my ( $total, $ontarget, $offtarget, $ummapped, $offtargetintron,
 		$offtargetintergenic, $offtargetmito )
@@ -641,8 +644,11 @@ sub getbammetric {
 		my $exonRatio2 = $ontargetD10num / $totalExonLength;
 		my $exonRatio3 = $ontargetD30num / $totalExonLength;
 
+		my $SM="";
+		$SM=`samtools view -H $in | grep \@RG | head -1 | sed "s/.*SM:\\([^\\t]*\\).*/\\1/" | tr -d '[:space:]'`;
+
 		my @returnValue = (
-			$label,                     $instrument,
+			$label,                     $SM, $instrument,
 			$runNumber,                 $flowcell,
 			$lane,                      $ummappedNorm,
 			$totalNorm,                     $ontargetNorm,
@@ -700,7 +706,7 @@ sub bamProcess {
 	my (
 		$threadNum,      $fileListRef,     $regionDatabaseRef,
 		$inBedSign,      $isdepth,         $samtoolsBin,
-		$caculateMethod, $totalExonLength, $nod, $targetregionfile, $no_batch, $logRef
+		$caculateMethod, $totalExonLength, $nod, $targetregionfile, $no_batch, $use_SM, $logRef
 	) = @_;
 	pInfo( "Thread $threadNum started", $logRef );
 	while (1) {
@@ -717,7 +723,7 @@ sub bamProcess {
 		pInfo( "Thread $threadNum processing $file", $logRef );
 		my ($metric) =
 		  &getbammetric( $file, $regionDatabaseRef, $inBedSign, $isdepth,
-			$samtoolsBin, $caculateMethod, $totalExonLength, $nod, $targetregionfile );
+			$samtoolsBin, $caculateMethod, $totalExonLength, $nod, $targetregionfile, $use_SM );
 
 		#return result here
 		{

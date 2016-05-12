@@ -47,7 +47,7 @@ my (
 	$targetregionfile, $gtffile,     $isdepth,    $nod,
         $caculateMethod,   $vcfCfgFile,  $method,     $maxThreads,
         $annovarDb,        $usePASS,     $xym,        $rePlot,
-        $no_batch,         $showHelp
+        $no_batch,         $use_SM,      $showHelp
 ) = ();
 our @log : shared;
 
@@ -63,6 +63,7 @@ GetOptions(
 	"d"    => \$isdepth,
 	"nod"  => \$nod,
 	"no_batch"  => \$no_batch,
+	"use_SM"	=>	\$use_SM,
 	"cm=i" => \$caculateMethod,
 
 	"c:s" => \$vcfCfgFile,
@@ -126,6 +127,7 @@ if ( !defined $targetregionfile and defined $nod ) {
 if ( !defined $isdepth ) { $isdepth = 0; }
 if ( !defined $nod ) { $nod = 0; }
 if ( !defined $no_batch ) { $no_batch = 0; }
+if ( !defined $use_SM ) { $use_SM = 0; }
 if ( !defined $usePASS ) { $usePASS = 0; }
 if ( !defined $xym ) { $xym = 0; }
 if ( !defined $method )  { $method  = 1; }
@@ -209,6 +211,7 @@ elsif ( $module eq "b" ) {
 	$config{'isdepth'}          = $isdepth;
 	$config{'nod'}              = $nod;
 	$config{'no_batch'}         = $no_batch;
+	$config{'use_SM'}         = $use_SM;
 	my $rResult = &bamSummary( $filelist, \%config );
 	if ( $rResult != 0 ) {
 		pInfo(
