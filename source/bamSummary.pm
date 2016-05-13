@@ -31,6 +31,9 @@ sub bamSummary {
 	my $resultDir        = $config->{'resultDir'};
 	my $isdepth          = $config->{'isdepth'};
 	my $nod              = $config->{'nod'};
+	my $d_cumul1         = $config->{'d_cumul1'};
+	my $d_cumul2         = $config->{'d_cumul2'};
+	my $d_cumul3         = $config->{'d_cumul3'};
 	my $no_batch         = $config->{'no_batch'};
 	my $use_SM           = $config->{'use_SM'};
 	my $RBin             = $config->{'RBin'};
@@ -62,6 +65,7 @@ Options:
 	-nod	no off-target depth Optional. The depth in off-target regions will not be calculated to save time.
 	-no_batch                 Optional. The batch effect part of figures will not be plotted (considering BAM file not informative).
 	-use_SM                   Optional. Extract SM field from bam file and use it as sample name.
+	-d_cumul                  Optional. Depth values for cumulative distribution computation. Put 3 values if format: -d_cumul 0,10,30 (default values).
 
 	-h	                      Optional. Show this information.
 
@@ -201,8 +205,8 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 			  threads->new(
 				\&bamProcess,     $x,              \@fileList,
 				\%regionDatabase, $inBedSign,      $isdepth,
-				$samtoolsBin,     $caculateMethod, $totalExonLength, $nod, $targetregionfile,
-				$no_batch,        $use_SM,         $logRef
+				$samtoolsBin,     $caculateMethod, $totalExonLength, $nod,      $targetregionfile,
+				$no_batch,        $use_SM,         $d_cumul1,        $d_cumul2, $d_cumul3,          $logRef
 			  );
 		}
 
@@ -264,9 +268,9 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 				"Off-target-intron($methodText Depth)",
 				"Off-target-intergenic($methodText Depth)",
 				"Off-target-mito($methodText Depth)",
-				"On-target percent (Depth larger than 0)",
-				"On-target percent (Depth larger than 10)",
-				"On-target percent (Depth larger than 30)\n"
+				"On-target percent (Depth larger than $d_cumul1)",
+				"On-target percent (Depth larger than $d_cumul2)",
+				"On-target percent (Depth larger than $d_cumul3)\n"
 			  );
 		}
 		else {
@@ -292,7 +296,7 @@ For more information, please refer to the readme file in QC3 directory. Or visit
 
 sub getbammetric {
 	my ( $in, $regionDatabaseRef, $inBedSign, $isdepth, $samtoolsBin,
-		$caculateMethod, $totalExonLength, $nod, $targetregionfile, $use_SM )
+		$caculateMethod, $totalExonLength, $nod, $targetregionfile, $use_SM, $d_cumul1, $d_cumul2, $d_cumul3 )
 	  = @_;
 	my ( $total, $ontarget, $offtarget, $ummapped, $offtargetintron,
 		$offtargetintergenic, $offtargetmito )
@@ -578,8 +582,8 @@ sub getbammetric {
 			$offtargetintrondepth, $offtargetintergenicdepth,
 			$offtargetmitodepth );
 		my (
-			$totalnum,               $ontargetnum,
-			$ontargetD10num,         $ontargetD30num,
+			$totalnum,               $ontargetnum,   $ontargetnum1,
+			$ontargetnum2,           $ontargetnum3,
 			$offtargetnum,           $offtargetintronnum,
 			$offtargetintergenicnum, $offtargetmitonum
 		) = ( 0, 0, 0, 0, 0, 0, 0, 0 );    # used as denominator
@@ -601,8 +605,9 @@ sub getbammetric {
 				$ontargetnum++;
 				&storeData( $depth, $ontargetdepth, $caculateMethod );
 
-				if ( $depth > 10 ) { $ontargetD10num++; }
-				if ( $depth > 30 ) { $ontargetD30num++; }
+				if ( $depth > $d_cumul1 ) { $ontargetnum1++; }
+				if ( $depth > $d_cumul2 ) { $ontargetnum2++; }
+				if ( $depth > $d_cumul3 ) { $ontargetnum3++; }
 			}
 			else {
 				$offtargetnum++;
@@ -640,9 +645,9 @@ sub getbammetric {
 		  findMedianMean( $offtargetmitodepth, $offtargetmitonum,
 			$caculateMethod );
 
-		my $exonRatio1 = $ontargetnum / $totalExonLength;
-		my $exonRatio2 = $ontargetD10num / $totalExonLength;
-		my $exonRatio3 = $ontargetD30num / $totalExonLength;
+		my $exonRatio1 = $ontargetnum1 / $totalExonLength;
+		my $exonRatio2 = $ontargetnum2 / $totalExonLength;
+		my $exonRatio3 = $ontargetnum3 / $totalExonLength;
 
 		my $SM="";
 		$SM=`samtools view -H $in | grep \@RG | head -1 | sed "s/.*SM:\\([^\\t]*\\).*/\\1/" | tr -d '[:space:]'`;
@@ -710,7 +715,8 @@ sub bamProcess {
 	my (
 		$threadNum,      $fileListRef,     $regionDatabaseRef,
 		$inBedSign,      $isdepth,         $samtoolsBin,
-		$caculateMethod, $totalExonLength, $nod, $targetregionfile, $no_batch, $use_SM, $logRef
+		$caculateMethod, $totalExonLength, $nod, $targetregionfile, $no_batch, $use_SM,
+		$d_cumul1, $d_cumul2, $d_cumul3, $logRef
 	) = @_;
 	pInfo( "Thread $threadNum started", $logRef );
 	while (1) {
@@ -727,7 +733,8 @@ sub bamProcess {
 		pInfo( "Thread $threadNum processing $file", $logRef );
 		my ($metric) =
 		  &getbammetric( $file, $regionDatabaseRef, $inBedSign, $isdepth,
-			$samtoolsBin, $caculateMethod, $totalExonLength, $nod, $targetregionfile, $use_SM );
+			$samtoolsBin, $caculateMethod, $totalExonLength, $nod, $targetregionfile, $use_SM,
+			$d_cumul1, $d_cumul2, $d_cumul3 );
 
 		#return result here
 		{

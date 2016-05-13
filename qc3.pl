@@ -47,7 +47,7 @@ my (
 	$targetregionfile, $gtffile,     $isdepth,    $nod,
         $caculateMethod,   $vcfCfgFile,  $method,     $maxThreads,
         $annovarDb,        $usePASS,     $xym,        $rePlot,
-        $no_batch,         $use_SM,      $showHelp
+        $no_batch,         $use_SM,      $d_cumul,		$showHelp
 ) = ();
 our @log : shared;
 
@@ -62,6 +62,7 @@ GetOptions(
 	"g=s"  => \$gtffile,
 	"d"    => \$isdepth,
 	"nod"  => \$nod,
+	"d_cumul=s" => \$d_cumul,
 	"no_batch"  => \$no_batch,
 	"use_SM"	=>	\$use_SM,
 	"cm=i" => \$caculateMethod,
@@ -126,6 +127,9 @@ if ( !defined $targetregionfile and defined $nod ) {
 }
 if ( !defined $isdepth ) { $isdepth = 0; }
 if ( !defined $nod ) { $nod = 0; }
+if ( !defined $d_cumul ) { $d_cumul = "0,10,30"; }
+my @d_cumul_array = split(',', $d_cumul);
+
 if ( !defined $no_batch ) { $no_batch = 0; }
 if ( !defined $use_SM ) { $use_SM = 0; }
 if ( !defined $usePASS ) { $usePASS = 0; }
@@ -210,8 +214,11 @@ elsif ( $module eq "b" ) {
 	$config{'gtffile'}          = $gtffile;
 	$config{'isdepth'}          = $isdepth;
 	$config{'nod'}              = $nod;
+	$config{'d_cumul1'}         = $d_cumul_array[0];
+	$config{'d_cumul2'}         = $d_cumul_array[1];
+	$config{'d_cumul3'}         = $d_cumul_array[2];
 	$config{'no_batch'}         = $no_batch;
-	$config{'use_SM'}         = $use_SM;
+	$config{'use_SM'}           = $use_SM;
 	my $rResult = &bamSummary( $filelist, \%config );
 	if ( $rResult != 0 ) {
 		pInfo(
