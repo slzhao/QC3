@@ -152,7 +152,7 @@ Release version 1.10
 Release version 1.00
  * Documents were improved;
  * The codes in bam QC were improved;
- 
+
 <a name="RC13">
 ## Release candidate (RC) version 1.3 on August 06, 2013
 Release candidate version 1.3 for test
@@ -215,7 +215,7 @@ Otherwise, for example, if HTML::Template package was missing, it may look like 
 	ok   threads::shared
 
 Then you need to install the missing packages from [CPAN](http://www.cpan.org/). A program was also provided to make the package installation more convenient.
-	
+
 	#if HTML::Template was missing
 	bash install.modules HTML::Template
 
@@ -266,7 +266,7 @@ The ANNOVAR database files were also needed for ANNOVAR annotation. Please refer
 
 <a name="drd"/>
 ## Download required database ##
-A gtf and/or a bed file was taken as database files in bam QC, and the position annotation for each sequence was exported from them. The chromosomes and positions information in these files should be exactly same with the bam files (for example, chromosome 1 can't be represented as chr1 in one file but 1 in another file). At least one of gtf/bed should be provided in bam QC. These files could be downloaded at [UCSC table browser](http://genome.ucsc.edu/cgi-bin/hgTables?command=start). The format of these files were: 
+A gtf and/or a bed file was taken as database files in bam QC, and the position annotation for each sequence was exported from them. The chromosomes and positions information in these files should be exactly same with the bam files (for example, chromosome 1 can't be represented as chr1 in one file but 1 in another file). At least one of gtf/bed should be provided in bam QC. These files could be downloaded at [UCSC table browser](http://genome.ucsc.edu/cgi-bin/hgTables?command=start). The format of these files were:
 
 	#bed file:
 	#Column1	    Column2         Column3
@@ -281,7 +281,7 @@ A gtf and/or a bed file was taken as database files in bam QC, and the position 
 The usage of QC3 software could be:
 
 	perl qc3.pl -m module -i inputFile -o outputDir [-t threads -rp] [some other parameters]
-	
+
 	-m [module]         Required. QC module used. It should be f (fastq QC), b (bam QC), or v (vcf QC).
 	-i [inputFile]      Required. Input file. In fastq QC or bam QC, it should be a file listing all analyzed files (supports .fastq, .fastq.gz, and .bam files). To analyze the pair-end fastq files in fastq QC, the two files for the same sample should be listed together in this file. In vcf QC, it should be a vcf file.
 	-o [outputDir]      Required. Output directory for QC result. If the directory doesn't exist, it would be created.
@@ -290,7 +290,7 @@ The usage of QC3 software could be:
 	-h	                Optional. Show help information for each module.
 
 <a name="if"/>
-## input file 
+## input file
 In fastq QC or bam QC, the input file should be a file listing all analyzed files (supports .fastq, .fastq.gz for fastq QC, and .bam for bam QC). To analyze the pair-end fastq files in fastq QC, the two files for the same sample should be listed together in this file. In vcf QC, the input file should be a vcf file.
 
 Input file for fastq QC or bam QC also supports label for each file listed (The labels are optional). The label should follow the file and separated by a Tab. The labels will be used in the report instead of the file names. So that the report will be much easier to understand. An example was listed here:
@@ -304,7 +304,7 @@ Input file for fastq QC or bam QC also supports label for each file listed (The 
 Here is more details for each module:
 
 <a name="fqc"/>
-## fastq QC 
+## fastq QC
 
 	perl qc3.pl -m f -i inputFileList -o outputDir -t threads
 
@@ -320,6 +320,9 @@ Here is more details for each module:
 	-cm [int]	    Optional. Calculation method for data summary, should be 1 or 2. Method 1 means mean and method 2 means median. The default value is 1.
 	-d				Optional. The depth in on-/off-target regions will be calculated. QC3 will not calculate depth by default, because it may take a long time.
 	-nod            Optional. Do not compute the depth in off-target regions for saving time (no off-target depth) If set, the user must provide a bed file for target regions.
+  -no_batch                 Optional. The batch effect part of figures will not be plotted (considering BAM file not informative).
+	-use_SM                   Optional. Extract SM field from bam file and use it as sample name.
+	-d_cumul                  Optional. Depth values for cumulative distribution computation. Put 3 values if format: -d_cumul 0,10,30 (default values).
 
 **Please note: At least one targetregion file or gtf file should be provided for bam QC**. So the user can use (-r) or (-g) or (-r and -g) option for bam QC.
 
@@ -342,7 +345,7 @@ You need to download and extract it to a directory. Then the example code for ru
 <a name="ded"/>
 ## download example data ##
 	#download and extract example data into exampleDir
-	mkdir exampleDir	
+	mkdir exampleDir
 	cd exampleDir
 	wget http://sourceforge.net/projects/qc3/files/example.tar.gz/download
 	tar zxvf example.tar.gz
@@ -366,23 +369,23 @@ You need to download and extract it to a directory. Then the example code for ru
 
 	#a simple example, with only bed file
 	perl qc3Dir/qc3.pl -m b -i example_bam_list.txt -r ../bamQcDatabase/hg19_protein_coding.bed.Part -o example_bam_result1
-	
+
 	#a simple example, with only gtf file
 	perl qc3Dir/qc3.pl -m b -i example_bam_list.txt -g ../bamQcDatabase/Homo_sapiens.GRCh37.63_protein_coding_chr1-22-X-Y-M.gtf.Part -o example_bam_result2
-	
+
 	#a example with both bed and gtf file, and will calculate the depth
 	perl qc3Dir/qc3.pl -m b -i example_bam_list.txt -r ../bamQcDatabase/hg19_protein_coding.bed.Part -g ../bamQcDatabase/Homo_sapiens.GRCh37.63_protein_coding_chr1-22-X-Y-M.gtf.Part -o example_bam_result3
 
 <a name="vqcE"/>
 ## vcf QC
-	
+
 	#assume qc3.pl in qc3Dir, examples in exampleDir
 	cd exampleDir
 	cd vcf
 
 	#a simple example, will not perform ANNOVAR annotation
 	perl qc3Dir/qc3.pl -m v -i CV-7261.vcf.top40000.txt -o example_vcf_result1
-	
+
 	#assume ANNOVAR database in annovarDatabase, will perform ANNOVAR annotation
 	perl qc3Dir/qc3.pl -m v -i CV-7261.vcf.top40000.txt -s 2 -a annovarDatabase -o example_vcf_result2
 
@@ -408,12 +411,12 @@ These 11 bam files including 10 primary solid tumor samples and 1 blood derived 
 <a name="TfqcE"/>
 ## fastq QC ##
 The fastq files were first generated based on the 11 bam files. Then fastq QC results were generated with following codes:
- 
+
 	#assume qc3.pl in qc3Dir, fastq files in fastqDir and listed in 11fastq.list file
 	cd fastqDir
 	perl qc3Dir/qc3.pl -m f -t 11 -i 11fastq.list -o 11BRCA_fastq_result
 
-The fastq QC results can be visited [Here](http://htmlpreview.github.io/?https://github.com/slzhao/QC3/blob/master/reportExample/fastq/fastqReport.html) 
+The fastq QC results can be visited [Here](http://htmlpreview.github.io/?https://github.com/slzhao/QC3/blob/master/reportExample/fastq/fastqReport.html)
 
 <a name="TbqcE"/>
 ## bam QC
@@ -428,9 +431,9 @@ The bam QC results can be visited [Here](http://htmlpreview.github.io/?https://g
 <a name="TvqcE"/>
 ## vcf QC
 The vcf file was first generated based on the 11 bam files by GATK. Then vcf QC results were generated with following codes:
- 	
+
 	#assume qc3.pl in qc3Dir, vcf files in vcfDir
-	cd vcfDir	
+	cd vcfDir
 	#assume ANNOVAR database in annovarDatabase, will perform ANNOVAR annotation
 	perl qc3Dir/qc3.pl -m v -i vcfFile -a annovarDatabase -o 11BRCA_vcf_result
 
@@ -439,15 +442,15 @@ The vcf QC results can be visited [Here](http://htmlpreview.github.io/?https://g
 <a name="Results"/>
 # Results #
 The first section in all reports was the date and command for report generation. So that the user can easily reproduce the report.
- 
+
 <a name="ifr"/>
 ## Introduction for fastq QC result ##
 
 An example report could be accessed at [Here](http://htmlpreview.github.io/?https://github.com/slzhao/QC3/blob/master/reportExample/fastq/fastqReport.html)
 
-fastq QC report was constituted by three sections. 
+fastq QC report was constituted by three sections.
 
-The "Result Table" section displayed the instrument, run number, flowcell, lane, total reads, base quality score and GC content for each fastq file. 
+The "Result Table" section displayed the instrument, run number, flowcell, lane, total reads, base quality score and GC content for each fastq file.
 
 The "Sequence quality and content" section indicated the per base sequence quality and per base nucleotide content for each fastq file (For pair end results the two files indicating one sample were plotted in the same figure).
 
@@ -458,9 +461,9 @@ The "Batch effect" section indicated the statistics of reads, BQ and GC by diffe
 
 An example report could be accessed at [Here](http://htmlpreview.github.io/?https://github.com/slzhao/QC3/blob/master/reportExample/bam/bamReport.html)
 
-bam QC report was constituted by three sections. 
+bam QC report was constituted by three sections.
 
-The "Result Table" section displayed the instrument, run number, flowcell, lane, total reads, on/off target reads, intron/intergenic/mito reads,  for each bam file. 
+The "Result Table" section displayed the instrument, run number, flowcell, lane, total reads, on/off target reads, intron/intergenic/mito reads,  for each bam file.
 
 The "Distribution" section visualized the distributions of statistics in all experiments.
 
@@ -471,7 +474,7 @@ The "Batch effect" section indicated the statistics of reads, on-target and off-
 
 An example report could be accessed at [Here](http://htmlpreview.github.io/?https://github.com/slzhao/QC3/blob/master/reportExample/vcf/vcfReport.html)
 
-vcf QC report was constituted by seven sections. 
+vcf QC report was constituted by seven sections.
 
 The "Filter" section displayed the arguments for the filter of vcf files.
 

@@ -1,5 +1,5 @@
 # TODO: Add comment
-# 
+#
 # Author: zhaos
 ###############################################################################
 
@@ -15,19 +15,19 @@ dir.create(figureDir, showWarnings = FALSE)
 oldwd<-getwd()
 setwd(figureDir)
 file.remove(list.files("."))
-if (ncol(allResult)>=35) {
-	colList<-list(5:11,c(12:14,NA,15:17),c(18:20,NA,21:23),c(24:26,NA,27:29),c(30:32,NA,33:35))
-} else if (ncol(allResult)>=29) {
-	colList<-list(5:11,c(12:14,NA,15:17),c(18:20,NA,21:23),c(24:26,NA,27:29))
+if (ncol(allResult)>=35+1) {
+	colList<-lapply(list(5:11,c(12:14,NA,15:17),c(18:20,NA,21:23),c(24:26,NA,27:29),c(30:32,NA,33:35)),function(x){x+1})
+} else if (ncol(allResult)>=29+1) {
+	colList<-lapply(list(5:11,c(12:14,NA,15:17),c(18:20,NA,21:23),c(24:26,NA,27:29)),function(x){x+1})
 } else {
-	colList<-list(5:11,c(12:14,NA,15:17),c(18:20,NA,21:23))
+	colList<-lapply(list(5:11,c(12:14,NA,15:17),c(18:20,NA,21:23)),function(x){x+1})
 }
-if (ncol(allResult)>=35) {
-	colBox<-5:35
-} else if (ncol(allResult)>=29) {
-	colBox<-5:29
+if (ncol(allResult)>=35+1) {
+	colBox<-(5:35)+1
+} else if (ncol(allResult)>=29+1) {
+	colBox<-(5:29)+1
 } else {
-	colBox<-5:ncol(allResult)
+	colBox<-(5:ncol(allResult))+1
 }
-plot_dataFrame(allResult,colBox=colBox,colList=colList)
+plot_dataFrame(allResult,colBox=colBox,colList=colList,nobatch=commandArgs()[6],useSM=commandArgs()[7])
 setwd(oldwd)
