@@ -10,7 +10,7 @@ Table of Content
  * [Release Version 1.26](#R126)
  * [Release Version 1.25](#R125)
  * [Release Version 1.24](#R124)
- * [Release Version 1.23](#R123)
+ * [Release Version 1.23](#R123) 
  * [Release Version 1.22](#R122)
  * [Release Version 1.21](#R121)
  * [Release Version 1.20](#R120)
@@ -320,9 +320,9 @@ Here is more details for each module:
 	-cm [int]	    Optional. Calculation method for data summary, should be 1 or 2. Method 1 means mean and method 2 means median. The default value is 1.
 	-d				Optional. The depth in on-/off-target regions will be calculated. QC3 will not calculate depth by default, because it may take a long time.
 	-nod            Optional. Do not compute the depth in off-target regions for saving time (no off-target depth) If set, the user must provide a bed file for target regions.
-  -no_batch                 Optional. The batch effect part of figures will not be plotted (considering BAM file not informative).
-	-use_SM                   Optional. Extract SM field from bam file and use it as sample name.
-	-d_cumul                  Optional. Depth values for cumulative distribution computation. Put 3 values if format: -d_cumul 0,10,30 (default values).
+	-no_batch       Optional. The batch effect part of figures will not be plotted (considering BAM file not informative).
+	-use_SM         Optional. Extract SM field from bam file and use it as sample name.
+	-d_cumul        Optional. Depth values for cumulative distribution computation. Put 3 values if format: -d_cumul 0,10,30 (default values).
 
 **Please note: At least one targetregion file or gtf file should be provided for bam QC**. So the user can use (-r) or (-g) or (-r and -g) option for bam QC.
 
